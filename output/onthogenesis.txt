@@ -1,0 +1,86 @@
+Step: 0
+    add stem sensor sensor forward left right
+Step: 1
+    cell_0: stem
+        gene Split
+            activated
+        gene ConnectLR
+        gene ConnectForward
+    cell_1: sensor
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_2: sensor
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_3: forward
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_4: left
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_5: right
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+
+express
+    cell_0: stem
+        E_NAME("n0_sen") expressed.
+        E_SPLIT("n1_forw") expressed.
+    cell_1: sensor
+    cell_2: sensor
+    cell_3: forward
+    cell_4: left
+    cell_5: right
+Step: 2
+    cell_0: n0_sen
+        gene Split
+        gene ConnectLR
+            activated
+        gene ConnectForward
+    cell_1: sensor
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_2: sensor
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_3: forward
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_4: left
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_5: right
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_6: n1_forw
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+            activated
+
+express
+    cell_0: n0_sen
+        E_DENDRITE("sensor") expressed.
+        E_AXON("left") expressed.
+        1
+        E_AXON("right") expressed.
+        1
+    cell_1: sensor
+    cell_2: sensor
+    cell_3: forward
+    cell_4: left
+    cell_5: right
+    cell_6: n1_forw
+        E_DENDRITE("sensor") expressed.
+        E_AXON("forward") expressed.
+        1
