@@ -24,7 +24,7 @@ private:
         size_t cell_id;
     };
     bool SearchProtein( const Ogre::String name, const int x, const int y, std::vector< PowerProtein >& powers );
-    bool FindPlaceForCell( const int x, const int y, int &new_x, int &new_y );
+    bool FindPlaceForCell( const int x, const int y, const int radius, int &new_x, int &new_y );
     bool IsCell( const int x, const int y );
 
 public:

@@ -83,38 +83,38 @@ Ontogenesis::LoadNetwork( Entity* entity )
     m_Network.push_back( cell );
 
     cell.name = "sensor";
-    cell.x = -20;
-    cell.y = -10;
+    cell.x = -5;
+    cell.y = -3;
     cell.protein = "sensor";
-    cell.protein_radius = 30;
+    cell.protein_radius = 8;
     m_Network.push_back( cell );
 
     cell.name = "sensor";
-    cell.x = -20;
-    cell.y = 10;
+    cell.x = -5;
+    cell.y = 3;
     cell.protein = "sensor";
-    cell.protein_radius = 30;
+    cell.protein_radius = 8;
     m_Network.push_back( cell );
 
     cell.name = "forward";
-    cell.x = 30;
+    cell.x = 5;
     cell.y = 0;
     cell.protein = "forward";
-    cell.protein_radius = 40;
+    cell.protein_radius = 6;
     m_Network.push_back( cell );
 
     cell.name = "left";
-    cell.x = 10;
-    cell.y = -10;
+    cell.x = 3;
+    cell.y = -3;
     cell.protein = "left";
-    cell.protein_radius = 20;
+    cell.protein_radius = 5;
     m_Network.push_back( cell );
 
     cell.name = "right";
-    cell.x = 10;
-    cell.y = 10;
+    cell.x = 3;
+    cell.y = 3;
     cell.protein = "right";
-    cell.protein_radius = 20;
+    cell.protein_radius = 5;
     m_Network.push_back( cell );
 
     export_script->Log( "Step: 0\n" );
@@ -230,7 +230,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         {
                             int x = 0;
                             int y = 0;
-                            bool place = FindPlaceForCell( m_Network[ i ].x, m_Network[ i ].y, 1, int &x, int &y );
+                            bool place = FindPlaceForCell( m_Network[ i ].x, m_Network[ i ].y, 1, x, y );
                             if( place == true )
                             {
                                 Cell new_cell;
@@ -257,7 +257,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                                 Cell cell = m_Network[ powers[ c ].cell_id ];
                                 int x = 0;
                                 int y = 0;
-                                bool place = FindPlaceForCell( cell.x, cell.y, cell.protein_radius, int &x, int &y );
+                                bool place = FindPlaceForCell( cell.x, cell.y, cell.protein_radius, x, y );
                                 if( place == true )
                                 {
                                     m_Network[ i ].x = x;
@@ -361,9 +361,9 @@ Ontogenesis::LoadNetwork( Entity* entity )
 void
 Ontogenesis::Update()
 {
-    float global_x = 300.0f;
-    float global_y = 300.0f;
-    float scale = 5.0f;
+    float global_x = 600.0f;
+    float global_y = 350.0f;
+    float scale = 20.0f;
 
     for( size_t i = 0; i < m_Network.size(); ++i )
     {
@@ -372,9 +372,9 @@ Ontogenesis::Update()
         float y = global_y + cell.y * scale;
         float radius = 2.0f;
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-        DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
         DEBUG_DRAW.Circle( x, y, cell.protein_radius * scale );
-
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
+        DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
         for( size_t j = 0; j < cell.synapses.size(); ++j )
         {
             Cell cell_con = m_Network[ cell.synapses[ j ].cell_id ];
@@ -388,14 +388,14 @@ Ontogenesis::Update()
 
 
 bool
-Ontogenesis::SearchProtein( const Ogre::String name, const float x, const float y, std::vector< PowerProtein >& powers )
+Ontogenesis::SearchProtein( const Ogre::String name, const int x, const int y, std::vector< PowerProtein >& powers )
 {
     for( size_t i = 0; i < m_Network.size(); ++i )
     {
         if( m_Network[ i ].protein == name )
         {
-            float x2 = m_Network[ i ].x;
-            float y2 = m_Network[ i ].y;
+            int x2 = m_Network[ i ].x;
+            int y2 = m_Network[ i ].y;
             float distance = sqrt( ( x2 - x ) * ( x2 - x ) + ( y2 - y ) * ( y2 - y ) );
             if( distance < m_Network[ i ].protein_radius )
             {

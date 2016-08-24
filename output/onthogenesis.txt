@@ -84,3 +84,4 @@ express
         E_DENDRITE("sensor") expressed.
         E_AXON("forward") expressed.
         1
+        E_MIGRATE("forward") expressed.

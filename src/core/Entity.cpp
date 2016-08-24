@@ -7,9 +7,12 @@
 
 
 Entity::Entity( const float x, const float y ):
+    m_Radius( 15.0f ),
     m_X( x ),
     m_Y( y ),
-    m_Radius( 15.0f ),
+    m_Rotation( 0.0f ),
+    m_ForwardImpulse( 0.0f ),
+    m_RotationImpulse( 0.0f ),
     m_Energy( 100.0f ),
     m_Think( 0.1f )
 {
@@ -63,9 +66,25 @@ Entity::Draw( const unsigned int x, const unsigned int y )
 
 
 float
+Entity::GetRadius() const
+{
+    return m_Radius;
+}
+
+
+
+float
 Entity::GetX() const
 {
     return m_X;
+}
+
+
+
+void
+Entity::SetX( const float x )
+{
+    m_X = x;
 }
 
 
@@ -78,10 +97,58 @@ Entity::GetY() const
 
 
 
-float
-Entity::GetRadius() const
+void
+Entity::SetY( const float y )
 {
-    return m_Radius;
+    m_Y = y;
+}
+
+
+
+float
+Entity::GetRotation() const
+{
+    return m_Rotation;
+}
+
+
+
+void
+Entity::SetRotation( const float rotation )
+{
+    m_Rotation = rotation;
+}
+
+
+
+float
+Entity::GetForwardImpulse() const
+{
+    return m_ForwardImpulse;
+}
+
+
+
+void
+Entity::SetForwardImpulse( const float forward_impulse )
+{
+    m_ForwardImpulse = forward_impulse;
+}
+
+
+
+float
+Entity::GetRotationImpulse() const
+{
+    return m_RotationImpulse;
+}
+
+
+
+void
+Entity::SetRotationImpulse( const float rotation_impulse )
+{
+    m_RotationImpulse = rotation_impulse;
 }
 
 
@@ -90,6 +157,15 @@ float
 Entity::GetEnergy() const
 {
     return m_Energy;
+}
+
+
+
+
+void
+Entity::SetEnergy( const float energy )
+{
+    m_Energy = energy;
 }
 
 
@@ -117,27 +193,5 @@ Entity::AddSynapse( const unsigned int self_id, const Ogre::String type, const f
     else if( type == "energy" )
     {
         m_Network[ self_id ]->AddEnergySynapse( power, inverted );
-    }
-}
-
-
-
-void
-Entity::AddEnergy( float energy )
-{
-    m_Energy += energy;
-    m_Energy = ( m_Energy > 100.0f ) ? 100.0f : m_Energy;
-}
-
-
-
-void
-Entity::Move( const float x, const float y )
-{
-    bool able = EntityManager::getSingleton().CheckMove( this, x, y );
-    if( able == true )
-    {
-        m_X += x;
-        m_Y += y;
     }
 }
