@@ -23,7 +23,9 @@ private:
         float power;
         size_t cell_id;
     };
-    bool SearchProtein( const Ogre::String name, const float x, const float y, std::vector< PowerProtein >& powers );
+    bool SearchProtein( const Ogre::String name, const int x, const int y, std::vector< PowerProtein >& powers );
+    bool FindPlaceForCell( const int x, const int y, int &new_x, int &new_y );
+    bool IsCell( const int x, const int y );
 
 public:
     enum ConditionType
@@ -38,7 +40,7 @@ public:
     {
         E_NAME = 0,
         E_SPLIT,
-        E_MOVEAWAY,
+        E_MIGRATE,
         E_PROTEIN,
         E_DENDRITE,
         E_AXON
@@ -74,18 +76,18 @@ public:
     {
         Cell():
             name( "" ),
-            x( 0.0f ),
-            y( 0.0f ),
+            x( 0 ),
+            y( 0 ),
             protein( "" ),
-            protein_radius( 0.0f )
+            protein_radius( 0 )
         {
         }
 
         Ogre::String name;
-        float x;
-        float y;
+        int x;
+        int y;
         Ogre::String protein;
-        float protein_radius;
+        int protein_radius;
         std::vector< Synapse > synapses;
 
         std::vector< unsigned int > expr_genes;

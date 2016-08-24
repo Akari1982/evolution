@@ -11,6 +11,7 @@ Ontogenesis::Ontogenesis()
     Condition cond;
     Expression expr;
 
+    // Split: C_NAME( "stem" ) -> E_NAME( "n0sen" ) E_SPLIT( "n1_forw" )
     gene.name = "Split";
     cond.type = Ontogenesis::C_NAME;
     cond.name = "stem";
@@ -25,6 +26,7 @@ Ontogenesis::Ontogenesis()
     gene.cond.clear();
     gene.expr.clear();
 
+    // ConnectLR: C_NAME( "n0_sen" ) -> E_DENDRITE( "sensor" ) E_AXON( "left" ) E_AXON( "right" )
     gene.name = "ConnectLR";
     cond.type = Ontogenesis::C_NAME;
     cond.name = "n0_sen";
@@ -42,6 +44,7 @@ Ontogenesis::Ontogenesis()
     gene.cond.clear();
     gene.expr.clear();
 
+    // ConnectForward: C_NAME( "n1_forw" ) -> E_DENDRITE( "sensor" ) E_AXON( "forward" ) E_MIGRATE( "forward" )
     gene.name = "ConnectForward";
     cond.type = Ontogenesis::C_NAME;
     cond.name = "n1_forw";
@@ -50,6 +53,9 @@ Ontogenesis::Ontogenesis()
     expr.name = "sensor";
     gene.expr.push_back( expr );
     expr.type = Ontogenesis::E_AXON;
+    expr.name = "forward";
+    gene.expr.push_back( expr );
+    expr.type = Ontogenesis::E_MIGRATE;
     expr.name = "forward";
     gene.expr.push_back( expr );
     m_Genome.push_back( gene );
@@ -72,43 +78,43 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
     Cell cell;
     cell.name = "stem";
-    cell.x = 0.0f;
-    cell.y = 0.0f;
+    cell.x = 0;
+    cell.y = 0;
     m_Network.push_back( cell );
 
     cell.name = "sensor";
-    cell.x = -20.0f;
-    cell.y = -10.0f;
+    cell.x = -20;
+    cell.y = -10;
     cell.protein = "sensor";
-    cell.protein_radius = 30.0f;
+    cell.protein_radius = 30;
     m_Network.push_back( cell );
 
     cell.name = "sensor";
-    cell.x = -20.0f;
-    cell.y = 10.0f;
+    cell.x = -20;
+    cell.y = 10;
     cell.protein = "sensor";
-    cell.protein_radius = 30.0f;
+    cell.protein_radius = 30;
     m_Network.push_back( cell );
 
     cell.name = "forward";
-    cell.x = 30.0f;
-    cell.y = 0.0f;
+    cell.x = 30;
+    cell.y = 0;
     cell.protein = "forward";
-    cell.protein_radius = 40.0f;
+    cell.protein_radius = 40;
     m_Network.push_back( cell );
 
     cell.name = "left";
-    cell.x = 10.0f;
-    cell.y = -10.0f;
+    cell.x = 10;
+    cell.y = -10;
     cell.protein = "left";
-    cell.protein_radius = 20.0f;
+    cell.protein_radius = 20;
     m_Network.push_back( cell );
 
     cell.name = "right";
-    cell.x = 10.0f;
-    cell.y = 10.0f;
+    cell.x = 10;
+    cell.y = 10;
     cell.protein = "right";
-    cell.protein_radius = 20.0f;
+    cell.protein_radius = 20;
     m_Network.push_back( cell );
 
     export_script->Log( "Step: 0\n" );
@@ -222,23 +228,41 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         break;
                         case Ontogenesis::E_SPLIT:
                         {
-                            Cell new_cell;
-                            new_cell.name = expr.name;
-                            new_cell.x = m_Network[ i ].x;
-                            new_cell.y = m_Network[ i ].y + 10;
-                            m_Network.push_back( new_cell );
-                            changes = true;
-                            export_script->Log( "        E_SPLIT(\"" + expr.name + "\") expressed.\n" );
+                            int x = 0;
+                            int y = 0;
+                            bool place = FindPlaceForCell( m_Network[ i ].x, m_Network[ i ].y, 1, int &x, int &y );
+                            if( place == true )
+                            {
+                                Cell new_cell;
+                                new_cell.name = expr.name;
+                                new_cell.x = x;
+                                new_cell.y = y;
+                                m_Network.push_back( new_cell );
+                                changes = true;
+                                export_script->Log( "        E_SPLIT(\"" + expr.name + "\") expressed.\n" );
+                            }
+                            else
+                            {
+                                export_script->Log( "        E_SPLIT(\"" + expr.name + "\") no place.\n" );
+                            }
                         }
                         break;
-                        case Ontogenesis::E_MOVEAWAY:
+                        case Ontogenesis::E_MIGRATE:
                         {
-                            export_script->Log( "        E_MOVEAWAY(\"" + expr.name + "\") expressed.\n" );
+                            export_script->Log( "        E_MIGRATE(\"" + expr.name + "\") expressed.\n" );
                             std::vector< PowerProtein > powers;
                             SearchProtein( expr.name, m_Network[ i ].x, m_Network[ i ].y, powers );
                             for( size_t c = 0; c < powers.size(); ++c )
                             {
-
+                                Cell cell = m_Network[ powers[ c ].cell_id ];
+                                int x = 0;
+                                int y = 0;
+                                bool place = FindPlaceForCell( cell.x, cell.y, cell.protein_radius, int &x, int &y );
+                                if( place == true )
+                                {
+                                    m_Network[ i ].x = x;
+                                    m_Network[ i ].y = y;
+                                }
                             }
                             powers.clear();
                         }
@@ -346,7 +370,7 @@ Ontogenesis::Update()
         Cell cell = m_Network[ i ];
         float x = global_x + cell.x * scale;
         float y = global_y + cell.y * scale;
-        float radius = 2.0f * scale;
+        float radius = 2.0f;
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
         DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
         DEBUG_DRAW.Circle( x, y, cell.protein_radius * scale );
@@ -387,5 +411,66 @@ Ontogenesis::SearchProtein( const Ogre::String name, const float x, const float 
     {
         return true;
     }
+    return false;
+}
+
+
+
+bool
+Ontogenesis::FindPlaceForCell( const int x, const int y, const int radius, int &new_x, int &new_y )
+{
+    for( int r = 1; r <= radius; ++r )
+    {
+        new_y = y - r;
+        for( int i = -r + 1; i <= r; ++i )
+        {
+            new_x = x + i;
+            if( IsCell( new_x, new_y ) == false )
+            {
+                return true;
+            }
+        }
+        for( int i = -r + 1; i <= r; ++i )
+        {
+            new_y = y + i;
+            if( IsCell( new_x, new_y ) == false )
+            {
+                return true;
+            }
+        }
+        for( int i = r - 1; i <= -r; --i )
+        {
+            new_x = x + i;
+            if( IsCell( new_x, new_y ) == false )
+            {
+                return true;
+            }
+        }
+        for( int i = r - 1; i <= -r; --i )
+        {
+            new_y = y + i;
+            if( IsCell( new_x, new_y ) == false )
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+
+bool
+Ontogenesis::IsCell( const int x, const int y )
+{
+    for( size_t i = 0; i < m_Network.size(); ++i )
+    {
+        if( m_Network[ i ].x == x && m_Network[ i ].y == y )
+        {
+            return true;
+        }
+    }
+
     return false;
 }
