@@ -36,7 +36,8 @@ public:
     void AddNeuron( const Ogre::String& type, const unsigned int x, const unsigned int y );
     void AddSynapse( const unsigned int self_id, const float power, const bool inverted, const unsigned int neuron_id );
 
-    float GetSensorFood() const;
+    float GetSensorFoodLeft() const;
+    float GetSensorFoodRight() const;
     float GetSensorEnergy() const;
 
 private:

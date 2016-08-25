@@ -34,7 +34,7 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
     {
         if( node->Type() == TiXmlNode::TINYXML_ELEMENT && node->ValueStr() == "neuron" )
         {
-            entity->AddNeuron( GetInt( node, "x" ), GetInt( node, "y" ), GetFloat( node, "motor_x", 0.0f ), GetFloat( node, "motor_y", 0.0f ) );
+            //entity->AddNeuron( GetInt( node, "x" ), GetInt( node, "y" ), GetFloat( node, "motor_x", 0.0f ), GetFloat( node, "motor_y", 0.0f ) );
         }
         node = node->NextSibling();
     }
@@ -50,7 +50,7 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
             {
                 if( node2->Type() == TiXmlNode::TINYXML_ELEMENT && node2->ValueStr() == "synapse" )
                 {
-                    entity->AddSynapse( self_id, GetString( node2, "type" ), GetFloat( node2, "power" ), GetBool( node2, "inverted", false ), GetInt( node2, "neuron_id" ), GetFloat( node2, "length" ), GetFloat( node2, "degree" ) );
+                    //entity->AddSynapse( self_id, GetString( node2, "type" ), GetFloat( node2, "power" ), GetBool( node2, "inverted", false ), GetInt( node2, "neuron_id" ), GetFloat( node2, "length" ), GetFloat( node2, "degree" ) );
                 }
                 node2 = node2->NextSibling();
             }

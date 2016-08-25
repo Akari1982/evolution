@@ -20,6 +20,7 @@ EntityManager::EntityManager():
     m_NextFoodTime( 5.0f ),
     m_SpawnTime( 10.0f )
 {
+    Ontogenesis genome;
     Entity* entity = new Entity( m_X + m_Width / 2.0f - 50.0f, m_Y + m_Height / 2.0f - 50.0f );
     genome.LoadNetwork( entity );
     m_Entity.push_back( entity );
@@ -82,30 +83,34 @@ EntityManager::Update()
         float forward_impulse = entity->GetForwardImpulse();
         float left_impulse = entity->GetLeftImpulse();
         float right_impulse = entity->GetRightImpulse();
-        if( left_impulse != 0.0f )
+        if( left_impulse > 0.0f )
         {
             rotation -= 45.0f * delta;
             if( rotation < 0.0f )
             {
                 rotation = ceil( -rotation / 360.0f ) * 360.0 - rotation;
             }
+            entity->SetRotation( rotation );
             left_impulse -= delta;
             left_impulse = ( left_impulse < 0.0f ) ? 0.0f : left_impulse;
+            entity->SetLeftImpulse( left_impulse );
         }
-        if( right_impulse != 0.0f )
+        if( right_impulse > 0.0f )
         {
             rotation += 45.0f * delta;
             if( rotation > 360.0f )
             {
                 rotation -= ceil( rotation / 360.0f ) * 360.0;
             }
+            entity->SetRotation( rotation );
             right_impulse -= delta;
             right_impulse = ( right_impulse < 0.0f ) ? 0.0f : right_impulse;
+            entity->SetRightImpulse( right_impulse );
         }
-        if( forward_impulse != 0.0f )
+        if( forward_impulse > 0.0f )
         {
-            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta;
-            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta;
+            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 10.0f;
+            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 10.0f;
             if( ( pos_x - radius > m_X ) && ( pos_x + radius < m_X + m_Width ) && ( pos_y - radius > m_Y ) && ( pos_y + radius < m_Y + m_Height ) )
             {
                 entity->SetX( pos_x );
@@ -113,6 +118,7 @@ EntityManager::Update()
             }
             forward_impulse -= delta;
             forward_impulse = ( forward_impulse < 0.0f ) ? 0.0f : forward_impulse;
+            entity->SetForwardImpulse( forward_impulse );
         }
 
 

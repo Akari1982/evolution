@@ -29,9 +29,13 @@ Neuron::Neuron( Entity* entity, const Ogre::String& type, const int x, const int
     {
          m_Type = Neuron::ACTIVATOR_RIGHT;
     }
-    else if( type == "sensor_food" )
+    else if( type == "sensor_food_left" )
     {
-         m_Type = Neuron::SENSOR_FOOD;
+         m_Type = Neuron::SENSOR_FOOD_LEFT;
+    }
+    else if( type == "sensor_food_right" )
+    {
+         m_Type = Neuron::SENSOR_FOOD_RIGHT;
     }
     else if( type == "sensor_energy" )
     {
@@ -60,44 +64,47 @@ Neuron::Update()
     }
     else
     {
-        if( m_Type == Neuron::NEURON )
+        for( size_t i = 0; i < m_Synapses.size(); ++i )
         {
-            for( size_t i = 0; i < m_Synapses.size(); ++i )
+            float value = 0;
+
+            switch( m_Synapses[ i ].neuron->m_Type )
             {
-                float value = 0;
-
-                switch( m_Synapses[ i ].neuron->m_Type )
+                case Neuron::NEURON:
                 {
-                    case Neuron::NEURON:
+                    if( m_Synapses[ i ].neuron->m_Fired == true )
                     {
-                        if( m_Synapses[ i ].neuron->m_Fired == true )
-                        {
-                            value = 1;
-                        }
+                        value = 1;
                     }
-                    break;
-
-                    case Neuron::SENSOR_FOOD:
-                    {
-                        value = m_Entity->GetSensorFood();
-                    }
-                    break;
-
-                    case Neuron::SENSOR_ENERGY:
-                    {
-                        value = m_Entity->GetSensorEnergy();
-                    }
-                    break;
                 }
+                break;
 
-                if( m_Synapses[ i ].inverted == false )
+                case Neuron::SENSOR_FOOD_LEFT:
                 {
-                    m_Value += value * m_Synapses[ i ].power;
+                    value = m_Entity->GetSensorFoodLeft();
                 }
-                else
+                break;
+
+                case Neuron::SENSOR_FOOD_RIGHT:
                 {
-                    m_Value += ( 1 - value ) * m_Synapses[ i ].power;
+                    value = m_Entity->GetSensorFoodRight();
                 }
+                break;
+
+                case Neuron::SENSOR_ENERGY:
+                {
+                    value = m_Entity->GetSensorEnergy();
+                }
+                break;
+            }
+
+            if( m_Synapses[ i ].inverted == false )
+            {
+                m_Value += value * m_Synapses[ i ].power;
+            }
+            else
+            {
+                m_Value += ( 1 - value ) * m_Synapses[ i ].power;
             }
         }
 
@@ -108,7 +115,7 @@ Neuron::Update()
 
             if( m_Type == Neuron::ACTIVATOR_FORWARD )
             {
-                 m_Entity->SetForwardImpulse( 2.0f );
+                m_Entity->SetForwardImpulse( 2.0f );
             }
             else if( m_Type == Neuron::ACTIVATOR_LEFT )
             {
@@ -129,14 +136,23 @@ Neuron::Draw( const unsigned int x, const unsigned int y )
 {
     if( m_Fired == true )
     {
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+    }
+    else if( m_Type == Neuron::ACTIVATOR_FORWARD || m_Type == Neuron::ACTIVATOR_LEFT || m_Type == Neuron::ACTIVATOR_RIGHT )
+    {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
+    }
+    else if( m_Type == Neuron::SENSOR_FOOD_LEFT || m_Type == Neuron::SENSOR_FOOD_RIGHT || m_Type == Neuron::SENSOR_ENERGY )
+    {
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
     }
     else
     {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 0.5f, 0.5f, 0.5f, 1 ) );
     }
     float radius = 2.0f;
-    DEBUG_DRAW.Quad( x + m_X - radius, y + m_Y - radius, x + m_X + radius, y + m_Y - radius, x + m_X + radius, y + m_Y + radius, x + m_X - radius, y + m_Y + radius );
+    float scale = 8.0f;
+    DEBUG_DRAW.Disc( x + m_X * scale, y + m_Y * scale, radius );
 
     for( size_t i = 0; i < m_Synapses.size(); ++i )
     {
@@ -149,7 +165,7 @@ Neuron::Draw( const unsigned int x, const unsigned int y )
         {
             DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
         }
-        DEBUG_DRAW.Line( x + m_X, y + m_Y, x + neuron->m_X, y + neuron->m_Y );
+        DEBUG_DRAW.Line( x + m_X * scale, y + m_Y * scale, x + neuron->m_X * scale, y + neuron->m_Y * scale );
     }
 }
 

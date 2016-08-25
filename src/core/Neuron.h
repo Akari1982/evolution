@@ -2,6 +2,7 @@
 #define NEURON_H
 
 
+#include <OgreString.h>
 #include <vector>
 
 
@@ -29,7 +30,8 @@ protected:
     enum NeuronType
     {
         NEURON,
-        SENSOR_FOOD,
+        SENSOR_FOOD_LEFT,
+        SENSOR_FOOD_RIGHT,
         SENSOR_ENERGY,
         ACTIVATOR_FORWARD,
         ACTIVATOR_LEFT,

@@ -82,14 +82,14 @@ Ontogenesis::LoadNetwork( Entity* entity )
     cell.y = 0;
     m_Network.push_back( cell );
 
-    cell.name = "sensor_food";
+    cell.name = "sensor_food_left";
     cell.x = -5;
     cell.y = -3;
     cell.protein = "sensor_food";
     cell.protein_radius = 8;
     m_Network.push_back( cell );
 
-    cell.name = "sensor_food";
+    cell.name = "sensor_food_right";
     cell.x = -5;
     cell.y = 3;
     cell.protein = "sensor_food";
