@@ -26,37 +26,37 @@ Ontogenesis::Ontogenesis()
     gene.cond.clear();
     gene.expr.clear();
 
-    // ConnectLR: C_NAME( "n0_sen" ) -> E_DENDRITE( "sensor" ) E_AXON( "left" ) E_AXON( "right" )
+    // ConnectLR: C_NAME( "n0_sen" ) -> E_DENDRITE( "sensor_food" ) E_AXON( "activator_left" ) E_AXON( "activator_right" )
     gene.name = "ConnectLR";
     cond.type = Ontogenesis::C_NAME;
     cond.name = "n0_sen";
     gene.cond.push_back( cond );
     expr.type = Ontogenesis::E_DENDRITE;
-    expr.name = "sensor";
+    expr.name = "sensor_food";
     gene.expr.push_back( expr );
     expr.type = Ontogenesis::E_AXON;
-    expr.name = "left";
+    expr.name = "activator_left";
     gene.expr.push_back( expr );
     expr.type = Ontogenesis::E_AXON;
-    expr.name = "right";
+    expr.name = "activator_right";
     gene.expr.push_back( expr );
     m_Genome.push_back( gene );
     gene.cond.clear();
     gene.expr.clear();
 
-    // ConnectForward: C_NAME( "n1_forw" ) -> E_DENDRITE( "sensor" ) E_AXON( "forward" ) E_MIGRATE( "forward" )
+    // ConnectForward: C_NAME( "n1_forw" ) -> E_DENDRITE( "sensor_food" ) E_AXON( "activator_forward" ) E_MIGRATE( "activator_forward" )
     gene.name = "ConnectForward";
     cond.type = Ontogenesis::C_NAME;
     cond.name = "n1_forw";
     gene.cond.push_back( cond );
     expr.type = Ontogenesis::E_DENDRITE;
-    expr.name = "sensor";
+    expr.name = "sensor_food";
     gene.expr.push_back( expr );
     expr.type = Ontogenesis::E_AXON;
-    expr.name = "forward";
+    expr.name = "activator_forward";
     gene.expr.push_back( expr );
     expr.type = Ontogenesis::E_MIGRATE;
-    expr.name = "forward";
+    expr.name = "activator_forward";
     gene.expr.push_back( expr );
     m_Genome.push_back( gene );
     gene.cond.clear();
@@ -82,43 +82,43 @@ Ontogenesis::LoadNetwork( Entity* entity )
     cell.y = 0;
     m_Network.push_back( cell );
 
-    cell.name = "sensor";
+    cell.name = "sensor_food";
     cell.x = -5;
     cell.y = -3;
-    cell.protein = "sensor";
+    cell.protein = "sensor_food";
     cell.protein_radius = 8;
     m_Network.push_back( cell );
 
-    cell.name = "sensor";
+    cell.name = "sensor_food";
     cell.x = -5;
     cell.y = 3;
-    cell.protein = "sensor";
+    cell.protein = "sensor_food";
     cell.protein_radius = 8;
     m_Network.push_back( cell );
 
-    cell.name = "forward";
+    cell.name = "activator_forward";
     cell.x = 5;
     cell.y = 0;
-    cell.protein = "forward";
+    cell.protein = "activator_forward";
     cell.protein_radius = 6;
     m_Network.push_back( cell );
 
-    cell.name = "left";
+    cell.name = "activator_left";
     cell.x = 3;
     cell.y = -3;
-    cell.protein = "left";
+    cell.protein = "activator_left";
     cell.protein_radius = 5;
     m_Network.push_back( cell );
 
-    cell.name = "right";
+    cell.name = "activator_right";
     cell.x = 3;
     cell.y = 3;
-    cell.protein = "right";
+    cell.protein = "activator_right";
     cell.protein_radius = 5;
     m_Network.push_back( cell );
 
     export_script->Log( "Step: 0\n" );
-    export_script->Log( "    add stem sensor sensor forward left right\n" );
+    export_script->Log( "    add stem sensor_food sensor_food activator_forward activator_left activator_right\n" );
 
 
 
@@ -324,36 +324,21 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
     for( size_t i = 0; i < m_Network.size(); ++i )
     {
-        entity->AddNeuron( m_Network[ i ].x, m_Network[ i ].y, 0.0f, 0.0f );
+        entity->AddNeuron( m_Network[ i ].name, m_Network[ i ].x, m_Network[ i ].y );
     }
 
-
-
-/*
-    unsigned int self_id = 0;
-    node = m_File.RootElement()->FirstChild();
-    while( node != NULL )
+    for( size_t i = 0; i < m_Network.size(); ++i )
     {
-        if( node->Type() == TiXmlNode::TINYXML_ELEMENT && node->ValueStr() == "neuron" )
+        Cell cell = m_Network[ i ];
+        for( size_t j = 0; j < cell.synapses.size(); ++j )
         {
-            TiXmlNode* node2 = node->FirstChild();
-            while( node2 != NULL )
-            {
-                if( node2->Type() == TiXmlNode::TINYXML_ELEMENT && node2->ValueStr() == "synapse" )
-                {
-                    entity->AddSynapse( self_id, GetString( node2, "type" ), GetFloat( node2, "power" ), GetBool( node2, "inverted", false ), GetInt( node2, "neuron_id" ), GetFloat( node2, "length" ), GetFloat( node2, "degree" ) );
-                }
-                node2 = node2->NextSibling();
-            }
-            ++self_id;
+            entity->AddSynapse( i, cell.synapses[ j ].power, false, cell.synapses[ j ].cell_id );
         }
-        node = node->NextSibling();
     }
-*/
 
 
 
-    //m_Network.clear();
+    m_Network.clear();
 }
 
 

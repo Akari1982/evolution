@@ -12,10 +12,6 @@ template<>EntityManager *Ogre::Singleton< EntityManager >::msSingleton = NULL;
 
 
 
-Ontogenesis genome;
-
-
-
 EntityManager::EntityManager():
     m_X( 100.0f ),
     m_Y( 300.0f ),
@@ -27,7 +23,7 @@ EntityManager::EntityManager():
     Entity* entity = new Entity( m_X + m_Width / 2.0f - 50.0f, m_Y + m_Height / 2.0f - 50.0f );
     genome.LoadNetwork( entity );
     m_Entity.push_back( entity );
-/*
+
     entity = new Entity( m_X + m_Width / 2.0f - 50.0f, m_Y + m_Height / 2.0f + 50.0f );
     genome.LoadNetwork( entity );
     m_Entity.push_back( entity );
@@ -39,7 +35,7 @@ EntityManager::EntityManager():
     entity = new Entity( m_X + m_Width / 2.0f + 50.0f, m_Y + m_Height / 2.0f + 50.0f );
     genome.LoadNetwork( entity );
     m_Entity.push_back( entity );
-*/
+
     LOG_TRIVIAL( "EntityManager created." );
 }
 
@@ -67,28 +63,71 @@ EntityManager::Input( const Event& event )
 void
 EntityManager::Update()
 {
-    genome.Update();
-
-/*
     float delta = Timer::getSingleton().GetGameTimeDelta();
     m_NextFoodTime -= delta;
     m_SpawnTime -= delta;
 
     for( size_t i = 0; i < m_Entity.size(); ++i )
     {
-        m_Entity[ i ]->Update();
+        Entity* entity = m_Entity[ i ];
+        entity->Update();
+
+
+
+        // perform movement
+        float start_x = entity->GetX();
+        float start_y = entity->GetY();
+        float rotation = entity->GetRotation();
+        float radius = entity->GetRadius();
+        float forward_impulse = entity->GetForwardImpulse();
+        float left_impulse = entity->GetLeftImpulse();
+        float right_impulse = entity->GetRightImpulse();
+        if( left_impulse != 0.0f )
+        {
+            rotation -= 45.0f * delta;
+            if( rotation < 0.0f )
+            {
+                rotation = ceil( -rotation / 360.0f ) * 360.0 - rotation;
+            }
+            left_impulse -= delta;
+            left_impulse = ( left_impulse < 0.0f ) ? 0.0f : left_impulse;
+        }
+        if( right_impulse != 0.0f )
+        {
+            rotation += 45.0f * delta;
+            if( rotation > 360.0f )
+            {
+                rotation -= ceil( rotation / 360.0f ) * 360.0;
+            }
+            right_impulse -= delta;
+            right_impulse = ( right_impulse < 0.0f ) ? 0.0f : right_impulse;
+        }
+        if( forward_impulse != 0.0f )
+        {
+            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta;
+            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta;
+            if( ( pos_x - radius > m_X ) && ( pos_x + radius < m_X + m_Width ) && ( pos_y - radius > m_Y ) && ( pos_y + radius < m_Y + m_Height ) )
+            {
+                entity->SetX( pos_x );
+                entity->SetY( pos_y );
+            }
+            forward_impulse -= delta;
+            forward_impulse = ( forward_impulse < 0.0f ) ? 0.0f : forward_impulse;
+        }
+
+
 
         // check entity [ food collision
         for( std::vector< Food >::iterator it = m_Food.begin(); it != m_Food.end(); )
         {
             float x1 = ( *it ).x;
             float y1 = ( *it ).y;
-            float x2 = m_Entity[ i ]->GetX();
-            float y2 = m_Entity[ i ]->GetY();
+            float x2 = entity->GetX();
+            float y2 = entity->GetY();
             float distance = sqrt( ( x2 - x1 ) * ( x2 - x1 ) + ( y2 - y1 ) * ( y2 - y1 ) );
-            if( distance <= m_Entity[ i ]->GetRadius() )
+            if( distance <= entity->GetRadius() )
             {
-                m_Entity[ i ]->AddEnergy( ( *it ).nutrition );
+                entity->SetEnergy( entity->GetEnergy() + ( *it ).nutrition );
                 it = m_Food.erase( it );
             }
             else
@@ -121,7 +160,6 @@ EntityManager::Update()
         Ontogenesis genome;
         genome.LoadNetwork( entity );
         m_Entity.push_back( entity );
-
         m_SpawnTime = 10.0f;
     }
 
@@ -141,7 +179,6 @@ EntityManager::Update()
 
 
     Draw();
-*/
 }
 
 
@@ -189,39 +226,4 @@ EntityManager::FeelFood( const float x, const float y, const float radius )
     }
 
     return ( ret > 1.0f ) ? 1.0f: ret;
-}
-
-
-
-bool
-EntityManager::CheckMove( Entity* entity, const float move_x, const float move_y )
-{
-    float pos_x = entity->GetX() + move_x;
-    float pos_y = entity->GetY() + move_y;
-    float radius = entity->GetRadius();
-
-    if( ( pos_x - radius < m_X ) || ( pos_x + radius > m_X + m_Width ) )
-    {
-        return false;
-    }
-    if( ( pos_y - radius < m_Y ) || ( pos_y + radius > m_Y + m_Height ) )
-    {
-        return false;
-    }
-
-    for( size_t i = 0; i < m_Entity.size(); ++i )
-    {
-        if( m_Entity[ i ] != entity )
-        {
-            float x2 = m_Entity[ i ]->GetX();
-            float y2 = m_Entity[ i ]->GetY();
-            float distance = sqrt( ( x2 - pos_x ) * ( x2 - pos_x ) + ( y2 - pos_y ) * ( y2 - pos_y ) );
-            if( distance <= radius + m_Entity[ i ]->GetRadius() )
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
 }

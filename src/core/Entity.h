@@ -25,14 +25,19 @@ public:
 
     float GetForwardImpulse() const;
     void SetForwardImpulse( const float forward_impulse );
-    float GetRotationImpulse() const;
-    void SetRotationImpulse( const float rotation_impulse );
+    float GetLeftImpulse() const;
+    void SetLeftImpulse( const float left_impulse );
+    float GetRightImpulse() const;
+    void SetRightImpulse( const float right_impulse );
 
     float GetEnergy() const;
     void SetEnergy( const float energy );
 
-    void AddNeuron( const unsigned int x, const unsigned int y, const float motor_x, const float motor_y );
-    void AddSynapse( const unsigned int self_id, const Ogre::String type, const float power, const bool inverted, const unsigned int neuron_id, const float length, const float degree );
+    void AddNeuron( const Ogre::String& type, const unsigned int x, const unsigned int y );
+    void AddSynapse( const unsigned int self_id, const float power, const bool inverted, const unsigned int neuron_id );
+
+    float GetSensorFood() const;
+    float GetSensorEnergy() const;
 
 private:
     Entity();
@@ -44,7 +49,8 @@ private:
     float m_Rotation;
 
     float m_ForwardImpulse;
-    float m_RotationImpulse;
+    float m_LeftImpulse;
+    float m_RightImpulse;
 
     float m_Energy;
 

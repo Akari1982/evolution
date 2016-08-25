@@ -50,6 +50,8 @@ private:
     void DestroyQuadVertexBuffer();
     void CreateCircleVertexBuffer();
     void DestroyCircleVertexBuffer();
+    void CreateDiscVertexBuffer();
+    void DestroyDiscVertexBuffer();
     void CreateTextVertexBuffer();
     void DestroyTextVertexBuffer();
 
@@ -81,6 +83,11 @@ private:
     Ogre::RenderOperation               m_CircleRenderOp;
     Ogre::HardwareVertexBufferSharedPtr m_CircleVertexBuffer;
     unsigned int                        m_CircleMaxVertexCount;
+
+    // circle
+    Ogre::RenderOperation               m_DiscRenderOp;
+    Ogre::HardwareVertexBufferSharedPtr m_DiscVertexBuffer;
+    unsigned int                        m_DiscMaxVertexCount;
 
     // text
     Ogre::RenderOperation               m_TextRenderOp;

@@ -12,7 +12,8 @@ Entity::Entity( const float x, const float y ):
     m_Y( y ),
     m_Rotation( 0.0f ),
     m_ForwardImpulse( 0.0f ),
-    m_RotationImpulse( 0.0f ),
+    m_LeftImpulse( 0.0f ),
+    m_RightImpulse( 0.0f ),
     m_Energy( 100.0f ),
     m_Think( 0.1f )
 {
@@ -53,10 +54,13 @@ Entity::Update()
 void
 Entity::Draw( const unsigned int x, const unsigned int y )
 {
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, m_Energy / 100.0f, 0, 1 ) );
-    float radius = m_Radius * 0.75f;
-    DEBUG_DRAW.Quad( m_X - radius, m_Y - radius, m_X + radius, m_Y - radius, m_X + radius, m_Y + radius, m_X - radius, m_Y + radius );
-
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1 - m_Energy / 100.0f, m_Energy / 100.0f, 0, 1 ) );
+    DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
+    float x = m_X + 10.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation ) ) );
+    float y = m_Y + 10.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation ) ) );
+    DEBUG_DRAW.Circle( x, y, 20.0f );
+    DEBUG_DRAW.Line( m_X, m_Y, x, y );
     for( size_t i = 0; i < m_Network.size(); ++i )
     {
         m_Network[ i ]->Draw( x, y );
@@ -138,17 +142,33 @@ Entity::SetForwardImpulse( const float forward_impulse )
 
 
 float
-Entity::GetRotationImpulse() const
+Entity::GetLeftImpulse() const
 {
-    return m_RotationImpulse;
+    return m_LeftImpulse;
 }
 
 
 
 void
-Entity::SetRotationImpulse( const float rotation_impulse )
+Entity::SetLeftImpulse( const float left_impulse )
 {
-    m_RotationImpulse = rotation_impulse;
+    m_LeftImpulse = left_impulse;
+}
+
+
+
+float
+Entity::GetRightImpulse() const
+{
+    return m_RightImpulse;
+}
+
+
+
+void
+Entity::SetRightImpulse( const float right_impulse )
+{
+    m_RightImpulse = right_impulse;
 }
 
 
@@ -171,27 +191,34 @@ Entity::SetEnergy( const float energy )
 
 
 void
-Entity::AddNeuron( const unsigned int x, const unsigned int y, const float motor_x, const float motor_y )
+Entity::AddNeuron( const Ogre::String& type, const unsigned int x, const unsigned int y )
 {
-    Neuron* neuron = new Neuron( this, x, y, motor_x, motor_y );
+    Neuron* neuron = new Neuron( this, type, x, y );
     m_Network.push_back( neuron );
 }
 
 
 
 void
-Entity::AddSynapse( const unsigned int self_id, const Ogre::String type, const float power, const bool inverted, const unsigned int neuron_id, const float length, const float degree )
+Entity::AddSynapse( const unsigned int self_id, const float power, const bool inverted, const unsigned int neuron_id )
 {
-    if( type == "neuron" )
-    {
-        m_Network[ self_id ]->AddNeuronSynapse( power, inverted, m_Network[ neuron_id ] );
-    }
-    else if( type == "food" )
-    {
-        m_Network[ self_id ]->AddFoodSynapse( power, inverted, length, degree );
-    }
-    else if( type == "energy" )
-    {
-        m_Network[ self_id ]->AddEnergySynapse( power, inverted );
-    }
+    m_Network[ self_id ]->AddSynapse( power, inverted, m_Network[ neuron_id ] );
+}
+
+
+
+float
+Entity::GetSensorFood() const
+{
+    float x = m_X + 10.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation ) ) );
+    float y = m_Y + 10.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation ) ) );
+    return EntityManager::getSingleton().FeelFood( x, y, 20.0f );
+}
+
+
+
+float
+Entity::GetSensorEnergy() const
+{
+    return m_Energy / 100.0f;
 }
