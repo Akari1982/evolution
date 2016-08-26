@@ -7,6 +7,8 @@
 
 Ontogenesis::Ontogenesis()
 {
+    Generation generation;
+
     Gene gene;
     Condition cond;
     Expression expr;
@@ -22,7 +24,7 @@ Ontogenesis::Ontogenesis()
     expr.type = Ontogenesis::E_SPLIT;
     expr.name = "n1_forw";
     gene.expr.push_back( expr );
-    m_Genome.push_back( gene );
+    generation.base_genome.push_back( gene );
     gene.cond.clear();
     gene.expr.clear();
 
@@ -40,7 +42,7 @@ Ontogenesis::Ontogenesis()
     expr.type = Ontogenesis::E_AXON;
     expr.name = "activator_right";
     gene.expr.push_back( expr );
-    m_Genome.push_back( gene );
+    generation.base_genome.push_back( gene );
     gene.cond.clear();
     gene.expr.clear();
 
@@ -58,9 +60,11 @@ Ontogenesis::Ontogenesis()
     expr.type = Ontogenesis::E_MIGRATE;
     expr.name = "activator_forward";
     gene.expr.push_back( expr );
-    m_Genome.push_back( gene );
+    generation.base_genome.push_back( gene );
     gene.cond.clear();
     gene.expr.clear();
+
+    m_Generations.push_back( generation );
 }
 
 
@@ -71,51 +75,54 @@ Ontogenesis::~Ontogenesis()
 
 
 
+
+void
+Ontogenesis::Draw()
+{
+    DEBUG_DRAW.Text( 10, 10, "Total number of species: " + IntToString( m_Generations[ 0 ].species.size() ) );
+}
+
+
+
 void
 Ontogenesis::LoadNetwork( Entity* entity )
 {
     Logger* export_script = new Logger( "onthogenesis.txt" );
 
-    Cell cell;
-    cell.name = "stem";
-    cell.x = 0;
-    cell.y = 0;
-    m_Network.push_back( cell );
 
-    cell.name = "sensor_food_left";
-    cell.x = -5;
-    cell.y = -3;
-    cell.protein = "sensor_food";
-    cell.protein_radius = 8;
-    m_Network.push_back( cell );
 
-    cell.name = "sensor_food_right";
-    cell.x = -5;
-    cell.y = 3;
-    cell.protein = "sensor_food";
-    cell.protein_radius = 8;
-    m_Network.push_back( cell );
+    Species species;
+    species.genome = m_Generations[ 0 ].base_genome;
 
-    cell.name = "activator_forward";
-    cell.x = 5;
-    cell.y = 0;
-    cell.protein = "activator_forward";
-    cell.protein_radius = 6;
-    m_Network.push_back( cell );
 
-    cell.name = "activator_left";
-    cell.x = 3;
-    cell.y = -3;
-    cell.protein = "activator_left";
-    cell.protein_radius = 5;
-    m_Network.push_back( cell );
 
-    cell.name = "activator_right";
-    cell.x = 3;
-    cell.y = 3;
-    cell.protein = "activator_right";
-    cell.protein_radius = 5;
-    m_Network.push_back( cell );
+    Cell* cell = new Cell( "stem", 0, 0 );
+    species.network.push_back( cell );
+
+    cell = new Cell( "sensor_food_left", -5, -3 );
+    cell->SetProtein( "sensor_food" );
+    cell->SetProteinRadius( 8 );
+    species.network.push_back( cell );
+
+    cell = new Cell( "sensor_food_right", -5, 3 );
+    cell->SetProtein( "sensor_food" );
+    cell->SetProteinRadius( 8 );
+    species.network.push_back( cell );
+
+    cell = new Cell( "activator_forward", 5, 0 );
+    cell->SetProtein( "activator_forward" );
+    cell->SetProteinRadius( 6 );
+    species.network.push_back( cell );
+
+    cell = new Cell( "activator_left", 3, -3 );
+    cell->SetProtein( "activator_left" );
+    cell->SetProteinRadius( 5 );
+    species.network.push_back( cell );
+
+    cell = new Cell( "activator_right", 3, 3 );
+    cell->SetProtein( "activator_right" );
+    cell->SetProteinRadius( 5 );
+    species.network.push_back( cell );
 
     export_script->Log( "Step: 0\n" );
     export_script->Log( "    add stem sensor_food sensor_food activator_forward activator_left activator_right\n" );
@@ -131,13 +138,17 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
         export_script->Log( "Step: " + IntToString( cycles ) + "\n" );
 
-        for( size_t i = 0; i < m_Network.size(); ++i )
-        {
-            export_script->Log( "    cell_" + IntToString( i ) + ": " + m_Network[ i ].name + "\n" );
+        std::vector< std::vector< unsigned int > > species_genes;
 
-            for( size_t gene_id = 0; gene_id < m_Genome.size(); ++gene_id )
+        for( size_t i = 0; i < species.network.size(); ++i )
+        {
+            std::vector< unsigned int > expr_genes;
+
+            export_script->Log( "    cell_" + IntToString( i ) + ": " + species.network[ i ]->GetTypeName() + "\n" );
+
+            for( size_t gene_id = 0; gene_id < species.genome.size(); ++gene_id )
             {
-                Gene gene = m_Genome[ gene_id ];
+                Gene gene = species.genome[ gene_id ];
                 bool exec = true;
 
                 export_script->Log( "        gene " + gene.name + "\n" );
@@ -150,7 +161,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                     {
                         case Ontogenesis::C_NAME:
                         {
-                            if( m_Network[ i ].name != cond.name )
+                            if( species.network[ i ]->GetTypeName() != cond.name )
                             {
                                 exec = false;
                             }
@@ -158,7 +169,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         break;
                         case Ontogenesis::C_NNAME:
                         {
-                            if( m_Network[ i ].name == cond.name )
+                            if( species.network[ i ]->GetTypeName() == cond.name )
                             {
                                 exec = false;
                             }
@@ -167,7 +178,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         case Ontogenesis::C_PROTEIN:
                         {
                             std::vector< PowerProtein > powers;
-                            bool power = SearchProtein( cond.name, m_Network[ i ].x, m_Network[ i ].y, powers );
+                            bool power = SearchProtein( cond.name, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             if( power == false )
                             {
                                 exec = false;
@@ -177,7 +188,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         case Ontogenesis::C_NPROTEIN:
                         {
                             std::vector< PowerProtein > powers;
-                            bool power = SearchProtein( cond.name, m_Network[ i ].x, m_Network[ i ].y, powers );
+                            bool power = SearchProtein( cond.name, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             if( power == true )
                             {
                                 exec = false;
@@ -190,33 +201,35 @@ Ontogenesis::LoadNetwork( Entity* entity )
                 if( exec == true )
                 {
                     export_script->Log( "            activated\n" );
-                    m_Network[ i ].expr_genes.push_back( gene_id );
+                    expr_genes.push_back( gene_id );
                 }
             }
+
+            species_genes.push_back( expr_genes );
         }
 
         export_script->Log( "\nexpress\n" );
 
-        size_t net = m_Network.size();
-        for( size_t i = 0; i < net; ++i )
+        size_t net_size = species.network.size();
+        for( size_t i = 0; i < net_size; ++i )
         {
-            export_script->Log( "    cell_" + IntToString( i ) + ": " + m_Network[ i ].name + "\n" );
+            export_script->Log( "    cell_" + IntToString( i ) + ": " + species.network[ i ]->GetTypeName() + "\n" );
 
-            for( size_t ge_id = 0; ge_id < m_Network[ i ].expr_genes.size(); ++ge_id )
+            for( size_t ge_id = 0; ge_id < species_genes[ i ].size(); ++ge_id )
             {
-                size_t gene_id = m_Network[ i ].expr_genes[ ge_id ];
+                size_t gene_id = species_genes[ i ][ ge_id ];
 
-                for( size_t expr_id = 0; expr_id < m_Genome[ gene_id ].expr.size(); ++expr_id )
+                for( size_t expr_id = 0; expr_id < species.genome[ gene_id ].expr.size(); ++expr_id )
                 {
-                    Expression expr = m_Genome[ gene_id ].expr[ expr_id ];
+                    Expression expr = species.genome[ gene_id ].expr[ expr_id ];
 
                     switch( expr.type )
                     {
                         case Ontogenesis::E_NAME:
                         {
-                            if( m_Network[ i ].name != expr.name )
+                            if( species.network[ i ]->GetTypeName() != expr.name )
                             {
-                                m_Network[ i ].name = expr.name;
+                                species.network[ i ]->SetTypeName( expr.name );
                                 changes = true;
                                 export_script->Log( "        E_NAME(\"" + expr.name + "\") expressed.\n" );
                             }
@@ -230,14 +243,11 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         {
                             int x = 0;
                             int y = 0;
-                            bool place = FindPlaceForCell( m_Network[ i ].x, m_Network[ i ].y, 1, x, y );
+                            bool place = FindPlaceForCell( species.network[ i ]->GetX(), species.network[ i ]->GetY(), 1, x, y );
                             if( place == true )
                             {
-                                Cell new_cell;
-                                new_cell.name = expr.name;
-                                new_cell.x = x;
-                                new_cell.y = y;
-                                m_Network.push_back( new_cell );
+                                Cell* cell = new Cell( expr.name, x, y );
+                                species.network.push_back( cell );
                                 changes = true;
                                 export_script->Log( "        E_SPLIT(\"" + expr.name + "\") expressed.\n" );
                             }
@@ -251,17 +261,17 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         {
                             export_script->Log( "        E_MIGRATE(\"" + expr.name + "\") expressed.\n" );
                             std::vector< PowerProtein > powers;
-                            SearchProtein( expr.name, m_Network[ i ].x, m_Network[ i ].y, powers );
+                            SearchProtein( expr.name, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             for( size_t c = 0; c < powers.size(); ++c )
                             {
-                                Cell cell = m_Network[ powers[ c ].cell_id ];
+                                Cell* cell = species.network[ powers[ c ].cell_id ];
                                 int x = 0;
                                 int y = 0;
-                                bool place = FindPlaceForCell( cell.x, cell.y, cell.protein_radius, x, y );
+                                bool place = FindPlaceForCell( cell->GetX(), cell->GetY(), cell->GetProteinRadius(), x, y );
                                 if( place == true )
                                 {
-                                    m_Network[ i ].x = x;
-                                    m_Network[ i ].y = y;
+                                    species.network[ i ]->SetX( x );
+                                    species.network[ i ]->SetY( y );
                                 }
                             }
                             powers.clear();
@@ -269,9 +279,9 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         break;
                         case Ontogenesis::E_PROTEIN:
                         {
-                            if( m_Network[ i ].protein != expr.name )
+                            if( species.network[ i ]->GetProtein() != expr.name )
                             {
-                                m_Network[ i ].protein = expr.name;
+                                species.network[ i ]->SetProtein( expr.name );
                                 changes = true;
                                 export_script->Log( "        E_PROTEIN(\"" + expr.name + "\") expressed.\n" );
                             }
@@ -285,13 +295,10 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         {
                             export_script->Log( "        E_DENDRITE(\"" + expr.name + "\") expressed.\n" );
                             std::vector< PowerProtein > powers;
-                            SearchProtein( expr.name, m_Network[ i ].x, m_Network[ i ].y, powers );
+                            SearchProtein( expr.name, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             for( size_t c = 0; c < powers.size(); ++c )
                             {
-                                Synapse synapse;
-                                synapse.power = powers[ c ].power;
-                                synapse.cell_id = powers[ c ].cell_id;
-                                m_Network[ i ].synapses.push_back( synapse );
+                                species.network[ i ]->AddSynapse( powers[ c ].power, false, species.network[ powers[ c ].cell_id ] );
                             }
                             powers.clear();
                         }
@@ -300,14 +307,10 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         {
                             export_script->Log( "        E_AXON(\"" + expr.name + "\") expressed.\n" );
                             std::vector< PowerProtein > powers;
-                            SearchProtein( expr.name, m_Network[ i ].x, m_Network[ i ].y, powers );
+                            SearchProtein( expr.name, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             for( size_t c = 0; c < powers.size(); ++c )
                             {
-                                export_script->Log( "        1\n" );
-                                Synapse synapse;
-                                synapse.power = powers[ c ].power;
-                                synapse.cell_id = i;
-                                m_Network[ powers[ c ].cell_id ].synapses.push_back( synapse );
+                                species.network[ powers[ c ].cell_id ]->AddSynapse( powers[ c ].power, false, species.network[ i ] );
                             }
                             powers.clear();
                         }
@@ -315,59 +318,18 @@ Ontogenesis::LoadNetwork( Entity* entity )
                     }
                 }
             }
-
-            m_Network[ i ].expr_genes.clear();
         }
+
+        species_genes.clear();
     }
 
 
 
-    for( size_t i = 0; i < m_Network.size(); ++i )
-    {
-        entity->AddNeuron( m_Network[ i ].name, m_Network[ i ].x, m_Network[ i ].y );
-    }
-
-    for( size_t i = 0; i < m_Network.size(); ++i )
-    {
-        Cell cell = m_Network[ i ];
-        for( size_t j = 0; j < cell.synapses.size(); ++j )
-        {
-            entity->AddSynapse( i, cell.synapses[ j ].power, false, cell.synapses[ j ].cell_id );
-        }
-    }
+    entity->AddNetwork( species.network );
 
 
 
-    m_Network.clear();
-}
-
-
-
-void
-Ontogenesis::Update()
-{
-    float global_x = 600.0f;
-    float global_y = 350.0f;
-    float scale = 20.0f;
-
-    for( size_t i = 0; i < m_Network.size(); ++i )
-    {
-        Cell cell = m_Network[ i ];
-        float x = global_x + cell.x * scale;
-        float y = global_y + cell.y * scale;
-        float radius = 2.0f;
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-        DEBUG_DRAW.Circle( x, y, cell.protein_radius * scale );
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
-        DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
-        for( size_t j = 0; j < cell.synapses.size(); ++j )
-        {
-            Cell cell_con = m_Network[ cell.synapses[ j ].cell_id ];
-            float x2 = global_x + cell_con.x * scale;
-            float y2 = global_y + cell_con.y * scale;
-            DEBUG_DRAW.Line( x, y, x2, y2 );
-        }
-    }
+    m_Generations[ 0 ].species.push_back( species );
 }
 
 

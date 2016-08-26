@@ -196,18 +196,9 @@ Entity::SetEnergy( const float energy )
 
 
 void
-Entity::AddNeuron( const Ogre::String& type, const unsigned int x, const unsigned int y )
+Entity::AddNetwork( std::vector< Cell* >& network )
 {
-    Neuron* neuron = new Neuron( this, type, x, y );
-    m_Network.push_back( neuron );
-}
-
-
-
-void
-Entity::AddSynapse( const unsigned int self_id, const float power, const bool inverted, const unsigned int neuron_id )
-{
-    m_Network[ self_id ]->AddSynapse( power, inverted, m_Network[ neuron_id ] );
+    m_Network = network;
 }
 
 

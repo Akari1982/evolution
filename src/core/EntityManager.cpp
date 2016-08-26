@@ -4,7 +4,6 @@
 #include "InputManager.h"
 #include "Logger.h"
 #include "Timer.h"
-#include "Ontogenesis.h"
 
 
 
@@ -17,27 +16,24 @@ EntityManager::EntityManager():
     m_Y( 300.0f ),
     m_Width( 1080.0f ),
     m_Height( 300.0f ),
-    m_NextFoodTime( 5.0f ),
+    m_NextFoodTime( 1.0f ),
     m_SpawnTime( 10.0f )
 {
-    Ontogenesis genome;
     Entity* entity = new Entity( m_X + m_Width / 2.0f - 50.0f, m_Y + m_Height / 2.0f - 50.0f );
-    genome.LoadNetwork( entity );
+    m_Ontogenesis.LoadNetwork( entity );
     m_Entity.push_back( entity );
 
     entity = new Entity( m_X + m_Width / 2.0f - 50.0f, m_Y + m_Height / 2.0f + 50.0f );
-    genome.LoadNetwork( entity );
+    m_Ontogenesis.LoadNetwork( entity );
     m_Entity.push_back( entity );
 
     entity = new Entity( m_X + m_Width / 2.0f + 50.0f, m_Y + m_Height / 2.0f - 50.0f );
-    genome.LoadNetwork( entity );
+    m_Ontogenesis.LoadNetwork( entity );
     m_Entity.push_back( entity );
 
     entity = new Entity( m_X + m_Width / 2.0f + 50.0f, m_Y + m_Height / 2.0f + 50.0f );
-    genome.LoadNetwork( entity );
+    m_Ontogenesis.LoadNetwork( entity );
     m_Entity.push_back( entity );
-
-    LOG_TRIVIAL( "EntityManager created." );
 }
 
 
@@ -48,8 +44,6 @@ EntityManager::~EntityManager()
     {
         delete m_Entity[ i ];
     }
-
-    LOG_TRIVIAL( "EntityManager destroyed." );
 }
 
 
@@ -163,15 +157,14 @@ EntityManager::Update()
     if( m_SpawnTime <= 0 && m_Entity.size() < 12 )
     {
         Entity* entity = new Entity( m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
-        Ontogenesis genome;
-        genome.LoadNetwork( entity );
+        m_Ontogenesis.LoadNetwork( entity );
         m_Entity.push_back( entity );
         m_SpawnTime = 10.0f;
     }
 
 
 
-    if( m_NextFoodTime <= 0 && m_Food.size() < 50 )
+    if( m_NextFoodTime <= 0 && m_Food.size() < 100 )
     {
         Food food;
         food.nutrition = 100;
@@ -179,12 +172,13 @@ EntityManager::Update()
         food.y = m_Y + rand() % ( int )m_Height;
         m_Food.push_back( food );
 
-        m_NextFoodTime = 5.0f;
+        m_NextFoodTime = 1.0f;
     }
 
 
 
     Draw();
+    m_Ontogenesis.Draw();
 }
 
 

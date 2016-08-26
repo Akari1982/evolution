@@ -1,8 +1,7 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "Event.h"
-#include "Neuron.h"
+#include "Cell.h"
 
 
 
@@ -33,8 +32,7 @@ public:
     float GetEnergy() const;
     void SetEnergy( const float energy );
 
-    void AddNeuron( const Ogre::String& type, const unsigned int x, const unsigned int y );
-    void AddSynapse( const unsigned int self_id, const float power, const bool inverted, const unsigned int neuron_id );
+    void AddNetwork( std::vector< Cell* >& network );
 
     float GetSensorFoodLeft() const;
     float GetSensorFoodRight() const;
@@ -56,7 +54,7 @@ private:
     float m_Energy;
 
     float m_Think;
-    std::vector< Neuron* > m_Network;
+    std::vector< Cell* > m_Network;
 };
 
 

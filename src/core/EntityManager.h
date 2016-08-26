@@ -5,6 +5,7 @@
 
 #include "Event.h"
 #include "Entity.h"
+#include "Ontogenesis.h"
 
 
 
@@ -22,6 +23,7 @@ public:
     bool CheckMove( Entity* entity, const float move_x, const float move_y );
 
 private:
+    Ontogenesis m_Ontogenesis;
     std::vector< Entity* > m_Entity;
 
     struct Food

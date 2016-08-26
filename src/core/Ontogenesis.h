@@ -4,6 +4,7 @@
 #include <vector>
 #include <OgreString.h>
 
+#include "Cell.h"
 #include "Entity.h"
 
 
@@ -14,8 +15,9 @@ public:
     Ontogenesis();
     virtual ~Ontogenesis();
 
+    void Draw();
+
     void LoadNetwork( Entity* entity );
-    void Update();
 
 private:
     struct PowerProtein
@@ -66,36 +68,20 @@ public:
         std::vector< Expression > expr;
     };
 
-    struct Synapse
+    struct Species
     {
-        float power;
-        size_t cell_id;
+        std::vector< Gene > genome;
+        std::vector< Cell* > network;
     };
 
-    struct Cell
+    struct Generation
     {
-        Cell():
-            name( "" ),
-            x( 0 ),
-            y( 0 ),
-            protein( "" ),
-            protein_radius( 0 )
-        {
-        }
-
-        Ogre::String name;
-        int x;
-        int y;
-        Ogre::String protein;
-        int protein_radius;
-        std::vector< Synapse > synapses;
-
-        std::vector< unsigned int > expr_genes;
+        std::vector< Gene > base_genome;
+        std::vector< Species > species;
     };
 
 private:
-    std::vector< Gene > m_Genome;
-    std::vector< Cell > m_Network;
+    std::vector< Generation > m_Generations;
 };
 
 
