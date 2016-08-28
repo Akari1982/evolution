@@ -48,6 +48,9 @@ Entity::Update()
         m_Think = 0.1f;
     }
     m_Energy -= delta * 1.0f;
+
+    m_Fitness += delta;
+    EntityManager::getSingleton().UpdateFitness( m_Fitness, m_GenerationId, m_SpeciesId );
 }
 
 
@@ -196,9 +199,11 @@ Entity::SetEnergy( const float energy )
 
 
 void
-Entity::AddNetwork( std::vector< Cell* >& network )
+Entity::AddNetwork( std::vector< Cell* >& network, const size_t generation_id, const size_t species_id )
 {
     m_Network = network;
+    m_GenerationId = generation_id;
+    m_SpeciesId = species_id;
 }
 
 

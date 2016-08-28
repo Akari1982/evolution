@@ -79,7 +79,7 @@ EntityManager::Update()
         float right_impulse = entity->GetRightImpulse();
         if( left_impulse > 0.0f )
         {
-            rotation -= 45.0f * delta;
+            rotation -= 5.0f * delta;
             if( rotation < 0.0f )
             {
                 rotation = ceil( -rotation / 360.0f ) * 360.0 - rotation;
@@ -91,7 +91,7 @@ EntityManager::Update()
         }
         if( right_impulse > 0.0f )
         {
-            rotation += 45.0f * delta;
+            rotation += 5.0f * delta;
             if( rotation > 360.0f )
             {
                 rotation -= ceil( rotation / 360.0f ) * 360.0;
@@ -103,8 +103,8 @@ EntityManager::Update()
         }
         if( forward_impulse > 0.0f )
         {
-            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 10.0f;
-            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 10.0f;
+            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
+            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
             if( ( pos_x - radius > m_X ) && ( pos_x + radius < m_X + m_Width ) && ( pos_y - radius > m_Y ) && ( pos_y + radius < m_Y + m_Height ) )
             {
                 entity->SetX( pos_x );
@@ -226,4 +226,12 @@ EntityManager::FeelFood( const float x, const float y, const float radius )
     }
 
     return ( ret > 1.0f ) ? 1.0f: ret;
+}
+
+
+
+void
+EntityManager::UpdateFitness( const float fitness, const size_t generation_id, const size_t species_id )
+{
+    m_Ontogenesis.UpdateFitness( fitness, generation_id, species_id );
 }

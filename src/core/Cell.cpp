@@ -3,22 +3,23 @@
 #include <OgreMath.h>
 
 #include "DebugDraw.h"
+#include "Entity.h"
 #include "Logger.h"
 #include "Timer.h"
 
 
 
-Cell::Cell( Entity* entity, const Ogre::String& type, const int x, const int y ):
+Cell::Cell( Entity* entity, const CellType type, const int x, const int y ):
     m_Entity( entity ),
+    m_Type( type ),
     m_X( x ),
     m_Y( y ),
-    m_Protein( "" ),
-    m_ProteinRadius( 0.0f ),
+    m_Protein( -1 ),
+    m_ProteinRadius( 0 ),
     m_Threshold( 1.0f ),
     m_Value( 0.0f ),
     m_Fired( false )
 {
-    SetTypeName( type );
 }
 
 
@@ -128,8 +129,8 @@ Cell::Draw( const unsigned int x, const unsigned int y )
     float scale = 8.0f;
     DEBUG_DRAW.Disc( x + m_X * scale, y + m_Y * scale, radius );
 
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0.7f, 0.7f, 0.7f, 1 ) );
-    DEBUG_DRAW.Circle( x + m_X * scale, y + m_Y * scale, m_ProteinRadius * scale );
+    //DEBUG_DRAW.SetColour( Ogre::ColourValue( 0.5f, 0.5f, 0.5f, 1 ) );
+    //DEBUG_DRAW.Circle( x + m_X * scale, y + m_Y * scale, m_ProteinRadius * scale );
 
     for( size_t i = 0; i < m_Synapses.size(); ++i )
     {
@@ -149,51 +150,22 @@ Cell::Draw( const unsigned int x, const unsigned int y )
 
 
 void
-Cell::SetTypeName( const Ogre::String& type )
+Cell::SetType( const Cell::CellType type )
 {
-    m_TypeName = type;
-
-    if( type == "activator_forward" )
-    {
-         m_Type = Cell::ACTIVATOR_FORWARD;
-    }
-    else if( type == "activator_left" )
-    {
-         m_Type = Cell::ACTIVATOR_LEFT;
-    }
-    else if( type == "activator_right" )
-    {
-         m_Type = Cell::ACTIVATOR_RIGHT;
-    }
-    else if( type == "sensor_food_left" )
-    {
-         m_Type = Cell::SENSOR_FOOD_LEFT;
-    }
-    else if( type == "sensor_food_right" )
-    {
-         m_Type = Cell::SENSOR_FOOD_RIGHT;
-    }
-    else if( type == "sensor_energy" )
-    {
-         m_Type = Cell::SENSOR_ENERGY;
-    }
-    else
-    {
-         m_Type = Cell::NEURON;
-    }
+    m_Type = type;
 }
 
 
 
-const Ogre::String&
-Cell::GetTypeName() const
+const Cell::CellType
+Cell::GetType() const
 {
-    return m_TypeName;
+    return m_Type;
 }
 
 
 
-float
+int
 Cell::GetX() const
 {
     return m_X;
@@ -202,14 +174,14 @@ Cell::GetX() const
 
 
 void
-Cell::SetX( const float x )
+Cell::SetX( const int x )
 {
     m_X = x;
 }
 
 
 
-float
+int
 Cell::GetY() const
 {
     return m_Y;
@@ -218,14 +190,14 @@ Cell::GetY() const
 
 
 void
-Cell::SetY( const float y )
+Cell::SetY( const int y )
 {
     m_Y = y;
 }
 
 
 
-const Ogre::String&
+int
 Cell::GetProtein() const
 {
     return m_Protein;
@@ -234,14 +206,14 @@ Cell::GetProtein() const
 
 
 void
-Cell::SetProtein( const Ogre::String& protein )
+Cell::SetProtein( const int protein )
 {
     m_Protein = protein;
 }
 
 
 
-float
+int
 Cell::GetProteinRadius() const
 {
     return m_ProteinRadius;
@@ -250,7 +222,7 @@ Cell::GetProteinRadius() const
 
 
 void
-Cell::SetProteinRadius( const float protein_radius )
+Cell::SetProteinRadius( const int protein_radius )
 {
     m_ProteinRadius = protein_radius;
 }

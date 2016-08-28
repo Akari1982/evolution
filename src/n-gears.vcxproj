@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\CameraManager.cpp" />
+    <ClCompile Include="core\Cell.cpp" />
     <ClCompile Include="core\ConfigCmd.cpp" />
     <ClCompile Include="core\ConfigCmdManager.cpp" />
     <ClCompile Include="core\ConfigFile.cpp" />
@@ -75,7 +76,6 @@
     <ClCompile Include="core\library\tinyxml\tinyxmlerror.cpp" />
     <ClCompile Include="core\library\tinyxml\tinyxmlparser.cpp" />
     <ClCompile Include="core\Logger.cpp" />
-    <ClCompile Include="core\Neuron.cpp" />
     <ClCompile Include="core\Ontogenesis.cpp" />
     <ClCompile Include="core\Timer.cpp" />
     <ClCompile Include="core\Utilites.cpp" />
@@ -87,6 +87,7 @@
     <ClInclude Include="core\Assert.h" />
     <ClInclude Include="core\CameraManager.h" />
     <ClInclude Include="core\CameraManagerCommands.h" />
+    <ClInclude Include="core\Cell.h" />
     <ClInclude Include="core\ConfigCmd.h" />
     <ClInclude Include="core\ConfigCmdManager.h" />
     <ClInclude Include="core\ConfigCmdManagerCommands.h" />
@@ -208,7 +209,6 @@
     <ClInclude Include="core\library\tinyxml\tinystr.h" />
     <ClInclude Include="core\library\tinyxml\tinyxml.h" />
     <ClInclude Include="core\Logger.h" />
-    <ClInclude Include="core\Neuron.h" />
     <ClInclude Include="core\Ontogenesis.h" />
     <ClInclude Include="core\Timer.h" />
     <ClInclude Include="core\Utilites.h" />

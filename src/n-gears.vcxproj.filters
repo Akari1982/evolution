@@ -211,9 +211,6 @@
     <ClCompile Include="core\library\tinyxml\tinyxmlparser.cpp">
       <Filter>N-Gears files\TinyXml</Filter>
     </ClCompile>
-    <ClCompile Include="core\Neuron.cpp">
-      <Filter>N-Gears files</Filter>
-    </ClCompile>
     <ClCompile Include="core\XmlNetworkFile.cpp">
       <Filter>N-Gears files</Filter>
     </ClCompile>
@@ -227,6 +224,9 @@
       <Filter>N-Gears files</Filter>
     </ClCompile>
     <ClCompile Include="core\Logger.cpp">
+      <Filter>N-Gears files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\Cell.cpp">
       <Filter>N-Gears files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -609,9 +609,6 @@
     <ClInclude Include="core\library\tinyxml\tinyxml.h">
       <Filter>N-Gears files\TinyXml</Filter>
     </ClInclude>
-    <ClInclude Include="core\Neuron.h">
-      <Filter>N-Gears files</Filter>
-    </ClInclude>
     <ClInclude Include="core\XmlNetworkFile.h">
       <Filter>N-Gears files</Filter>
     </ClInclude>
@@ -622,6 +619,9 @@
       <Filter>N-Gears files</Filter>
     </ClInclude>
     <ClInclude Include="core\Ontogenesis.h">
+      <Filter>N-Gears files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\Cell.h">
       <Filter>N-Gears files</Filter>
     </ClInclude>
   </ItemGroup>

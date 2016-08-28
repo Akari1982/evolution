@@ -18,16 +18,7 @@ public:
     void Draw();
 
     void LoadNetwork( Entity* entity );
-
-private:
-    struct PowerProtein
-    {
-        float power;
-        size_t cell_id;
-    };
-    bool SearchProtein( const Ogre::String name, const int x, const int y, std::vector< PowerProtein >& powers );
-    bool FindPlaceForCell( const int x, const int y, const int radius, int &new_x, int &new_y );
-    bool IsCell( const int x, const int y );
+    void UpdateFitness( const float fitness, const size_t generation_id, const size_t species_id );
 
 public:
     enum ConditionType
@@ -51,13 +42,13 @@ public:
     struct Condition
     {
         ConditionType type;
-        Ogre::String name;
+        int value;
     };
 
     struct Expression
     {
         ExpressionType type;
-        Ogre::String name;
+        int value;
     };
 
     struct Gene
@@ -70,15 +61,28 @@ public:
 
     struct Species
     {
+        float fitness;
         std::vector< Gene > genome;
         std::vector< Cell* > network;
     };
 
     struct Generation
     {
+        float top_fitness;
         std::vector< Gene > base_genome;
         std::vector< Species > species;
     };
+
+private:
+    struct PowerProtein
+    {
+        float power;
+        size_t cell_id;
+    };
+    bool SearchProtein( std::vector< Cell* >& network, const int protein, const int x, const int y, std::vector< PowerProtein >& powers );
+    bool FindPlaceForCell( std::vector< Cell* >& network, const int x, const int y, const int radius, int &new_x, int &new_y );
+    bool IsCell( std::vector< Cell* >& network, const int x, const int y );
+    std::vector< Gene > Mutate( std::vector< Gene >& genome );
 
 private:
     std::vector< Generation > m_Generations;

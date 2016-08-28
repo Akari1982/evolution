@@ -21,6 +21,7 @@ public:
 
     float FeelFood( const float x, const float y, const float radius );
     bool CheckMove( Entity* entity, const float move_x, const float move_y );
+    void UpdateFitness( const float fitness, const size_t generation_id, const size_t species_id );
 
 private:
     Ontogenesis m_Ontogenesis;

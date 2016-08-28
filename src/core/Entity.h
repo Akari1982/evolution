@@ -32,7 +32,7 @@ public:
     float GetEnergy() const;
     void SetEnergy( const float energy );
 
-    void AddNetwork( std::vector< Cell* >& network );
+    void AddNetwork( std::vector< Cell* >& network, const size_t generation_id, const size_t species_id );
 
     float GetSensorFoodLeft() const;
     float GetSensorFoodRight() const;
@@ -52,6 +52,9 @@ private:
     float m_RightImpulse;
 
     float m_Energy;
+    float m_Fitness;
+    size_t m_GenerationId;
+    size_t m_SpeciesId;
 
     float m_Think;
     std::vector< Cell* > m_Network;

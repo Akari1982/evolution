@@ -1,87 +1,79 @@
 Step: 0
     add stem sensor_food sensor_food activator_forward activator_left activator_right
 Step: 1
-    cell_0: stem
+    cell_0: 0
         gene Split
             activated
         gene ConnectLR
         gene ConnectForward
-    cell_1: sensor_food_left
+    cell_1: 2
         gene Split
         gene ConnectLR
         gene ConnectForward
-    cell_2: sensor_food_right
+    cell_2: 3
         gene Split
         gene ConnectLR
         gene ConnectForward
-    cell_3: activator_forward
+    cell_3: 5
         gene Split
         gene ConnectLR
         gene ConnectForward
-    cell_4: activator_left
+    cell_4: 6
         gene Split
         gene ConnectLR
         gene ConnectForward
-    cell_5: activator_right
+    cell_5: 7
         gene Split
         gene ConnectLR
         gene ConnectForward
 
 express
-    cell_0: stem
-        E_NAME("n0_sen") expressed.
-        E_SPLIT("n1_forw") expressed.
-    cell_1: sensor_food_left
-    cell_2: sensor_food_right
-    cell_3: activator_forward
-    cell_4: activator_left
-    cell_5: activator_right
+    cell_0: 0
+        E_NAME("1") expressed.
+        E_NAME("1") depressed.
+    cell_1: 2
+    cell_2: 3
+    cell_3: 5
+    cell_4: 6
+    cell_5: 7
 Step: 2
-    cell_0: n0_sen
+    cell_0: 1
         gene Split
         gene ConnectLR
             activated
         gene ConnectForward
-    cell_1: sensor_food_left
-        gene Split
-        gene ConnectLR
-        gene ConnectForward
-    cell_2: sensor_food_right
-        gene Split
-        gene ConnectLR
-        gene ConnectForward
-    cell_3: activator_forward
-        gene Split
-        gene ConnectLR
-        gene ConnectForward
-    cell_4: activator_left
-        gene Split
-        gene ConnectLR
-        gene ConnectForward
-    cell_5: activator_right
-        gene Split
-        gene ConnectLR
-        gene ConnectForward
-    cell_6: n1_forw
-        gene Split
-        gene ConnectLR
-        gene ConnectForward
             activated
+    cell_1: 2
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_2: 3
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_3: 5
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_4: 6
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
+    cell_5: 7
+        gene Split
+        gene ConnectLR
+        gene ConnectForward
 
 express
-    cell_0: n0_sen
-        E_DENDRITE("sensor_food") expressed.
-        E_AXON("activator_left") expressed.
-        1
-        E_AXON("activator_right") expressed.
-        1
-    cell_1: sensor_food_left
-    cell_2: sensor_food_right
-    cell_3: activator_forward
-    cell_4: activator_left
-    cell_5: activator_right
-    cell_6: n1_forw
-        E_DENDRITE("sensor_food") expressed.
-        E_AXON("activator_forward") expressed.
-        1
-        E_MIGRATE("activator_forward") expressed.
+    cell_0: 1
+        E_DENDRITE("1") expressed.
+        E_AXON("3") expressed.
+        E_AXON("4") expressed.
+        E_DENDRITE("1") expressed.
+        E_AXON("2") expressed.
+        E_MIGRATE("2") expressed.
+    cell_1: 2
+    cell_2: 3
+    cell_3: 5
+    cell_4: 6
+    cell_5: 7

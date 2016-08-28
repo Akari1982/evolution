@@ -15,19 +15,32 @@ class Entity;
 class Cell
 {
 public:
-    Cell( Entity* entity, const Ogre::String& type, const int x, const int y );
+    enum CellType
+    {
+        STEM = 0,
+        NEURON,
+        SENSOR_FOOD_LEFT,
+        SENSOR_FOOD_RIGHT,
+        SENSOR_ENERGY,
+        ACTIVATOR_FORWARD,
+        ACTIVATOR_LEFT,
+        ACTIVATOR_RIGHT,
+        TOTAL
+    };
+
+    Cell( Entity* entity, const CellType type, const int x, const int y );
     virtual ~Cell();
     void Update();
     void Draw( const unsigned int x, const unsigned int y );
 
-    void SetTypeName( const Ogre::String& type );
-    const Ogre::String& GetTypeName() const;
-    float GetX() const;
-    void SetX( const float x );
-    float GetY() const;
-    void SetY( const float y );
-    const Ogre::String& GetProtein() const;
-    void SetProtein( const Ogre::String& protein );
+    void SetType( const CellType type );
+    const CellType GetType() const;
+    int GetX() const;
+    void SetX( const int x );
+    int GetY() const;
+    void SetY( const int y );
+    int GetProtein() const;
+    void SetProtein( const int protein );
     int GetProteinRadius() const;
     void SetProteinRadius( const int protein_radius );
 
@@ -37,25 +50,13 @@ private:
     Cell();
 
 protected:
-    enum CellType
-    {
-        NEURON,
-        SENSOR_FOOD_LEFT,
-        SENSOR_FOOD_RIGHT,
-        SENSOR_ENERGY,
-        ACTIVATOR_FORWARD,
-        ACTIVATOR_LEFT,
-        ACTIVATOR_RIGHT
-    };
-
     Entity* m_Entity;
     CellType m_Type;
-    Ogre::String m_TypeName;
 
     int m_X;
     int m_Y;
 
-    Ogre::String m_Protein;
+    int m_Protein;
     int m_ProteinRadius;
 
     float m_Threshold;
