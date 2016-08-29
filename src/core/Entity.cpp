@@ -6,7 +6,7 @@
 
 
 
-Entity::Entity( const float x, const float y ):
+Entity::Entity( const int type, const float x, const float y ):
     m_Radius( 15.0f ),
     m_X( x ),
     m_Y( y ),
@@ -15,6 +15,7 @@ Entity::Entity( const float x, const float y ):
     m_LeftImpulse( 0.0f ),
     m_RightImpulse( 0.0f ),
     m_Energy( 100.0f ),
+    m_Type( type ),
     m_Think( 0.1f )
 {
     m_Rotation = rand() % 360;
@@ -58,9 +59,16 @@ Entity::Update()
 void
 Entity::Draw( const unsigned int x, const unsigned int y )
 {
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1 - m_Energy / 100.0f, m_Energy / 100.0f, 0, 1 ) );
+    if( m_Type == 0 )
+    {
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
+    }
+    else
+    {
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
+    }
     DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.5f ) );
     float pos_x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
     float pos_y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
     DEBUG_DRAW.Circle( pos_x, pos_y, 40.0f );
@@ -194,6 +202,14 @@ void
 Entity::SetEnergy( const float energy )
 {
     m_Energy = energy;
+}
+
+
+
+int
+Entity::GetType() const
+{
+    return m_Type;
 }
 
 

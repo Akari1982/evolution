@@ -8,7 +8,7 @@
 class Entity
 {
 public:
-    Entity( const float x, const float y );
+    Entity( const int type, const float x, const float y );
     virtual ~Entity();
 
     void Update();
@@ -31,6 +31,8 @@ public:
 
     float GetEnergy() const;
     void SetEnergy( const float energy );
+
+    int GetType() const;
 
     void AddNetwork( std::vector< Cell* >& network, const size_t generation_id, const size_t species_id );
 
@@ -55,6 +57,7 @@ private:
     float m_Fitness;
     size_t m_GenerationId;
     size_t m_SpeciesId;
+    int m_Type;
 
     float m_Think;
     std::vector< Cell* > m_Network;

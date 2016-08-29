@@ -24,8 +24,11 @@ public:
     void UpdateFitness( const float fitness, const size_t generation_id, const size_t species_id );
 
 private:
-    Ontogenesis m_Ontogenesis;
+    Ontogenesis m_Ontogenesis0;
+    Ontogenesis m_Ontogenesis1;
     std::vector< Entity* > m_Entity;
+    int m_TypeNum0;
+    int m_TypeNum1;
 
     struct Food
     {

@@ -11,29 +11,22 @@ template<>EntityManager *Ogre::Singleton< EntityManager >::msSingleton = NULL;
 
 
 
+const float SPAWN_TIME = 5.0f;
+const size_t MAX_ENTITY = 20;
+const float FOOD_TIME = 1.0f;
+
+
+
 EntityManager::EntityManager():
+    m_TypeNum1( 0 ),
+    m_TypeNum2( 0 ),
     m_X( 100.0f ),
     m_Y( 300.0f ),
     m_Width( 1080.0f ),
     m_Height( 300.0f ),
-    m_NextFoodTime( 1.0f ),
-    m_SpawnTime( 10.0f )
+    m_NextFoodTime( FOOD_TIME ),
+    m_SpawnTime( SPAWN_TIME )
 {
-    Entity* entity = new Entity( m_X + m_Width / 2.0f - 50.0f, m_Y + m_Height / 2.0f - 50.0f );
-    m_Ontogenesis.LoadNetwork( entity );
-    m_Entity.push_back( entity );
-
-    entity = new Entity( m_X + m_Width / 2.0f - 50.0f, m_Y + m_Height / 2.0f + 50.0f );
-    m_Ontogenesis.LoadNetwork( entity );
-    m_Entity.push_back( entity );
-
-    entity = new Entity( m_X + m_Width / 2.0f + 50.0f, m_Y + m_Height / 2.0f - 50.0f );
-    m_Ontogenesis.LoadNetwork( entity );
-    m_Entity.push_back( entity );
-
-    entity = new Entity( m_X + m_Width / 2.0f + 50.0f, m_Y + m_Height / 2.0f + 50.0f );
-    m_Ontogenesis.LoadNetwork( entity );
-    m_Entity.push_back( entity );
 }
 
 
@@ -144,6 +137,11 @@ EntityManager::Update()
     {
         if( ( *it )->GetEnergy() <= 0 )
         {
+            switch( ( *it )->GetType() )
+            {
+                case 0: --m_TypeNum0; break;
+                case 1: --m_TypeNum1; break;
+            }
             it = m_Entity.erase( it );
         }
         else
@@ -154,12 +152,21 @@ EntityManager::Update()
 
 
 
-    if( m_SpawnTime <= 0 && m_Entity.size() < 12 )
+    if( m_SpawnTime <= 0 && m_Entity.size() < MAX_ENTITY )
     {
-        Entity* entity = new Entity( m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
-        m_Ontogenesis.LoadNetwork( entity );
+        Entity* entity;
+        if( m_TypeNum1 > m_TypeNum0 )
+        {
+            entity = new Entity( 0, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
+            m_Ontogenesis0.LoadNetwork( entity );
+        }
+        else
+        {
+            entity = new Entity( 1, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
+            m_Ontogenesis1.LoadNetwork( entity );
+        }
         m_Entity.push_back( entity );
-        m_SpawnTime = 10.0f;
+        m_SpawnTime = SPAWN_TIME;
     }
 
 
@@ -171,8 +178,7 @@ EntityManager::Update()
         food.x = m_X + rand() % ( int )m_Width;
         food.y = m_Y + rand() % ( int )m_Height;
         m_Food.push_back( food );
-
-        m_NextFoodTime = 1.0f;
+        m_NextFoodTime = FOOD_TIME;
     }
 
 
@@ -192,14 +198,25 @@ EntityManager::Draw()
     DEBUG_DRAW.Line( m_X, m_Y, m_X + m_Width, m_Y );
     DEBUG_DRAW.Line( m_X, m_Y + m_Height, m_X + m_Width, m_Y + m_Height );
 
+    int type0 = 0;
+    int type1 = 0;
     for( size_t i = 0; i < m_Entity.size(); ++i )
     {
-        m_Entity[ i ]->Draw( 100 + i * 100, 100 );
+        if( m_Entity[ i ]->GetType() == 0 )
+        {
+            m_Entity[ i ]->Draw( 10 + type0 * 100, 100 );
+            ++type0;
+        }
+        else
+        {
+            m_Entity[ i ]->Draw( 10 + type1 * 100, 200 );
+            ++type1;
+        }
     }
 
     for( size_t i = 0; i < m_Food.size(); ++i )
     {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, m_Food[ i ].nutrition / 100.0f, 0, 1 ) );
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
         float radius = 1;
         float x = m_Food[ i ].x;
         float y = m_Food[ i ].y;
