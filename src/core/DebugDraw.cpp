@@ -614,7 +614,7 @@ DebugDraw::renderQueueEnded( Ogre::uint8 queueGroupId, const Ogre::String& invoc
 void
 DebugDraw::CreateLineVertexBuffer()
 {
-    m_LineMaxVertexCount = 1024 * 2;
+    m_LineMaxVertexCount = 8192 * 2;
     m_LineRenderOp.vertexData = new Ogre::VertexData;
     m_LineRenderOp.vertexData->vertexStart = 0;
 

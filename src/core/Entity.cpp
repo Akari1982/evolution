@@ -1,6 +1,7 @@
 #include "Entity.h"
 
 #include "DebugDraw.h"
+#include "Logger.h"
 #include "EntityManager.h"
 #include "Timer.h"
 
@@ -51,7 +52,7 @@ Entity::Update()
     m_Energy -= delta * 1.0f;
 
     m_Fitness += delta;
-    EntityManager::getSingleton().UpdateFitness( m_Fitness, m_GenerationId, m_SpeciesId );
+    EntityManager::getSingleton().UpdateFitness( m_Type, m_Fitness, m_GenerationId, m_SpeciesId );
 }
 
 
@@ -68,6 +69,8 @@ Entity::Draw( const unsigned int x, const unsigned int y )
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
     }
     DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+    DEBUG_DRAW.Text( m_X, m_Y, IntToString( ( int )m_Energy ) );
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.5f ) );
     float pos_x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
     float pos_y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );

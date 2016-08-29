@@ -85,13 +85,13 @@ Ontogenesis::~Ontogenesis()
 
 
 void
-Ontogenesis::Draw()
+Ontogenesis::Draw( const unsigned int x, const unsigned int y )
 {
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
     size_t cur_gen = m_Generations.size() - 1;
-    DEBUG_DRAW.Text( 10, 10, "Generation " + IntToString( cur_gen ) );
-    DEBUG_DRAW.Text( 10, 30, "top fitness: " + IntToString( m_Generations[ cur_gen ].top_fitness ) );
-    DEBUG_DRAW.Text( 10, 50, "number of species: " + IntToString( m_Generations[ cur_gen ].species.size() ) );
+    DEBUG_DRAW.Text( x, y, "Generation " + IntToString( cur_gen ) );
+    DEBUG_DRAW.Text( x + 200, y, "Top fitness: " + IntToString( m_Generations[ cur_gen ].top_fitness ) );
+    DEBUG_DRAW.Text( x + 400, y, "Number of species: " + IntToString( m_Generations[ cur_gen ].species.size() ) );
 }
 
 
@@ -103,24 +103,24 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
 
 
-    Generation cur_gen = m_Generations[ m_Generations.size() - 1 ];
-    if( cur_gen.species.size() >= 100 )
+    size_t cur_gen = m_Generations.size() - 1;
+    if( m_Generations[ cur_gen ].species.size() >= 5 )
     {
         Generation generation;
         generation.top_fitness = 0.0f;
-        for( size_t i = 0; i < cur_gen.species.size(); ++i )
+        for( size_t i = 0; i < m_Generations[ cur_gen ].species.size(); ++i )
         {
-            if( cur_gen.species[ i ].fitness == cur_gen.top_fitness )
+            if( m_Generations[ cur_gen ].species[ i ].fitness == m_Generations[ cur_gen ].top_fitness )
             {
-                generation.base_genome = cur_gen.species[ i ].genome;
+                generation.base_genome = m_Generations[ cur_gen ].species[ i ].genome;
             }
         }
-        cur_gen = generation;
-        m_Generations.push_back( cur_gen );
+        ++cur_gen;
+        m_Generations.push_back( generation );
     }
     Species species;
     species.fitness = 0.0f;
-    species.genome = Mutate( cur_gen.base_genome );
+    species.genome = Mutate( m_Generations[ cur_gen ].base_genome );
 
 
 
@@ -353,11 +353,11 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
 
 
-    cur_gen.species.push_back( species );
+    m_Generations[ cur_gen ].species.push_back( species );
 
 
 
-    entity->AddNetwork( species.network, m_Generations.size() - 1, cur_gen.species.size() - 1 );
+    entity->AddNetwork( species.network, m_Generations.size() - 1, m_Generations[ cur_gen ].species.size() - 1 );
 }
 
 

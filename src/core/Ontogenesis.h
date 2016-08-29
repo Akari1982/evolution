@@ -15,7 +15,7 @@ public:
     Ontogenesis();
     virtual ~Ontogenesis();
 
-    void Draw();
+    void Draw( const unsigned int x, const unsigned int y );
 
     void LoadNetwork( Entity* entity );
     void UpdateFitness( const float fitness, const size_t generation_id, const size_t species_id );

@@ -18,8 +18,8 @@ const float FOOD_TIME = 1.0f;
 
 
 EntityManager::EntityManager():
+    m_TypeNum0( 0 ),
     m_TypeNum1( 0 ),
-    m_TypeNum2( 0 ),
     m_X( 100.0f ),
     m_Y( 300.0f ),
     m_Width( 1080.0f ),
@@ -108,8 +108,6 @@ EntityManager::Update()
             entity->SetForwardImpulse( forward_impulse );
         }
 
-
-
         // check entity [ food collision
         for( std::vector< Food >::iterator it = m_Food.begin(); it != m_Food.end(); )
         {
@@ -159,11 +157,13 @@ EntityManager::Update()
         {
             entity = new Entity( 0, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
             m_Ontogenesis0.LoadNetwork( entity );
+            ++m_TypeNum0;
         }
         else
         {
             entity = new Entity( 1, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
             m_Ontogenesis1.LoadNetwork( entity );
+            ++m_TypeNum1;
         }
         m_Entity.push_back( entity );
         m_SpawnTime = SPAWN_TIME;
@@ -184,7 +184,8 @@ EntityManager::Update()
 
 
     Draw();
-    m_Ontogenesis.Draw();
+    m_Ontogenesis0.Draw( 10, 10 );
+    m_Ontogenesis1.Draw( 10, 160 );
 }
 
 
@@ -209,7 +210,7 @@ EntityManager::Draw()
         }
         else
         {
-            m_Entity[ i ]->Draw( 10 + type1 * 100, 200 );
+            m_Entity[ i ]->Draw( 10 + type1 * 100, 250 );
             ++type1;
         }
     }
@@ -248,7 +249,14 @@ EntityManager::FeelFood( const float x, const float y, const float radius )
 
 
 void
-EntityManager::UpdateFitness( const float fitness, const size_t generation_id, const size_t species_id )
+EntityManager::UpdateFitness( const int type, const float fitness, const size_t generation_id, const size_t species_id )
 {
-    m_Ontogenesis.UpdateFitness( fitness, generation_id, species_id );
+    if( type == 0 )
+    {
+        m_Ontogenesis0.UpdateFitness( fitness, generation_id, species_id );
+    }
+    else
+    {
+        m_Ontogenesis1.UpdateFitness( fitness, generation_id, species_id );
+    }
 }
