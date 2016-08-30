@@ -214,10 +214,10 @@ Entity::GetGenerationId() const
 
 
 
-int
+size_t
 Entity::GetSpeciesId() const
 {
-    return m_Speciesid;
+    return m_SpeciesId;
 }
 
 

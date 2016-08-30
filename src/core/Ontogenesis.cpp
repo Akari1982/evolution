@@ -10,7 +10,7 @@ const int MAX_PROTEIN = 5;
 
 
 Ontogenesis::Ontogenesis( const Ogre::String& file_name ):
-    m_Filename( file_name ),
+    m_FileName( file_name ),
     m_GeneUniqueId( 0 )
 {
 }
@@ -465,7 +465,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
             case E_NAME:
             case E_SPLIT:
             {
-                cond.value = Cell::NEURON;
+                expr.value = Cell::NEURON;
             }
             break;
             case E_MIGRATE:
@@ -473,11 +473,11 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
             case E_DENDRITE:
             case E_AXON:
             {
-                cond.value = rand() % MAX_PROTEIN;;
+                expr.value = rand() % MAX_PROTEIN;;
             }
             break;
         }
-        gene.expr.push_back( cond );
+        gene.expr.push_back( expr );
         mutated.push_back( gene );
         ++m_GeneUniqueId;
     }
@@ -552,44 +552,44 @@ Ontogenesis::ExpressionTypeToString( const ExpressionType type )
 
 
 void
-Ontogenesis::DumpGenome( Logger* dump, std::vector< Gene >& genome );
+Ontogenesis::DumpGenome( Logger* dump, std::vector< Ontogenesis::Gene >& genome )
 {
     for( size_t i = 0; i < genome.size(); ++i )
     {
         for( size_t cond_id = 0; cond_id < genome[ i ].cond.size(); ++cond_id )
         {
             Condition cond = genome[ i ].cond[ cond_id ];
-            export_script->Log( ConditionTypeToString( cond.type ) + "( " );
+            dump->Log( ConditionTypeToString( cond.type ) + "( " );
             switch( cond.type )
             {
                 case C_NAME:
                 case C_NNAME:
                 {
-                    export_script->Log( Cell::CellTypeToString( cond.value ) );
+                    dump->Log( Cell::CellTypeToString( ( Cell::CellType )cond.value ) );
                 }
                 break;
                 case C_PROTEIN:
                 case C_NPROTEIN:
                 {
-                    export_script->Log( IntToString( cond.value ) );
+                    dump->Log( IntToString( cond.value ) );
                 }
                 break;
             }
-            export_script->Log( " ) " );
+            dump->Log( " ) " );
         }
 
-        export_script->Log( ": " );
+        dump->Log( ": " );
 
         for( size_t expr_id = 0; expr_id < genome[ i ].expr.size(); ++expr_id )
         {
             Expression expr = genome[ i ].expr[ expr_id ];
-            export_script->Log( ExpressionTypeToString( cond.type ) + "( " );
+            dump->Log( ExpressionTypeToString( expr.type ) + "( " );
             switch( expr.type )
             {
                 case E_NAME:
                 case E_SPLIT:
                 {
-                    export_script->Log( Cell::CellTypeToString( expr.value ) );
+                    dump->Log( Cell::CellTypeToString( ( Cell::CellType )expr.value ) );
                 }
                 break;
                 case E_MIGRATE:
@@ -597,11 +597,11 @@ Ontogenesis::DumpGenome( Logger* dump, std::vector< Gene >& genome );
                 case E_DENDRITE:
                 case E_AXON:
                 {
-                    export_script->Log( IntToString( expr.value ) );
+                    dump->Log( IntToString( expr.value ) );
                 }
                 break;
             }
-            export_script->Log( " ) " );
+            dump->Log( " ) " );
         }
     }
 }
