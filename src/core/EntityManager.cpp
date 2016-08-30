@@ -27,6 +27,8 @@ EntityManager::EntityManager():
     m_NextFoodTime( FOOD_TIME ),
     m_SpawnTime( SPAWN_TIME )
 {
+    m_Ontogenesis0 = new Ontogenesis( "specie0.txt" );
+    m_Ontogenesis1 = new Ontogenesis( "specie1.txt" );
 }
 
 
@@ -37,6 +39,9 @@ EntityManager::~EntityManager()
     {
         delete m_Entity[ i ];
     }
+
+    delete m_Ontogenesis0;
+    delete m_Ontogenesis1;
 }
 
 
@@ -118,13 +123,29 @@ EntityManager::Update()
             float distance = sqrt( ( x2 - x1 ) * ( x2 - x1 ) + ( y2 - y1 ) * ( y2 - y1 ) );
             if( distance <= entity->GetRadius() )
             {
-                entity->SetEnergy( entity->GetEnergy() + ( *it ).nutrition );
+                float energy = entity->GetEnergy() + ( *it ).nutrition;
+                energy = ( energy > 100.0f) ? 100.0f : energy;
+                entity->SetEnergy( energy );
                 it = m_Food.erase( it );
             }
             else
             {
                 ++it;
             }
+        }
+
+
+
+        // consume energy and update fitness
+        entity->SetEnergy( entity->GetEnergy() - delta * 1.0f );
+        int type = entity->GetType();
+        if( type == 0 )
+        {
+            m_Ontogenesis0->UpdateFitness( delta, entity->GetGenerationId(), entity->GetSpeciesId() );
+        }
+        else
+        {
+            m_Ontogenesis1->UpdateFitness( delta, entity->GetGenerationId(), entity->GetSpeciesId() );
         }
     }
 
@@ -156,13 +177,13 @@ EntityManager::Update()
         if( m_TypeNum1 > m_TypeNum0 )
         {
             entity = new Entity( 0, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
-            m_Ontogenesis0.LoadNetwork( entity );
+            m_Ontogenesis0->LoadNetwork( entity );
             ++m_TypeNum0;
         }
         else
         {
             entity = new Entity( 1, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
-            m_Ontogenesis1.LoadNetwork( entity );
+            m_Ontogenesis1->LoadNetwork( entity );
             ++m_TypeNum1;
         }
         m_Entity.push_back( entity );
@@ -184,8 +205,8 @@ EntityManager::Update()
 
 
     Draw();
-    m_Ontogenesis0.Draw( 10, 10 );
-    m_Ontogenesis1.Draw( 10, 160 );
+    m_Ontogenesis0->Draw( 10, 10 );
+    m_Ontogenesis1->Draw( 10, 160 );
 }
 
 
@@ -244,19 +265,4 @@ EntityManager::FeelFood( const float x, const float y, const float radius )
     }
 
     return ( ret > 1.0f ) ? 1.0f: ret;
-}
-
-
-
-void
-EntityManager::UpdateFitness( const int type, const float fitness, const size_t generation_id, const size_t species_id )
-{
-    if( type == 0 )
-    {
-        m_Ontogenesis0.UpdateFitness( fitness, generation_id, species_id );
-    }
-    else
-    {
-        m_Ontogenesis1.UpdateFitness( fitness, generation_id, species_id );
-    }
 }

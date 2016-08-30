@@ -21,11 +21,10 @@ public:
 
     float FeelFood( const float x, const float y, const float radius );
     bool CheckMove( Entity* entity, const float move_x, const float move_y );
-    void UpdateFitness( const int type, const float fitness, const size_t generation_id, const size_t species_id );
 
 private:
-    Ontogenesis m_Ontogenesis0;
-    Ontogenesis m_Ontogenesis1;
+    Ontogenesis* m_Ontogenesis0;
+    Ontogenesis* m_Ontogenesis1;
     std::vector< Entity* > m_Entity;
     int m_TypeNum0;
     int m_TypeNum1;

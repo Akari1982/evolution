@@ -12,13 +12,16 @@
 class Ontogenesis
 {
 public:
-    Ontogenesis();
+    Ontogenesis( const Ogre::String& file_name );
     virtual ~Ontogenesis();
 
     void Draw( const unsigned int x, const unsigned int y );
 
     void LoadNetwork( Entity* entity );
-    void UpdateFitness( const float fitness, const size_t generation_id, const size_t species_id );
+    void UpdateFitness( const float delta, const size_t generation_id, const size_t species_id );
+
+private:
+    Ontogenesis();
 
 public:
     enum ConditionType
@@ -26,7 +29,9 @@ public:
         C_NAME = 0,
         C_NNAME,
         C_PROTEIN,
-        C_NPROTEIN
+        C_NPROTEIN,
+
+        C_TOTAL
     };
 
     enum ExpressionType
@@ -36,8 +41,10 @@ public:
         E_MIGRATE,
         E_PROTEIN,
         E_DENDRITE,
-        E_AXON
-    };
+        E_AXON,
+
+        E_TOTAL
+   };
 
     struct Condition
     {
@@ -53,8 +60,8 @@ public:
 
     struct Gene
     {
-        Ogre::String name;
-
+        unsigned int unique_id;
+        float conserv;
         std::vector< Condition > cond;
         std::vector< Expression > expr;
     };
@@ -84,7 +91,14 @@ private:
     bool IsCell( std::vector< Cell* >& network, const int x, const int y );
     std::vector< Gene > Mutate( std::vector< Gene >& genome );
 
+    Ogre::String ConditionTypeToString( const ConditionType type );
+    Ogre::String ExpressionTypeToString( const ExpressionType type );
+    void DumpGenome( Logger* dump, std::vector< Gene >& genome );
+
 private:
+    Ogre::String m_FileName;
+
+    unsigned int m_GeneUniqueId;
     std::vector< Generation > m_Generations;
 };
 

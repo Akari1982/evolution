@@ -46,6 +46,8 @@ public:
 
     void AddSynapse( const float power, const bool inverted, Cell* cell );
 
+    static Ogre::String CellTypeToString( const CellType type );
+
 private:
     Cell();
 

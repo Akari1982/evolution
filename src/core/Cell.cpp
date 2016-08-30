@@ -45,7 +45,7 @@ Cell::Update()
 
             switch( m_Synapses[ i ].cell->m_Type )
             {
-                case Cell::NEURON:
+                case NEURON:
                 {
                     if( m_Synapses[ i ].cell->m_Fired == true )
                     {
@@ -54,19 +54,19 @@ Cell::Update()
                 }
                 break;
 
-                case Cell::SENSOR_FOOD_LEFT:
+                case SENSOR_FOOD_LEFT:
                 {
                     value = m_Entity->GetSensorFoodLeft();
                 }
                 break;
 
-                case Cell::SENSOR_FOOD_RIGHT:
+                case SENSOR_FOOD_RIGHT:
                 {
                     value = m_Entity->GetSensorFoodRight();
                 }
                 break;
 
-                case Cell::SENSOR_ENERGY:
+                case SENSOR_ENERGY:
                 {
                     value = m_Entity->GetSensorEnergy();
                 }
@@ -88,15 +88,15 @@ Cell::Update()
             m_Value = 0.0f;
             m_Fired = true;
 
-            if( m_Type == Cell::ACTIVATOR_FORWARD )
+            if( m_Type == ACTIVATOR_FORWARD )
             {
                 m_Entity->SetForwardImpulse( 2.0f );
             }
-            else if( m_Type == Cell::ACTIVATOR_LEFT )
+            else if( m_Type == ACTIVATOR_LEFT )
             {
                  m_Entity->SetLeftImpulse( 2.0f );
             }
-            else if( m_Type == Cell::ACTIVATOR_RIGHT )
+            else if( m_Type == ACTIVATOR_RIGHT )
             {
                  m_Entity->SetRightImpulse( 2.0f );
             }
@@ -113,11 +113,11 @@ Cell::Draw( const unsigned int x, const unsigned int y )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
     }
-    else if( m_Type == Cell::ACTIVATOR_FORWARD || m_Type == Cell::ACTIVATOR_LEFT || m_Type == Cell::ACTIVATOR_RIGHT )
+    else if( m_Type == ACTIVATOR_FORWARD || m_Type == ACTIVATOR_LEFT || m_Type == ACTIVATOR_RIGHT )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 1 ) );
     }
-    else if( m_Type == Cell::SENSOR_FOOD_LEFT || m_Type == Cell::SENSOR_FOOD_RIGHT || m_Type == Cell::SENSOR_ENERGY )
+    else if( m_Type == SENSOR_FOOD_LEFT || m_Type == SENSOR_FOOD_RIGHT || m_Type == SENSOR_ENERGY )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
     }
@@ -150,7 +150,7 @@ Cell::Draw( const unsigned int x, const unsigned int y )
 
 
 void
-Cell::SetType( const Cell::CellType type )
+Cell::SetType( const CellType type )
 {
     m_Type = type;
 }
@@ -237,4 +237,23 @@ Cell::AddSynapse( const float power, const bool inverted, Cell* cell )
     synapse.inverted = inverted;
     synapse.cell = cell;
     m_Synapses.push_back( synapse );
+}
+
+
+
+Ogre::String
+Cell::CellTypeToString( const CellType type )
+{
+    switch( type )
+    {
+        case STEM: return "STEM";
+        case NEURON: return "NEURON";
+        case SENSOR_FOOD_LEFT: return "SENSOR_FOOD_LEFT";
+        case SENSOR_FOOD_RIGHT: return "SENSOR_FOOD_RIGHT";
+        case SENSOR_ENERGY: return "SENSOR_ENERGY";
+        case ACTIVATOR_FORWARD: return "ACTIVATOR_FORWARD";
+        case ACTIVATOR_LEFT: return "ACTIVATOR_LEFT";
+        case ACTIVATOR_RIGHT: return "ACTIVATOR_RIGHT";
+    }
+    return "UNKNOWN";
 }

@@ -49,10 +49,6 @@ Entity::Update()
 
         m_Think = 0.1f;
     }
-    m_Energy -= delta * 1.0f;
-
-    m_Fitness += delta;
-    EntityManager::getSingleton().UpdateFitness( m_Type, m_Fitness, m_GenerationId, m_SpeciesId );
 }
 
 
@@ -70,6 +66,7 @@ Entity::Draw( const unsigned int x, const unsigned int y )
     }
     DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+    DEBUG_DRAW.SetTextAlignment( DebugDraw::CENTER );
     DEBUG_DRAW.Text( m_X, m_Y, IntToString( ( int )m_Energy ) );
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.5f ) );
     float pos_x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
@@ -205,6 +202,22 @@ void
 Entity::SetEnergy( const float energy )
 {
     m_Energy = energy;
+}
+
+
+
+size_t
+Entity::GetGenerationId() const
+{
+    return m_GenerationId;
+}
+
+
+
+int
+Entity::GetSpeciesId() const
+{
+    return m_Speciesid;
 }
 
 

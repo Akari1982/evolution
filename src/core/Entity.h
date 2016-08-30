@@ -32,6 +32,8 @@ public:
     float GetEnergy() const;
     void SetEnergy( const float energy );
 
+    size_t GetGenerationId() const;
+    size_t GetSpeciesId() const;
     int GetType() const;
 
     void AddNetwork( std::vector< Cell* >& network, const size_t generation_id, const size_t species_id );
@@ -54,7 +56,6 @@ private:
     float m_RightImpulse;
 
     float m_Energy;
-    float m_Fitness;
     size_t m_GenerationId;
     size_t m_SpeciesId;
     int m_Type;
