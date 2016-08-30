@@ -226,12 +226,12 @@ EntityManager::Draw()
     {
         if( m_Entity[ i ]->GetType() == 0 )
         {
-            m_Entity[ i ]->Draw( 10 + type0 * 100, 100 );
+            m_Entity[ i ]->Draw( 30 + type0 * 120, 100 );
             ++type0;
         }
         else
         {
-            m_Entity[ i ]->Draw( 10 + type1 * 100, 250 );
+            m_Entity[ i ]->Draw( 30 + type1 * 120, 250 );
             ++type1;
         }
     }

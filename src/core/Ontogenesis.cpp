@@ -27,7 +27,7 @@ Ontogenesis::~Ontogenesis()
 void
 Ontogenesis::Draw( const unsigned int x, const unsigned int y )
 {
-    size_t cur_gen = m_Generations.size() - 1;
+    int cur_gen = m_Generations.size() - 1;
     if( cur_gen >= 0 )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
@@ -46,8 +46,15 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
 
 
-    size_t cur_gen = m_Generations.size() - 1;
-    if( cur_gen < 0 || m_Generations[ cur_gen ].species.size() >= 5 )
+    int cur_gen = m_Generations.size() - 1;
+    if( cur_gen < 0 )
+    {
+        Generation generation;
+        generation.top_fitness = 0.0f;
+        ++cur_gen;
+        m_Generations.push_back( generation );
+    }
+    else if( m_Generations[ cur_gen ].species.size() >= 5 )
     {
         Generation generation;
         generation.top_fitness = 0.0f;
@@ -61,6 +68,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
         ++cur_gen;
         m_Generations.push_back( generation );
     }
+
     Species species;
     species.fitness = 0.0f;
     species.genome = Mutate( m_Generations[ cur_gen ].base_genome );
@@ -116,15 +124,11 @@ Ontogenesis::LoadNetwork( Entity* entity )
         ++cycles;
         changes = false;
 
-        dump->Log( "Step: " + IntToString( cycles ) + "\n" );
-
         std::vector< std::vector< unsigned int > > species_genes;
 
         for( size_t i = 0; i < species.network.size(); ++i )
         {
             std::vector< unsigned int > expr_genes;
-
-            dump->Log( "    cell_" + IntToString( i ) + ": " + IntToString( species.network[ i ]->GetType() ) + "\n" );
 
             for( size_t gene_id = 0; gene_id < species.genome.size(); ++gene_id )
             {
@@ -442,10 +446,12 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
         cond.type = ( ConditionType )( rand() % C_TOTAL );
         switch( cond.type )
         {
+            // now only neuron and stem cells can develop during onthogenesis with 50% chance each
+            // other cells are fixed
             case C_NAME:
             case C_NNAME:
             {
-                cond.value = rand() % Cell::TOTAL;
+                cond.value = ( ( rand() % 1 ) == 1 ) ? Cell::NEURON : Cell::STEM;
             }
             break;
             case C_PROTEIN:
