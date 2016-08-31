@@ -14,8 +14,9 @@ Cell::Cell( Entity* entity, const CellType type, const int x, const int y ):
     m_Type( type ),
     m_X( x ),
     m_Y( y ),
-    m_Protein( -1 ),
-    m_ProteinRadius( 0 ),
+    m_OuterProtein( -1 ),
+    m_OuterProteinRadius( 0 ),
+    m_InnerProtein( -1 ),
     m_Threshold( 1.0f ),
     m_Value( 0.0f ),
     m_Fired( false )
@@ -198,33 +199,49 @@ Cell::SetY( const int y )
 
 
 int
-Cell::GetProtein() const
+Cell::GetOuterProtein() const
 {
-    return m_Protein;
+    return m_OuterProtein;
 }
 
 
 
 void
-Cell::SetProtein( const int protein )
+Cell::SetOuterProtein( const int protein )
 {
-    m_Protein = protein;
+    m_OuterProtein = protein;
 }
 
 
 
 int
-Cell::GetProteinRadius() const
+Cell::GetOuterProteinRadius() const
 {
-    return m_ProteinRadius;
+    return m_OuterProteinRadius;
 }
 
 
 
 void
-Cell::SetProteinRadius( const int protein_radius )
+Cell::SetOuterProteinRadius( const int protein_radius )
 {
-    m_ProteinRadius = protein_radius;
+    m_OuterProteinRadius = protein_radius;
+}
+
+
+
+int
+Cell::GetInnerProtein() const
+{
+    return m_InnerProtein;
+}
+
+
+
+void
+Cell::SetInnerProtein( const int protein )
+{
+    m_InnerProtein = protein;
 }
 
 
@@ -233,10 +250,28 @@ void
 Cell::AddSynapse( const float power, const bool inverted, Cell* cell )
 {
     Synapse synapse;
-    synapse.power = power;
-    synapse.inverted = inverted;
-    synapse.cell = cell;
-    m_Synapses.push_back( synapse );
+
+    bool found = false;
+    for( size_t i = 0; i < m_Synapses.size(); ++i )
+    {
+        if( ( m_Synapses[ i ].cell == cell ) && ( m_Synapses[ i ].inverted == inverted ) )
+        {
+            synapse = m_Synapses[ i ];
+            found = true;
+        }
+    }
+
+    if( found == true )
+    {
+        synapse.power += power;
+    }
+    else
+    {
+        synapse.power = power;
+        synapse.inverted = inverted;
+        synapse.cell = cell;
+        m_Synapses.push_back( synapse );
+    }
 }
 
 
@@ -246,7 +281,6 @@ Cell::CellTypeToString( const CellType type )
 {
     switch( type )
     {
-        case STEM: return "STEM";
         case NEURON: return "NEURON";
         case SENSOR_FOOD_LEFT: return "SENSOR_FOOD_LEFT";
         case SENSOR_FOOD_RIGHT: return "SENSOR_FOOD_RIGHT";

@@ -72,7 +72,6 @@ Entity::Draw( const unsigned int x, const unsigned int y )
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.5f ) );
     float pos_x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
     float pos_y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
-    DEBUG_DRAW.Circle( pos_x, pos_y, 40.0f );
     DEBUG_DRAW.Line( m_X, m_Y, pos_x, pos_y );
     pos_x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
     pos_y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
@@ -246,7 +245,7 @@ Entity::GetSensorFoodLeft() const
 {
     float x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
     float y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
-    return EntityManager::getSingleton().FeelFood( x, y, 40.0f );
+    return EntityManager::getSingleton().FeelFood( x, y );
 }
 
 
@@ -256,7 +255,7 @@ Entity::GetSensorFoodRight() const
 {
     float x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
     float y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
-    return EntityManager::getSingleton().FeelFood( x, y, 40.0f );
+    return EntityManager::getSingleton().FeelFood( x, y );
 }
 
 

@@ -123,10 +123,19 @@ EntityManager::Update()
             float distance = sqrt( ( x2 - x1 ) * ( x2 - x1 ) + ( y2 - y1 ) * ( y2 - y1 ) );
             if( distance <= entity->GetRadius() )
             {
-                float energy = entity->GetEnergy() + ( *it ).nutrition;
+                float energy = entity->GetEnergy() + ( *it ).power;
                 energy = ( energy > 100.0f) ? 100.0f : energy;
                 entity->SetEnergy( energy );
                 it = m_Food.erase( it );
+
+                if( entity->GetType() == 0 )
+                {
+                    m_Ontogenesis0->UpdateFitness( ( *it ).power, entity->GetGenerationId(), entity->GetSpeciesId() );
+                }
+                else
+                {
+                    m_Ontogenesis1->UpdateFitness( ( *it ).power, entity->GetGenerationId(), entity->GetSpeciesId() );
+                }
             }
             else
             {
@@ -138,15 +147,6 @@ EntityManager::Update()
 
         // consume energy and update fitness
         entity->SetEnergy( entity->GetEnergy() - delta * 1.0f );
-        int type = entity->GetType();
-        if( type == 0 )
-        {
-            m_Ontogenesis0->UpdateFitness( delta, entity->GetGenerationId(), entity->GetSpeciesId() );
-        }
-        else
-        {
-            m_Ontogenesis1->UpdateFitness( delta, entity->GetGenerationId(), entity->GetSpeciesId() );
-        }
     }
 
 
@@ -195,7 +195,7 @@ EntityManager::Update()
     if( m_NextFoodTime <= 0 && m_Food.size() < 100 )
     {
         Food food;
-        food.nutrition = 100;
+        food.power = 20 + rand() % 50;
         food.x = m_X + rand() % ( int )m_Width;
         food.y = m_Y + rand() % ( int )m_Height;
         m_Food.push_back( food );
@@ -226,12 +226,12 @@ EntityManager::Draw()
     {
         if( m_Entity[ i ]->GetType() == 0 )
         {
-            m_Entity[ i ]->Draw( 30 + type0 * 120, 100 );
+            m_Entity[ i ]->Draw( 50 + type0 * 120, 100 );
             ++type0;
         }
         else
         {
-            m_Entity[ i ]->Draw( 30 + type1 * 120, 250 );
+            m_Entity[ i ]->Draw( 50 + type1 * 120, 250 );
             ++type1;
         }
     }
@@ -242,6 +242,7 @@ EntityManager::Draw()
         float radius = 1;
         float x = m_Food[ i ].x;
         float y = m_Food[ i ].y;
+        DEBUG_DRAW.Circle( x, y, m_Food[ i ].power );
         DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
     }
 }
@@ -249,20 +250,19 @@ EntityManager::Draw()
 
 
 float
-EntityManager::FeelFood( const float x, const float y, const float radius )
+EntityManager::FeelFood( const float x, const float y )
 {
     float ret = 0.0f;
-
     for( size_t i = 0; i < m_Food.size(); ++i )
     {
         float x1 = m_Food[ i ].x;
         float y1 = m_Food[ i ].y;
+        float radius = m_Food[ i ].power;
         float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
-        if( distance <= radius )
+        if( distance < radius )
         {
             ret += 1.0f - distance / radius;
         }
     }
-
     return ( ret > 1.0f ) ? 1.0f: ret;
 }

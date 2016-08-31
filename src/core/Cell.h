@@ -17,8 +17,7 @@ class Cell
 public:
     enum CellType
     {
-        STEM = 0,
-        NEURON,
+        NEURON = 0,
         SENSOR_FOOD_LEFT,
         SENSOR_FOOD_RIGHT,
         SENSOR_ENERGY,
@@ -39,10 +38,12 @@ public:
     void SetX( const int x );
     int GetY() const;
     void SetY( const int y );
-    int GetProtein() const;
-    void SetProtein( const int protein );
-    int GetProteinRadius() const;
-    void SetProteinRadius( const int protein_radius );
+    int GetOuterProtein() const;
+    void SetOuterProtein( const int protein );
+    int GetOuterProteinRadius() const;
+    void SetOuterProteinRadius( const int protein_radius );
+    int GetInnerProtein() const;
+    void SetInnerProtein( const int protein );
 
     void AddSynapse( const float power, const bool inverted, Cell* cell );
 
@@ -58,8 +59,9 @@ protected:
     int m_X;
     int m_Y;
 
-    int m_Protein;
-    int m_ProteinRadius;
+    int m_OuterProtein;
+    int m_OuterProteinRadius;
+    int m_InnerProtein;
 
     float m_Threshold;
     float m_Value;

@@ -5,20 +5,21 @@
 
 
 
-const int MAX_PROTEIN = 5;
+const int MAX_PROTEIN = 10;
 
 
 
 Ontogenesis::Ontogenesis( const Ogre::String& file_name ):
-    m_FileName( file_name ),
     m_GeneUniqueId( 0 )
 {
+    m_Dump = new Logger( file_name );
 }
 
 
 
 Ontogenesis::~Ontogenesis()
 {
+    delete m_Dump;
 }
 
 
@@ -42,10 +43,6 @@ Ontogenesis::Draw( const unsigned int x, const unsigned int y )
 void
 Ontogenesis::LoadNetwork( Entity* entity )
 {
-    Logger* dump = new Logger( m_FileName );
-
-
-
     int cur_gen = m_Generations.size() - 1;
     if( cur_gen < 0 )
     {
@@ -54,7 +51,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
         ++cur_gen;
         m_Generations.push_back( generation );
     }
-    else if( m_Generations[ cur_gen ].species.size() >= 5 )
+    else if( m_Generations[ cur_gen ].species.size() >= 100 )
     {
         Generation generation;
         generation.top_fitness = 0.0f;
@@ -75,51 +72,51 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
 
 
-    dump->Log( "Generation: " + IntToString( cur_gen ) + " " );
-    DumpGenome( dump, species.genome );
-    dump->Log( "\n" );
+    m_Dump->Log( "Generation: " + IntToString( cur_gen ) + " " );
+    DumpGenome( species.genome );
+    m_Dump->Log( "\n" );
 
 
 
     // Default cells
-    int protein_sensor_food = 1;
-    int protein_activator_forward = 2;
-    int protein_activator_left = 3;
-    int protein_activator_right = 4;
+    int protein_sensor_food_left = 1;
+    int protein_sensor_food_right = 2;
+    int protein_activator_forward = 3;
+    int protein_activator_left = 4;
+    int protein_activator_right = 5;
 
-    Cell* cell = new Cell( entity, Cell::STEM, 0, 0 );
+    Cell* cell = new Cell( entity, Cell::NEURON, 0, 0 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::SENSOR_FOOD_LEFT, -5, -3 );
-    cell->SetProtein( protein_sensor_food );
-    cell->SetProteinRadius( 8 );
+    cell->SetOuterProtein( protein_sensor_food_left );
+    cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::SENSOR_FOOD_RIGHT, -5, 3 );
-    cell->SetProtein( protein_sensor_food );
-    cell->SetProteinRadius( 8 );
+    cell->SetOuterProtein( protein_sensor_food_right );
+    cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::ACTIVATOR_FORWARD, 5, 0 );
-    cell->SetProtein( protein_activator_forward );
-    cell->SetProteinRadius( 6 );
+    cell->SetOuterProtein( protein_activator_forward );
+    cell->SetOuterProteinRadius( 6 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::ACTIVATOR_LEFT, 3, -3 );
-    cell->SetProtein( protein_activator_left );
-    cell->SetProteinRadius( 5 );
+    cell->SetOuterProtein( protein_activator_left );
+    cell->SetOuterProteinRadius( 5 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::ACTIVATOR_RIGHT, 3, 3 );
-    cell->SetProtein( protein_activator_right );
-    cell->SetProteinRadius( 5 );
+    cell->SetOuterProtein( protein_activator_right );
+    cell->SetOuterProteinRadius( 5 );
     species.network.push_back( cell );
 
 
 
-    bool changes = true;
     int cycles = 0;
-    while( changes == true && cycles < 3 )
+    while( cycles < 3 )
     {
         ++cycles;
         changes = false;
@@ -128,6 +125,12 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
         for( size_t i = 0; i < species.network.size(); ++i )
         {
+            // express genes only for neurons
+            if( species.network[ i ]->GetType() != Cell::NEURON )
+            {
+                continue;
+            }
+
             std::vector< unsigned int > expr_genes;
 
             for( size_t gene_id = 0; gene_id < species.genome.size(); ++gene_id )
@@ -141,37 +144,22 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
                     switch( cond.type )
                     {
-                        case C_NAME:
-                        {
-                            if( species.network[ i ]->GetType() != cond.value )
-                            {
-                                exec = false;
-                            }
-                        }
-                        break;
-                        case C_NNAME:
-                        {
-                            if( species.network[ i ]->GetType() == cond.value )
-                            {
-                                exec = false;
-                            }
-                        }
-                        break;
-                        case C_PROTEIN:
+                        case C_O_PROTEIN:
+                        case C_NO_PROTEIN:
                         {
                             std::vector< PowerProtein > powers;
                             bool power = SearchProtein( species.network, cond.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
-                            if( power == false )
+                            if( ( ( cond.type == C_O_PROTEIN ) && ( power == false ) ) || ( ( cond.type == C_NO_PROTEIN ) && ( power != false ) ) )
                             {
                                 exec = false;
                             }
                         }
                         break;
-                        case C_NPROTEIN:
+                        case C_I_PROTEIN:
+                        case C_NI_PROTEIN:
                         {
-                            std::vector< PowerProtein > powers;
-                            bool power = SearchProtein( species.network, cond.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
-                            if( power == true )
+                            bool found == species.network[ i ]->GetInnerProtein() == cond.value;
+                            if( ( ( cond.type == C_I_PROTEIN ) && ( found == false ) ) || ( ( cond.type == C_NI_PROTEIN ) && ( found == true ) ) )
                             {
                                 exec = false;
                             }
@@ -202,15 +190,6 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
                     switch( expr.type )
                     {
-                        case E_NAME:
-                        {
-                            if( species.network[ i ]->GetType() != expr.value )
-                            {
-                                species.network[ i ]->SetType( ( Cell::CellType )expr.value );
-                                changes = true;
-                            }
-                        }
-                        break;
                         case E_SPLIT:
                         {
                             int x = 0;
@@ -220,7 +199,6 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             {
                                 Cell* cell = new Cell( entity, ( Cell::CellType )expr.value, x, y );
                                 species.network.push_back( cell );
-                                changes = true;
                             }
                         }
                         break;
@@ -243,33 +221,40 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             powers.clear();
                         }
                         break;
-                        case E_PROTEIN:
+                        case E_O_PROTEIN:
                         {
-                            if( species.network[ i ]->GetProtein() != expr.value )
+                            if( species.network[ i ]->GetOuterProtein() != expr.value )
                             {
-                                species.network[ i ]->SetProtein( expr.value );
-                                changes = true;
+                                species.network[ i ]->SetOuterProtein( expr.value );
+                            }
+                        }
+                        break;
+                        case E_I_PROTEIN:
+                        {
+                            if( species.network[ i ]->GetInnerProtein() != expr.value )
+                            {
+                                species.network[ i ]->SetInnerProtein( expr.value );
                             }
                         }
                         break;
                         case E_DENDRITE:
-                        {
-                            std::vector< PowerProtein > powers;
-                            SearchProtein( species.network, expr.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
-                            for( size_t c = 0; c < powers.size(); ++c )
-                            {
-                                species.network[ i ]->AddSynapse( powers[ c ].power, false, species.network[ powers[ c ].cell_id ] );
-                            }
-                            powers.clear();
-                        }
-                        break;
+                        case E_DENDRITE_I:
                         case E_AXON:
+                        case E_AXON_I:
                         {
                             std::vector< PowerProtein > powers;
                             SearchProtein( species.network, expr.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             for( size_t c = 0; c < powers.size(); ++c )
                             {
-                                species.network[ powers[ c ].cell_id ]->AddSynapse( powers[ c ].power, false, species.network[ i ] );
+                                bool inverted = ( expr.type == E_DENDRITE_I ) || ( expr.type == E_AXON_I );
+                                if( ( expr.type == E_DENDRITE ) || ( expr.type == E_DENDRITE_I ) )
+                                {
+                                    species.network[ i ]->AddSynapse( powers[ c ].power, inverted, species.network[ powers[ c ].cell_id ] );
+                                }
+                                else
+                                {
+                                    species.network[ powers[ c ].cell_id ]->AddSynapse( powers[ c ].power, inverted, species.network[ i ] );
+                                }
                             }
                             powers.clear();
                         }
@@ -294,12 +279,20 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
 
 void
-Ontogenesis::UpdateFitness( const float delta, const size_t generation_id, const size_t species_id )
+Ontogenesis::UpdateFitness( const float add, const size_t generation_id, const size_t species_id )
 {
-    m_Generations[ generation_id ].species[ species_id ].fitness += delta;
+    m_Generations[ generation_id ].species[ species_id ].fitness += add;
     if( m_Generations[ generation_id ].top_fitness < m_Generations[ generation_id ].species[ species_id ].fitness )
     {
         m_Generations[ generation_id ].top_fitness = m_Generations[ generation_id ].species[ species_id ].fitness;
+
+        // if already new generation but some old entity still live and better than old one
+        // then update genome for futher use (only for next generation)
+        int cur_gen = m_Generations.size() - 1;
+        if( cur_gen != generation_id )
+        {
+            m_Generations[ generation_id + 1 ].base_genome = m_Generations[ generation_id ].species[ species_id ].genome;
+        }
     }
 }
 
@@ -315,10 +308,10 @@ Ontogenesis::SearchProtein( std::vector< Cell* >& network, const int protein, co
             int x2 = network[ i ]->GetX();
             int y2 = network[ i ]->GetY();
             float distance = sqrt( ( x2 - x ) * ( x2 - x ) + ( y2 - y ) * ( y2 - y ) );
-            if( distance < network[ i ]->GetProteinRadius() )
+            if( distance < network[ i ]->GetOuterProteinRadius() )
             {
                 PowerProtein pp;
-                pp.power = 1.0;
+                pp.power = ( network[ i ]->GetOuterProteinRadius() / distance ) * 0.5f;
                 pp.cell_id = i;
                 powers.push_back( pp );
             }
@@ -400,40 +393,13 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
 {
     std::vector< Gene > mutated;
 
-    // Genome mutation: Another important kind of mutation that is found in nature as
-    // well is mutation on the genome level: deletion, insertion, and doubling of entire
-    // genes. For example, successful genes (e.g., structure genes that build a layer of
-    // neurons) can be doubled while other useless genes may vanish entirely. Gene
-    // doubling has become a success story in evolution. Indeed, it was shown recently
-    // [20] that initially simple morphological genes (sometimes even entire genomes)
-    // often doubled during evolution, only to subsequently specialize
+
 
     // allow only 1 mutation per mutate function
     bool mutation = false;
-/*
-    for( size_t i = 0; i < genome.size(); ++i )
-    {
-        // chance to be deleted 1%
-        if( ( mutation == true ) || ( (rand() % 100 ) != 1 ) )
-        {
-            mutated.push_back( genome[ i ] );
 
-            // chance to be duplicated 5%
-            if( ( mutation == false ) && ( ( rand() % 100 ) < 5 ) )
-            {
-                mutation = true;
-                Gene gene = genome[ i ];
-                gene.unique_id = m_GeneUniqueId;
-                mutated.push_back( gene );
-                ++m_GeneUniqueId;
-            }
-        }
-        else
-        {
-            mutation = true;
-        }
-    }
-*/
+
+
     // insert new genes only if genome is empty
     // add one random condition and one random expression
     if( genome.size() == 0 )
@@ -442,47 +408,9 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
         Gene gene;
         gene.unique_id = m_GeneUniqueId;
         gene.conserv = 0.0f;
-        Condition cond;
-        cond.type = ( ConditionType )( rand() % C_TOTAL );
-        switch( cond.type )
-        {
-            // now only neuron and stem cells can develop during onthogenesis with 50% chance each
-            // other cells are fixed
-            case C_NAME:
-            case C_NNAME:
-            {
-                cond.value = ( ( rand() % 1 ) == 1 ) ? Cell::NEURON : Cell::STEM;
-            }
-            break;
-            case C_PROTEIN:
-            case C_NPROTEIN:
-            {
-                cond.value = rand() % MAX_PROTEIN;;
-            }
-            break;
-        }
+        Condition cond = GenerateRandomCondition();
         gene.cond.push_back( cond );
-        Expression expr;
-        expr.type = ( ExpressionType )( rand() % E_TOTAL );
-        switch( expr.type )
-        {
-            // now only neuron allowed for expression
-            // other cells are fixed
-            case E_NAME:
-            case E_SPLIT:
-            {
-                expr.value = Cell::NEURON;
-            }
-            break;
-            case E_MIGRATE:
-            case E_PROTEIN:
-            case E_DENDRITE:
-            case E_AXON:
-            {
-                expr.value = rand() % MAX_PROTEIN;;
-            }
-            break;
-        }
+        Expression expr = GenerateRandomExpression();
         gene.expr.push_back( expr );
         mutated.push_back( gene );
         ++m_GeneUniqueId;
@@ -490,37 +418,175 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
 
 
 
-/*
-    // Point mutations: These are restricted to one gene. A randomly chosen condition
-    // atom or expression command of a randomly chosen gene changes to its nearest
-    // neighbor in genetic space. This means that if, for example, the condition atom
-    // ADD[IP2] has been chosen, mutation changes either the substrate (e.g., to ADD[IP1] )
-    // or the operation (e.g., to MUL[IP2] ) but never both.
-    for( size_t i = 0; i < mutated.size(); ++i )
+    // copy existed genome to mutated and do some mutation
+    for( size_t i = 0; i < genome.size(); ++i )
     {
-        for( size_t cond_id = 0; cond_id < mutated[ i ].cond.size(); ++cond_id )
+        Gene gene = genome[ i ];
+
+        // chance to be deleted 0-10% (reduced if this is conservative gene)
+        // don't delete if this is only gene in genome
+        // just don't copy it to new genome
+        if( ( mutation == true ) || ( genome.size() == 1 ) || ( ( rand() % ( int )( 1000.0f / gene.conserv ) ) != 1 ) )
         {
-            // chance to be mutated
-            if( ( mutation == false ) && ( (rand() % 100 ) < 30 ) )
+            mutated.push_back( gene );
+
+            // chance to be duplicated 5% (not affected by conservativeness)
+            if( ( mutation == false ) && ( ( rand() % 20 ) == 1 ) )
             {
                 mutation = true;
-                mutated[ i ].cond[ cond_id ].type = ( ConditionType )( rand() % 3 );
+                Gene dup_gene = gene;
+                dup_gene.unique_id = m_GeneUniqueId;
+                dup_gene.conserv = 0.0f;
+                mutated.push_back( dup_gene );
+                ++m_GeneUniqueId;
             }
         }
-
-        for( size_t expr_id = 0; expr_id < mutated[ i ].expr.size(); ++expr_id )
+        else
         {
-            // chance to be mutated
-            if( ( mutation == false ) && ( (rand() % 100 ) < 30 ) )
+            mutation = true;
+        }
+    }
+
+
+
+    for( size_t i = 0; i < mutated.size(); ++i )
+    {
+        // mutate only if conserv roll pass
+        if( ( rand() % 100 ) < 100.0f - mutated[ i ].conserv )
+        {
+            // remove random condition if there are more than one condition
+            // chance 3%
+            if( ( mutation == false ) && ( mutated[ i ].cond.size() > 1 ) && ( rand() % 100 ) < 3 )
             {
                 mutation = true;
-                mutated[ i ].expr[ expr_id ].type = ( ExpressionType )( rand() % 5 );
+                mutated[ i ].cond.erase( mutated[ i ].cond.begin() + ( rand() % mutated[ i ].cond.size() ) );
+            }
+            for( size_t cond_id = 0; cond_id < mutated[ i ].cond.size(); ++cond_id )
+            {
+                // conditions can interchangebly mutate as they want
+                // chance of mutation 0-30%
+                if( ( mutation == false ) && ( (rand() % 100 ) < 30 ) )
+                {
+                    mutation = true;
+                    mutated[ i ].cond[ cond_id ].type = ( ConditionType )( rand() % C_TOTAL );
+                }
+                if( ( mutation == false ) && ( (rand() % 100 ) < 30 ) )
+                {
+                    mutation = true;
+                    GenerateRandomConditionValue( mutated[ i ].cond[ cond_id ] );
+                }
+            }
+            // add random condition with chance 3%
+            if( ( mutation == false ) && ( rand() % 100 ) < 3 )
+            {
+                mutation = true;
+                mutated[ i ].cond.push_back( GenerateRandomCondition() );
+            }
+
+
+
+            // remove random expression if there are more than one expression
+            // chance 5%
+            if( ( mutation == false ) && ( mutated[ i ].expr.size() > 1 ) && ( rand() % 100 ) < 5 )
+            {
+                mutation = true;
+                mutated[ i ].expr.erase( mutated[ i ].expr.begin() + ( rand() % mutated[ i ].expr.size() ) );
+            }
+            for( size_t expr_id = 0; expr_id < mutated[ i ].expr.size(); ++expr_id )
+            {
+                // expression can interchangebly mutate as they want
+                // chance of mutation 0-30%
+                if( ( mutation == false ) && ( (rand() % 100 ) < 30 ) )
+                {
+                    mutation = true;
+                    mutated[ i ].expr[ expr_id ].type = ( ExpressionType )( rand() % E_TOTAL );
+                }
+                if( ( mutation == false ) && ( (rand() % 100 ) < 30 ) )
+                {
+                    mutation = true;
+                    GenerateRandomExpressionValue( mutated[ i ].expr[ expr_id ] );
+                }
+            }
+            // add random expression with chance 5%
+            if( ( mutation == false ) && ( rand() % 100 ) < 5 )
+            {
+                mutation = true;
+                mutated[ i ].expr.push_back( GenerateRandomExpression() );
             }
         }
     }
-*/
+
+
 
     return mutated;
+}
+
+
+
+Ontogenesis::Condition
+Ontogenesis::GenerateRandomCondition()
+{
+    Condition cond;
+    cond.type = ( ConditionType )( rand() % C_TOTAL );
+    GenerateRandomConditionValue( cond );
+    return cond;
+}
+
+
+
+void
+Ontogenesis::GenerateRandomConditionValue( Condition& cond )
+{
+    switch( cond.type )
+    {
+        case C_O_PROTEIN:
+        case C_NO_PROTEIN:
+        case C_I_PROTEIN:
+        case C_NI_PROTEIN:
+        {
+            cond.value = rand() % MAX_PROTEIN;
+        }
+        break;
+    }
+}
+
+
+
+Ontogenesis::Expression
+Ontogenesis::GenerateRandomExpression()
+{
+    Expression expr;
+    expr.type = ( ExpressionType )( rand() % E_TOTAL );
+    GenerateRandomExpressionValue( expr );
+    return expr;
+}
+
+
+
+void
+Ontogenesis::GenerateRandomExpressionValue( Expression& expr )
+{
+    switch( expr.type )
+    {
+        // now only neuron allowed for expression
+        // other cells are fixed
+        case E_SPLIT:
+        {
+            expr.value = Cell::NEURON;
+        }
+        break;
+        case E_MIGRATE:
+        case E_O_PROTEIN:
+        case E_I_PROTEIN:
+        case E_DENDRITE:
+        case E_DENDRITE_I:
+        case E_AXON:
+        case E_AXON_I:
+        {
+            expr.value = rand() % MAX_PROTEIN;
+        }
+        break;
+    }
 }
 
 
@@ -530,10 +596,10 @@ Ontogenesis::ConditionTypeToString( const ConditionType type )
 {
     switch( type )
     {
-        case C_NAME: return "NAME";
-        case C_NNAME: return "NNAME";
-        case C_PROTEIN: return "PROTEIN";
-        case C_NPROTEIN: return "NPROTEIN";
+        case C_O_PROTEIN: return "O_PROTEIN";
+        case C_NO_PROTEIN: return "NO_PROTEIN";
+        case C_I_PROTEIN: return "I_PROTEIN";
+        case C_NI_PROTEIN: return "NI_PROTEIN";
     }
     return "UNKNOWN";
 }
@@ -545,12 +611,14 @@ Ontogenesis::ExpressionTypeToString( const ExpressionType type )
 {
     switch( type )
     {
-        case E_NAME: return "NAME";
         case E_SPLIT: return "SPLIT";
         case E_MIGRATE: return "MIGRATE";
-        case E_PROTEIN: return "PROTEIN";
+        case E_O_PROTEIN: return "O_PROTEIN";
+        case E_I_PROTEIN: return "I_PROTEIN";
         case E_DENDRITE: return "DENDRITE";
+        case E_DENDRITE_I: return "DENDRITE_I";
         case E_AXON: return "AXON";
+        case E_AXON_I: return "AXON_I";
     }
     return "UNKNOWN";
 }
@@ -558,56 +626,54 @@ Ontogenesis::ExpressionTypeToString( const ExpressionType type )
 
 
 void
-Ontogenesis::DumpGenome( Logger* dump, std::vector< Ontogenesis::Gene >& genome )
+Ontogenesis::DumpGenome( std::vector< Ontogenesis::Gene >& genome )
 {
     for( size_t i = 0; i < genome.size(); ++i )
     {
         for( size_t cond_id = 0; cond_id < genome[ i ].cond.size(); ++cond_id )
         {
             Condition cond = genome[ i ].cond[ cond_id ];
-            dump->Log( ConditionTypeToString( cond.type ) + "( " );
+            m_Dump->Log( ConditionTypeToString( cond.type ) + "( " );
             switch( cond.type )
             {
-                case C_NAME:
-                case C_NNAME:
+                case C_O_PROTEIN:
+                case C_NO_PROTEIN:
+                case C_I_PROTEIN:
+                case C_NI_PROTEIN:
                 {
-                    dump->Log( Cell::CellTypeToString( ( Cell::CellType )cond.value ) );
-                }
-                break;
-                case C_PROTEIN:
-                case C_NPROTEIN:
-                {
-                    dump->Log( IntToString( cond.value ) );
+                    m_Dump->Log( IntToString( cond.value ) );
                 }
                 break;
             }
-            dump->Log( " ) " );
+            m_Dump->Log( " ) " );
         }
 
-        dump->Log( ": " );
+        m_Dump->Log( ": " );
 
         for( size_t expr_id = 0; expr_id < genome[ i ].expr.size(); ++expr_id )
         {
             Expression expr = genome[ i ].expr[ expr_id ];
-            dump->Log( ExpressionTypeToString( expr.type ) + "( " );
+            m_Dump->Log( ExpressionTypeToString( expr.type ) + "( " );
             switch( expr.type )
             {
-                case E_NAME:
                 case E_SPLIT:
                 {
-                    dump->Log( Cell::CellTypeToString( ( Cell::CellType )expr.value ) );
+                    m_Dump->Log( Cell::CellTypeToString( ( Cell::CellType )expr.value ) );
                 }
                 break;
                 case E_MIGRATE:
-                case E_PROTEIN:
+                case E_O_PROTEIN:
+                case E_I_PROTEIN:
                 case E_DENDRITE:
+                case E_DENDRITE_I:
                 case E_AXON:
+                case E_AXON_I:
                 {
-                    dump->Log( IntToString( expr.value ) );
+                    m_Dump->Log( IntToString( expr.value ) );
                 }
                 break;
             }
-            dump->Log( " ) " );
+            m_Dump->Log( " ) " );
         }
     }
 }

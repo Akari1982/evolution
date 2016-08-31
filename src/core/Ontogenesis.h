@@ -19,7 +19,7 @@ public:
     void Draw( const unsigned int x, const unsigned int y );
 
     void LoadNetwork( Entity* entity );
-    void UpdateFitness( const float delta, const size_t generation_id, const size_t species_id );
+    void UpdateFitness( const float add, const size_t generation_id, const size_t species_id );
 
 private:
     Ontogenesis();
@@ -27,22 +27,24 @@ private:
 public:
     enum ConditionType
     {
-        C_NAME = 0,
-        C_NNAME,
-        C_PROTEIN,
-        C_NPROTEIN,
+        C_O_PROTEIN = 0,
+        C_NO_PROTEIN,
+        C_I_PROTEIN,
+        C_NI_PROTEIN,
 
         C_TOTAL
     };
 
     enum ExpressionType
     {
-        E_NAME = 0,
-        E_SPLIT,
+        E_SPLIT = 0,
         E_MIGRATE,
-        E_PROTEIN,
+        E_O_PROTEIN,
+        E_I_PROTEIN,
         E_DENDRITE,
+        E_DENDRITE_I,
         E_AXON,
+        E_AXON_I,
 
         E_TOTAL
    };
@@ -91,12 +93,17 @@ private:
     bool FindPlaceForCell( std::vector< Cell* >& network, const int x, const int y, const int radius, int &new_x, int &new_y );
     bool IsCell( std::vector< Cell* >& network, const int x, const int y );
     std::vector< Gene > Mutate( std::vector< Gene >& genome );
+    Condition GenerateRandomCondition();
+    void GenerateRandomConditionValue( Condition& cond );
+    Expression GenerateRandomExpressuon();
+    void GenerateRandomExpressionValue( Expression& expr );
 
     Ogre::String ConditionTypeToString( const ConditionType type );
     Ogre::String ExpressionTypeToString( const ExpressionType type );
-    void DumpGenome( Logger* dump, std::vector< Gene >& genome );
+    void DumpGenome( std::vector< Gene >& genome );
 
 private:
+    Logger* m_Dump;
     Ogre::String m_FileName;
 
     unsigned int m_GeneUniqueId;

@@ -19,7 +19,7 @@ public:
     void Update();
     void Draw();
 
-    float FeelFood( const float x, const float y, const float radius );
+    float FeelFood( const float x, const float y );
     bool CheckMove( Entity* entity, const float move_x, const float move_y );
 
 private:
@@ -31,7 +31,7 @@ private:
 
     struct Food
     {
-        float nutrition;
+        float power;
         float x;
         float y;
     };
