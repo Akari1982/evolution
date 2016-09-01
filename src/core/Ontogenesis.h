@@ -89,13 +89,13 @@ private:
         float power;
         size_t cell_id;
     };
-    bool SearchProtein( std::vector< Cell* >& network, const int protein, const int x, const int y, std::vector< PowerProtein >& powers );
+    bool SearchOuterProtein( std::vector< Cell* >& network, const int protein, const int x, const int y, std::vector< PowerProtein >& powers );
     bool FindPlaceForCell( std::vector< Cell* >& network, const int x, const int y, const int radius, int &new_x, int &new_y );
     bool IsCell( std::vector< Cell* >& network, const int x, const int y );
     std::vector< Gene > Mutate( std::vector< Gene >& genome );
     Condition GenerateRandomCondition();
     void GenerateRandomConditionValue( Condition& cond );
-    Expression GenerateRandomExpressuon();
+    Expression GenerateRandomExpression();
     void GenerateRandomExpressionValue( Expression& expr );
 
     Ogre::String ConditionTypeToString( const ConditionType type );

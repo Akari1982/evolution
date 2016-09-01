@@ -75,7 +75,6 @@ Entity::Draw( const unsigned int x, const unsigned int y )
     DEBUG_DRAW.Line( m_X, m_Y, pos_x, pos_y );
     pos_x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
     pos_y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
-    DEBUG_DRAW.Circle( pos_x, pos_y, 40.0f );
     DEBUG_DRAW.Line( m_X, m_Y, pos_x, pos_y );
     for( size_t i = 0; i < m_Network.size(); ++i )
     {

@@ -51,7 +51,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
         ++cur_gen;
         m_Generations.push_back( generation );
     }
-    else if( m_Generations[ cur_gen ].species.size() >= 100 )
+    else if( m_Generations[ cur_gen ].species.size() >= 20 )
     {
         Generation generation;
         generation.top_fitness = 0.0f;
@@ -74,7 +74,6 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
     m_Dump->Log( "Generation: " + IntToString( cur_gen ) + " " );
     DumpGenome( species.genome );
-    m_Dump->Log( "\n" );
 
 
 
@@ -116,10 +115,9 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
 
     int cycles = 0;
-    while( cycles < 3 )
+    while( cycles < 5 )
     {
         ++cycles;
-        changes = false;
 
         std::vector< std::vector< unsigned int > > species_genes;
 
@@ -130,7 +128,6 @@ Ontogenesis::LoadNetwork( Entity* entity )
             {
                 continue;
             }
-
             std::vector< unsigned int > expr_genes;
 
             for( size_t gene_id = 0; gene_id < species.genome.size(); ++gene_id )
@@ -148,7 +145,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         case C_NO_PROTEIN:
                         {
                             std::vector< PowerProtein > powers;
-                            bool power = SearchProtein( species.network, cond.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
+                            bool power = SearchOuterProtein( species.network, cond.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             if( ( ( cond.type == C_O_PROTEIN ) && ( power == false ) ) || ( ( cond.type == C_NO_PROTEIN ) && ( power != false ) ) )
                             {
                                 exec = false;
@@ -158,7 +155,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         case C_I_PROTEIN:
                         case C_NI_PROTEIN:
                         {
-                            bool found == species.network[ i ]->GetInnerProtein() == cond.value;
+                            bool found = ( species.network[ i ]->GetInnerProtein() == cond.value );
                             if( ( ( cond.type == C_I_PROTEIN ) && ( found == false ) ) || ( ( cond.type == C_NI_PROTEIN ) && ( found == true ) ) )
                             {
                                 exec = false;
@@ -175,19 +172,26 @@ Ontogenesis::LoadNetwork( Entity* entity )
             }
 
             species_genes.push_back( expr_genes );
+            expr_genes.clear();
         }
 
         size_t net_size = species.network.size();
+        size_t i_active = 0;
         for( size_t i = 0; i < net_size; ++i )
         {
-            for( size_t ge_id = 0; ge_id < species_genes[ i ].size(); ++ge_id )
+            // express genes only for neurons
+            if( species.network[ i ]->GetType() != Cell::NEURON )
             {
-                size_t gene_id = species_genes[ i ][ ge_id ];
+                continue;
+            }
+
+            for( size_t ge_id = 0; ge_id < species_genes[ i_active ].size(); ++ge_id )
+            {
+                size_t gene_id = species_genes[ i_active ][ ge_id ];
 
                 for( size_t expr_id = 0; expr_id < species.genome[ gene_id ].expr.size(); ++expr_id )
                 {
                     Expression expr = species.genome[ gene_id ].expr[ expr_id ];
-
                     switch( expr.type )
                     {
                         case E_SPLIT:
@@ -205,13 +209,13 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         case E_MIGRATE:
                         {
                             std::vector< PowerProtein > powers;
-                            SearchProtein( species.network, expr.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
+                            SearchOuterProtein( species.network, expr.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             for( size_t c = 0; c < powers.size(); ++c )
                             {
                                 Cell* cell = species.network[ powers[ c ].cell_id ];
                                 int x = 0;
                                 int y = 0;
-                                bool place = FindPlaceForCell( species.network, cell->GetX(), cell->GetY(), cell->GetProteinRadius(), x, y );
+                                bool place = FindPlaceForCell( species.network, cell->GetX(), cell->GetY(), cell->GetOuterProteinRadius(), x, y );
                                 if( place == true )
                                 {
                                     species.network[ i ]->SetX( x );
@@ -243,7 +247,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         case E_AXON_I:
                         {
                             std::vector< PowerProtein > powers;
-                            SearchProtein( species.network, expr.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
+                            SearchOuterProtein( species.network, expr.value, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             for( size_t c = 0; c < powers.size(); ++c )
                             {
                                 bool inverted = ( expr.type == E_DENDRITE_I ) || ( expr.type == E_AXON_I );
@@ -262,6 +266,8 @@ Ontogenesis::LoadNetwork( Entity* entity )
                     }
                 }
             }
+
+            ++i_active;
         }
 
         species_genes.clear();
@@ -299,11 +305,11 @@ Ontogenesis::UpdateFitness( const float add, const size_t generation_id, const s
 
 
 bool
-Ontogenesis::SearchProtein( std::vector< Cell* >& network, const int protein, const int x, const int y, std::vector< PowerProtein >& powers )
+Ontogenesis::SearchOuterProtein( std::vector< Cell* >& network, const int protein, const int x, const int y, std::vector< PowerProtein >& powers )
 {
     for( size_t i = 0; i < network.size(); ++i )
     {
-        if( network[ i ]->GetProtein() == protein )
+        if( network[ i ]->GetOuterProtein() == protein )
         {
             int x2 = network[ i ]->GetX();
             int y2 = network[ i ]->GetY();
@@ -500,6 +506,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
                 {
                     mutation = true;
                     mutated[ i ].expr[ expr_id ].type = ( ExpressionType )( rand() % E_TOTAL );
+// FIXME
                 }
                 if( ( mutation == false ) && ( (rand() % 100 ) < 30 ) )
                 {
@@ -675,5 +682,7 @@ Ontogenesis::DumpGenome( std::vector< Ontogenesis::Gene >& genome )
             }
             m_Dump->Log( " ) " );
         }
+
+        m_Dump->Log( "\n" );
     }
 }
