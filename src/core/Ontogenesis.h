@@ -13,13 +13,13 @@
 class Ontogenesis
 {
 public:
-    Ontogenesis( const Ogre::String& file_name );
+    Ontogenesis( const Ogre::String& file_prefix );
     virtual ~Ontogenesis();
 
     void Draw( const unsigned int x, const unsigned int y );
 
     void LoadNetwork( Entity* entity );
-    void UpdateFitness( const float add, const size_t generation_id, const size_t species_id );
+    void EntityDeath( Entity* entity );
 
 private:
     Ontogenesis();
@@ -71,7 +71,6 @@ public:
 
     struct Species
     {
-        float fitness;
         std::vector< Gene > genome;
         std::vector< Cell* > network;
     };
@@ -79,8 +78,11 @@ public:
     struct Generation
     {
         float top_fitness;
+        size_t top_id;
         std::vector< Gene > base_genome;
         std::vector< Species > species;
+
+        Logger* file;
     };
 
 private:
@@ -100,11 +102,10 @@ private:
 
     Ogre::String ConditionTypeToString( const ConditionType type );
     Ogre::String ExpressionTypeToString( const ExpressionType type );
-    void DumpGenome( std::vector< Gene >& genome );
+    void DumpGenome( Logger* file, std::vector< Gene >& genome );
 
 private:
-    Logger* m_Dump;
-    Ogre::String m_FileName;
+    Ogre::String m_FilePrefix;
 
     unsigned int m_GeneUniqueId;
     std::vector< Generation > m_Generations;

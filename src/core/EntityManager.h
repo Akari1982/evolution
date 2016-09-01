@@ -19,6 +19,8 @@ public:
     void Update();
     void Draw();
 
+    void ResetType( const int type, Ogre::String& file_name );
+
     float FeelFood( const float x, const float y );
     bool CheckMove( Entity* entity, const float move_x, const float move_y );
 

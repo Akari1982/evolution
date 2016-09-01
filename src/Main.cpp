@@ -22,7 +22,7 @@ QG_STATE  g_ApplicationState;
 
 
 int
-main(int argc, char *argv[])
+main( int argc, char *argv[] )
 {
     Ogre::Root* root;
     Ogre::RenderWindow* window;

@@ -31,6 +31,8 @@ public:
 
     float GetEnergy() const;
     void SetEnergy( const float energy );
+    float GetFitness() const;
+    void SetFitness( const float fitness );
 
     size_t GetGenerationId() const;
     size_t GetSpeciesId() const;
@@ -56,6 +58,8 @@ private:
     float m_RightImpulse;
 
     float m_Energy;
+    float m_Fitness;
+
     size_t m_GenerationId;
     size_t m_SpeciesId;
     int m_Type;

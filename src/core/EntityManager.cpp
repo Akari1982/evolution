@@ -1,4 +1,5 @@
 #include "EntityManager.h"
+#include "EntityManagerCommands.h"
 
 #include "DebugDraw.h"
 #include "InputManager.h"
@@ -27,8 +28,10 @@ EntityManager::EntityManager():
     m_NextFoodTime( FOOD_TIME ),
     m_SpawnTime( SPAWN_TIME )
 {
-    m_Ontogenesis0 = new Ontogenesis( "specie0.txt" );
-    m_Ontogenesis1 = new Ontogenesis( "specie1.txt" );
+    InitCommands();
+
+    m_Ontogenesis0 = new Ontogenesis( "specie0" );
+    m_Ontogenesis1 = new Ontogenesis( "specie1" );
 }
 
 
@@ -77,7 +80,7 @@ EntityManager::Update()
         float right_impulse = entity->GetRightImpulse();
         if( left_impulse > 0.0f )
         {
-            rotation -= 5.0f * delta;
+            rotation -= 10.0f * delta;
             if( rotation < 0.0f )
             {
                 rotation = ceil( -rotation / 360.0f ) * 360.0 - rotation;
@@ -89,7 +92,7 @@ EntityManager::Update()
         }
         if( right_impulse > 0.0f )
         {
-            rotation += 5.0f * delta;
+            rotation += 10.0f * delta;
             if( rotation > 360.0f )
             {
                 rotation -= ceil( rotation / 360.0f ) * 360.0;
@@ -101,8 +104,8 @@ EntityManager::Update()
         }
         if( forward_impulse > 0.0f )
         {
-            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
-            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
+            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 40.0f;
+            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 40.0f;
             if( ( pos_x - radius > m_X ) && ( pos_x + radius < m_X + m_Width ) && ( pos_y - radius > m_Y ) && ( pos_y + radius < m_Y + m_Height ) )
             {
                 entity->SetX( pos_x );
@@ -126,16 +129,8 @@ EntityManager::Update()
                 float energy = entity->GetEnergy() + ( *it ).power;
                 energy = ( energy > 100.0f) ? 100.0f : energy;
                 entity->SetEnergy( energy );
+                entity->SetFitness( entity->GetFitness() + ( *it ).power );
                 it = m_Food.erase( it );
-
-                if( entity->GetType() == 0 )
-                {
-                    m_Ontogenesis0->UpdateFitness( ( *it ).power, entity->GetGenerationId(), entity->GetSpeciesId() );
-                }
-                else
-                {
-                    m_Ontogenesis1->UpdateFitness( ( *it ).power, entity->GetGenerationId(), entity->GetSpeciesId() );
-                }
             }
             else
             {
@@ -146,7 +141,7 @@ EntityManager::Update()
 
 
         // consume energy
-        entity->SetEnergy( entity->GetEnergy() - delta * 10.0f );
+        entity->SetEnergy( entity->GetEnergy() - delta * 5.0f );
     }
 
 
@@ -161,6 +156,17 @@ EntityManager::Update()
                 case 0: --m_TypeNum0; break;
                 case 1: --m_TypeNum1; break;
             }
+
+            if( entity->GetType() == 0 )
+            {
+                m_Ontogenesis0->UpdateFitness( entity );
+            }
+            else
+            {
+                m_Ontogenesis1->UpdateFitness( entity );
+            }
+
+            delete ( *it );
             it = m_Entity.erase( it );
         }
         else
@@ -245,6 +251,38 @@ EntityManager::Draw()
         DEBUG_DRAW.Circle( x, y, m_Food[ i ].power );
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
         DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
+    }
+}
+
+
+
+void
+EntityManager::ResetType( const int type, Ogre::String& file_name )
+{
+    for( std::vector< Entity* >::iterator it = m_Entity.begin(); it != m_Entity.end(); )
+    {
+        if( ( *it )->GetType() == type )
+        {
+            delete ( *it );
+            it = m_Entity.erase( it );
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    if( type == 0 )
+    {
+        m_TypeNum0 = 0;
+        delete m_Ontogenesis0;
+        m_Ontogenesis0 = new Ontogenesis( "specie0" );
+    }
+    else
+    {
+        m_TypeNum1 = 0;
+        delete m_Ontogenesis1;
+        m_Ontogenesis1 = new Ontogenesis( "specie1" );
     }
 }
 

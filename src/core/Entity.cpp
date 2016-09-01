@@ -7,6 +7,12 @@
 
 
 
+const float SENSOR_LENGTH = 40.0f;
+const float SENSOR_LEFT_ROT = 45.0f;
+const float SENSOR_RIGHT_ROT = -45.0f;
+
+
+
 Entity::Entity( const int type, const float x, const float y ):
     m_Radius( 15.0f ),
     m_X( x ),
@@ -16,6 +22,7 @@ Entity::Entity( const int type, const float x, const float y ):
     m_LeftImpulse( 0.0f ),
     m_RightImpulse( 0.0f ),
     m_Energy( 100.0f ),
+    m_Fitness( 0.0f ),
     m_Type( type ),
     m_Think( 0.1f )
 {
@@ -56,6 +63,7 @@ Entity::Update()
 void
 Entity::Draw( const unsigned int x, const unsigned int y )
 {
+    // draw entity itself
     if( m_Type == 0 )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
@@ -65,21 +73,36 @@ Entity::Draw( const unsigned int x, const unsigned int y )
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
     }
     DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+
+    // draw energy
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 0, 1 ) );
     DEBUG_DRAW.SetTextAlignment( DebugDraw::CENTER );
-    DEBUG_DRAW.Text( m_X, m_Y, IntToString( ( int )m_Energy ) );
+    DEBUG_DRAW.Text( m_X, m_Y - 8, IntToString( ( int )m_Energy ) );
     DEBUG_DRAW.SetTextAlignment( DebugDraw::LEFT );
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.5f ) );
-    float pos_x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
-    float pos_y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
+
+    // draw sensors
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.4f ) );
+    float pos_x = m_X + SENSOR_LENGTH * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + SENSOR_LEFT_ROT ) ) );
+    float pos_y = m_Y + SENSOR_LENGTH * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + SENSOR_LEFT_ROT ) ) );
     DEBUG_DRAW.Line( m_X, m_Y, pos_x, pos_y );
-    pos_x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
-    pos_y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
+    pos_x = m_X + SENSOR_LENGTH * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + SENSOR_RIGHT_ROT ) ) );
+    pos_y = m_Y + SENSOR_LENGTH * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + SENSOR_RIGHT_ROT ) ) );
     DEBUG_DRAW.Line( m_X, m_Y, pos_x, pos_y );
+
+    // draw network
     for( size_t i = 0; i < m_Network.size(); ++i )
     {
         m_Network[ i ]->Draw( x, y );
     }
+
+    // line connecting neural network and entity
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 0.5f ) );
+    DEBUG_DRAW.Line( m_X, m_Y, x, y );
+
+    // draw info about entity
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+    DEBUG_DRAW.Text( x, y - 40, "gen:" + IntToString( m_GenerationId ) + " spe:" + IntToString( m_SpeciesId ) );
+    DEBUG_DRAW.Text( x, y - 20, "fitness:" + IntToString( ( int )m_Fitness ) );
 }
 
 
@@ -205,6 +228,23 @@ Entity::SetEnergy( const float energy )
 
 
 
+float
+Entity::GetFitness() const
+{
+    return m_Fitness;
+}
+
+
+
+
+void
+Entity::SetFitness( const float fitness )
+{
+    m_Fitness = fitness;
+}
+
+
+
 size_t
 Entity::GetGenerationId() const
 {
@@ -242,8 +282,8 @@ Entity::AddNetwork( std::vector< Cell* >& network, const size_t generation_id, c
 float
 Entity::GetSensorFoodLeft() const
 {
-    float x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
-    float y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + 45 ) ) );
+    float x = m_X + SENSOR_LENGTH * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + SENSOR_LEFT_ROT ) ) );
+    float y = m_Y + SENSOR_LENGTH * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + SENSOR_LEFT_ROT ) ) );
     return EntityManager::getSingleton().FeelFood( x, y );
 }
 
@@ -252,8 +292,8 @@ Entity::GetSensorFoodLeft() const
 float
 Entity::GetSensorFoodRight() const
 {
-    float x = m_X + 50.0f * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
-    float y = m_Y + 50.0f * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation - 45 ) ) );
+    float x = m_X + SENSOR_LENGTH * Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( m_Rotation + SENSOR_RIGHT_ROT ) ) );
+    float y = m_Y + SENSOR_LENGTH * Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( m_Rotation + SENSOR_RIGHT_ROT ) ) );
     return EntityManager::getSingleton().FeelFood( x, y );
 }
 
