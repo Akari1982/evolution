@@ -624,5 +624,8 @@
     <ClInclude Include="core\Cell.h">
       <Filter>N-Gears files</Filter>
     </ClInclude>
+    <ClInclude Include="core\EntityManagerCommands.h">
+      <Filter>N-Gears files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

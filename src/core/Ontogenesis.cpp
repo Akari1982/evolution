@@ -47,25 +47,28 @@ void
 Ontogenesis::LoadNetwork( Entity* entity )
 {
     int cur_gen = m_Generations.size() - 1;
-    bool need_new_gen = ( m_Generations[ cur_gen ].species.size() >= 20 );
-    if( ( cur_gen < 0 ) || ( need_new_gen == true ) )
+LOG_ERROR( "1 cur_gen=" + IntToString( cur_gen ) );
+    if( ( cur_gen < 0 ) || ( m_Generations[ cur_gen ].species.size() >= 20 ) )
     {
-        ++cur_gen;
+LOG_ERROR( "2" );
         Generation generation;
         generation.top_fitness = 0.0f;
         generation.top_id = 0;
-        if( need_new_gen == true )
+        if( ( cur_gen >= 0 ) && ( m_Generations[ cur_gen ].species.size() >= 20 ) )
         {
             generation.base_genome = m_Generations[ cur_gen ].species[ m_Generations[ cur_gen ].top_id ].genome;
         }
-        generation.file = new Logger( m_FilePrefix + "_" + cur_gen + ".txt" );
+LOG_ERROR( "3" );
+        ++cur_gen;
+        generation.file = new Logger( m_FilePrefix + "_" + IntToString( cur_gen ) + ".txt" );
         generation.file->Log( "Generation: " + IntToString( cur_gen ) + "\n" );
         generation.file->Log( "base_genome" );
         DumpGenome( generation.file, generation.base_genome );
+        generation.file->Log( "\n" );
         m_Generations.push_back( generation );
     }
 
-
+LOG_ERROR( "4" );
 
     Species species;
     species.genome = Mutate( m_Generations[ cur_gen ].base_genome );
@@ -275,7 +278,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
     m_Generations[ cur_gen ].species.push_back( species );
 
-
+LOG_ERROR( "fin" );
 
     entity->AddNetwork( species.network, m_Generations.size() - 1, m_Generations[ cur_gen ].species.size() - 1 );
 }
@@ -289,10 +292,11 @@ Ontogenesis::EntityDeath( Entity* entity )
     size_t species_id = entity->GetSpeciesId();
     float fitness = entity->GetFitness();
 
-    generation.file->Log( "Species: " + IntToString( species_id ) + "\n" );
-    generation.file->Log( "fitness: " + FloatToString( fitness ) );
-    generation.file->Log( "genome" );
+    m_Generations[ generation_id ].file->Log( "Species: " + IntToString( species_id ) + "\n" );
+    m_Generations[ generation_id ].file->Log( "fitness: " + FloatToString( fitness ) + "\n" );
+    m_Generations[ generation_id ].file->Log( "genome" );
     DumpGenome( m_Generations[ generation_id ].file, m_Generations[ generation_id ].species[ species_id ].genome );
+    m_Generations[ generation_id ].file->Log( "\n" );
 
     if( m_Generations[ generation_id ].top_fitness <= fitness )
     {
@@ -435,7 +439,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
         // just don't copy it to new genome
         if( ( genome.size() == 1 ) || ( ( rand() % ( int )( 5.0f * ( gene.conserv + 1.0f ) ) ) != 1 ) )
         {
-            gene.conserv += ( 100.0f - gene.conserv ) / 4.0f
+            gene.conserv += ( 100.0f - gene.conserv ) / 4.0f;
             gene.conserv = ( gene.conserv > 99.0f ) ? 99.0f : gene.conserv;
             mutated.push_back( gene );
 

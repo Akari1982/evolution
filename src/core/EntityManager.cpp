@@ -157,13 +157,13 @@ EntityManager::Update()
                 case 1: --m_TypeNum1; break;
             }
 
-            if( entity->GetType() == 0 )
+            if( ( *it )->GetType() == 0 )
             {
-                m_Ontogenesis0->UpdateFitness( entity );
+                m_Ontogenesis0->EntityDeath( ( *it ) );
             }
             else
             {
-                m_Ontogenesis1->UpdateFitness( entity );
+                m_Ontogenesis1->EntityDeath( ( *it ) );
             }
 
             delete ( *it );

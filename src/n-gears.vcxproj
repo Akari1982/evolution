@@ -98,6 +98,7 @@
     <ClInclude Include="core\DebugDraw.h" />
     <ClInclude Include="core\Entity.h" />
     <ClInclude Include="core\EntityManager.h" />
+    <ClInclude Include="core\EntityManagerCommands.h" />
     <ClInclude Include="core\Event.h" />
     <ClInclude Include="core\GameFrameListner.h" />
     <ClInclude Include="core\InputManager.h" />

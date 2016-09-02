@@ -96,13 +96,13 @@ Entity::Draw( const unsigned int x, const unsigned int y )
     }
 
     // line connecting neural network and entity
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 0.5f ) );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 0.1f ) );
     DEBUG_DRAW.Line( m_X, m_Y, x, y );
 
     // draw info about entity
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-    DEBUG_DRAW.Text( x, y - 40, "gen:" + IntToString( m_GenerationId ) + " spe:" + IntToString( m_SpeciesId ) );
-    DEBUG_DRAW.Text( x, y - 20, "fitness:" + IntToString( ( int )m_Fitness ) );
+    DEBUG_DRAW.Text( x - 40, y - 70, "gen:" + IntToString( m_GenerationId ) + " spe:" + IntToString( m_SpeciesId ) );
+    DEBUG_DRAW.Text( x - 40, y - 50, "fitness:" + IntToString( ( int )m_Fitness ) );
 }
 
 

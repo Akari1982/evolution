@@ -19,6 +19,7 @@ public:
     void Update();
     void Draw();
 
+    void InitCommands();
     void ResetType( const int type, Ogre::String& file_name );
 
     float FeelFood( const float x, const float y );
