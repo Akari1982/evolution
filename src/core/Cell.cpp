@@ -9,9 +9,9 @@
 
 
 
-Cell::Cell( Entity* entity, const CellType type, const int x, const int y ):
+Cell::Cell( Entity* entity, const CellName name, const int x, const int y ):
     m_Entity( entity ),
-    m_Type( type ),
+    m_Name( name ),
     m_X( x ),
     m_Y( y ),
     m_OuterProtein( -1 ),
@@ -21,6 +21,16 @@ Cell::Cell( Entity* entity, const CellType type, const int x, const int y ):
     m_Value( 0.0f ),
     m_Fired( false )
 {
+    switch( name )
+    {
+        case NEURON_COMMON:     m_Type = NEURON;    break;
+        case SENSOR_FOOD_LEFT:  m_Type = SENSOR;    break;
+        case SENSOR_FOOD_RIGHT: m_Type = SENSOR;    break;
+        case SENSOR_ENERGY:     m_Type = SENSOR;    break;
+        case ACTIVATOR_FORWARD: m_Type = ACTIVATOR; break;
+        case ACTIVATOR_LEFT:    m_Type = ACTIVATOR; break;
+        case ACTIVATOR_RIGHT:   m_Type = ACTIVATOR; break;
+    }
 }
 
 
@@ -44,9 +54,9 @@ Cell::Update()
         {
             float value = 0;
 
-            switch( m_Synapses[ i ].cell->m_Type )
+            switch( m_Synapses[ i ].cell->m_Name )
             {
-                case NEURON:
+                case NEURON_COMMON:
                 {
                     if( m_Synapses[ i ].cell->m_Fired == true )
                     {
@@ -89,15 +99,15 @@ Cell::Update()
             m_Value = 0.0f;
             m_Fired = true;
 
-            if( m_Type == ACTIVATOR_FORWARD )
+            if( m_Name == ACTIVATOR_FORWARD )
             {
                 m_Entity->SetForwardImpulse( 2.0f );
             }
-            else if( m_Type == ACTIVATOR_LEFT )
+            else if( m_Name == ACTIVATOR_LEFT )
             {
                  m_Entity->SetLeftImpulse( 2.0f );
             }
-            else if( m_Type == ACTIVATOR_RIGHT )
+            else if( m_Name == ACTIVATOR_RIGHT )
             {
                  m_Entity->SetRightImpulse( 2.0f );
             }
@@ -114,11 +124,11 @@ Cell::Draw( const unsigned int x, const unsigned int y )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
     }
-    else if( m_Type == ACTIVATOR_FORWARD || m_Type == ACTIVATOR_LEFT || m_Type == ACTIVATOR_RIGHT )
+    else if( m_Type == ACTIVATOR )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 1 ) );
     }
-    else if( m_Type == SENSOR_FOOD_LEFT || m_Type == SENSOR_FOOD_RIGHT || m_Type == SENSOR_ENERGY )
+    else if( m_Type == SENSOR )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
     }
@@ -150,10 +160,10 @@ Cell::Draw( const unsigned int x, const unsigned int y )
 
 
 
-void
-Cell::SetType( const CellType type )
+const Cell::CellName
+Cell::GetName() const
 {
-    m_Type = type;
+    return m_Name;
 }
 
 

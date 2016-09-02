@@ -47,10 +47,8 @@ void
 Ontogenesis::LoadNetwork( Entity* entity )
 {
     int cur_gen = m_Generations.size() - 1;
-LOG_ERROR( "1 cur_gen=" + IntToString( cur_gen ) );
     if( ( cur_gen < 0 ) || ( m_Generations[ cur_gen ].species.size() >= 20 ) )
     {
-LOG_ERROR( "2" );
         Generation generation;
         generation.top_fitness = 0.0f;
         generation.top_id = 0;
@@ -58,7 +56,6 @@ LOG_ERROR( "2" );
         {
             generation.base_genome = m_Generations[ cur_gen ].species[ m_Generations[ cur_gen ].top_id ].genome;
         }
-LOG_ERROR( "3" );
         ++cur_gen;
         generation.file = new Logger( m_FilePrefix + "_" + IntToString( cur_gen ) + ".txt" );
         generation.file->Log( "Generation: " + IntToString( cur_gen ) + "\n" );
@@ -68,7 +65,7 @@ LOG_ERROR( "3" );
         m_Generations.push_back( generation );
     }
 
-LOG_ERROR( "4" );
+
 
     Species species;
     species.genome = Mutate( m_Generations[ cur_gen ].base_genome );
@@ -82,7 +79,7 @@ LOG_ERROR( "4" );
     int protein_activator_left = 3;
     int protein_activator_right = 4;
 
-    Cell* cell = new Cell( entity, Cell::NEURON, 0, 0 );
+    Cell* cell = new Cell( entity, Cell::NEURON_COMMON, 0, 0 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::SENSOR_FOOD_LEFT, -5, -3 );
@@ -249,13 +246,17 @@ LOG_ERROR( "4" );
                             for( size_t c = 0; c < powers.size(); ++c )
                             {
                                 bool inverted = ( expr.type == E_DENDRITE_I ) || ( expr.type == E_AXON_I );
+                                int type = species.network[ powers[ c ].cell_id ]->GetType();
                                 if( ( expr.type == E_DENDRITE ) || ( expr.type == E_DENDRITE_I ) )
                                 {
-                                    species.network[ i ]->AddSynapse( powers[ c ].power, inverted, species.network[ powers[ c ].cell_id ] );
+                                    if( type == Cell::NEURON || type == Cell::SENSOR )
+                                    {
+                                        species.network[ i ]->AddSynapse( powers[ c ].power, inverted, species.network[ powers[ c ].cell_id ] );
+                                    }
                                 }
                                 else
                                 {
-                                    if( species.network[ powers[ c ].cell_id ]->GetType() == Cell::NEURON )
+                                    if( type == Cell::NEURON )
                                     {
                                         species.network[ powers[ c ].cell_id ]->AddSynapse( powers[ c ].power, inverted, species.network[ i ] );
                                     }
@@ -278,7 +279,7 @@ LOG_ERROR( "4" );
 
     m_Generations[ cur_gen ].species.push_back( species );
 
-LOG_ERROR( "fin" );
+
 
     entity->AddNetwork( species.network, m_Generations.size() - 1, m_Generations[ cur_gen ].species.size() - 1 );
 }
@@ -594,7 +595,7 @@ Ontogenesis::GenerateRandomExpressionValue( Expression& expr )
         // other cells are fixed
         case E_SPLIT:
         {
-            expr.value = Cell::NEURON;
+            expr.value = Cell::NEURON_COMMON;
         }
         break;
         case E_MIGRATE:

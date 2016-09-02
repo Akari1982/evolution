@@ -15,24 +15,29 @@ class Entity;
 class Cell
 {
 public:
-    enum CellType
+    enum CellName
     {
-        NEURON = 0,
+        NEURON_COMMON = 0,
         SENSOR_FOOD_LEFT,
         SENSOR_FOOD_RIGHT,
         SENSOR_ENERGY,
         ACTIVATOR_FORWARD,
         ACTIVATOR_LEFT,
-        ACTIVATOR_RIGHT,
-        TOTAL
+        ACTIVATOR_RIGHT
+    };
+    enum CellType
+    {
+        NEURON = 0,
+        SENSOR,
+        ACTIVATOR
     };
 
-    Cell( Entity* entity, const CellType type, const int x, const int y );
+    Cell( Entity* entity, const CellName name, const int x, const int y );
     virtual ~Cell();
     void Update();
     void Draw( const unsigned int x, const unsigned int y );
 
-    void SetType( const CellType type );
+    const CellName GetName() const;
     const CellType GetType() const;
     int GetX() const;
     void SetX( const int x );
@@ -54,6 +59,7 @@ private:
 
 protected:
     Entity* m_Entity;
+    CellName m_Name;
     CellType m_Type;
 
     int m_X;
