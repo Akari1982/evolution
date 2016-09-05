@@ -6,6 +6,8 @@
 
 
 const int MAX_PROTEIN = 6;
+const int SPECIES_PER_GENERATION = 100;
+const int GENES_PER_GENOME = 5;
 
 
 
@@ -47,12 +49,12 @@ void
 Ontogenesis::LoadNetwork( Entity* entity )
 {
     int cur_gen = m_Generations.size() - 1;
-    if( ( cur_gen < 0 ) || ( m_Generations[ cur_gen ].species.size() >= 20 ) )
+    if( ( cur_gen < 0 ) || ( m_Generations[ cur_gen ].species.size() >= SPECIES_PER_GENERATION ) )
     {
         Generation generation;
         generation.top_fitness = 0.0f;
         generation.top_id = 0;
-        if( ( cur_gen >= 0 ) && ( m_Generations[ cur_gen ].species.size() >= 20 ) )
+        if( ( cur_gen >= 0 ) && ( m_Generations[ cur_gen ].species.size() >= SPECIES_PER_GENERATION ) )
         {
             generation.base_genome = m_Generations[ cur_gen ].species[ m_Generations[ cur_gen ].top_id ].genome;
         }
@@ -196,7 +198,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             bool place = FindPlaceForCell( species.network, species.network[ i ]->GetX(), species.network[ i ]->GetY(), 1, x, y );
                             if( place == true )
                             {
-                                Cell* cell = new Cell( entity, ( Cell::CellType )expr.value, x, y );
+                                Cell* cell = new Cell( entity, ( Cell::CellName )expr.value, x, y );
                                 species.network.push_back( cell );
                             }
                         }
@@ -256,7 +258,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                                 }
                                 else
                                 {
-                                    if( type == Cell::NEURON )
+                                    if( type == Cell::ACTIVATOR )
                                     {
                                         species.network[ powers[ c ].cell_id ]->AddSynapse( powers[ c ].power, inverted, species.network[ i ] );
                                     }
@@ -413,9 +415,9 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
 
 
 
-    // insert new genes only if genome is empty
+    // insert new genes if genome is empty or if 20% chance
     // add one random condition and one random expression
-    if( genome.size() == 0 )
+    if( ( genome.size() == 0 ) || ( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) ) )
     {
         Gene gene;
         gene.unique_id = m_GeneUniqueId;
@@ -444,9 +446,8 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
             gene.conserv = ( gene.conserv > 99.0f ) ? 99.0f : gene.conserv;
             mutated.push_back( gene );
 
-            // chance to be duplicated 5% (not affected by conservativeness)
-            // this not counts as mutation
-            if( ( rand() % 20 ) == 1 )
+            // chance to be duplicated 20% (not affected by conservativeness)
+            if( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) )
             {
                 Gene dup_gene = gene;
                 dup_gene.unique_id = m_GeneUniqueId;
@@ -456,6 +457,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
             }
         }
     }
+
 
 
 
@@ -469,6 +471,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
             if( ( mutated[ i ].cond.size() > 1 ) && ( ( rand() % 100 ) < 10 ) )
             {
                 mutated[ i ].cond.erase( mutated[ i ].cond.begin() + ( rand() % mutated[ i ].cond.size() ) );
+                mutated[ i ].conserv /= 2.0f;
             }
             for( size_t cond_id = 0; cond_id < mutated[ i ].cond.size(); ++cond_id )
             {
@@ -477,16 +480,19 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
                 if( ( rand() % 100 ) < 30 )
                 {
                     mutated[ i ].cond[ cond_id ].type = ( ConditionType )( rand() % C_TOTAL );
+                    mutated[ i ].conserv /= 2.0f;
                 }
                 if( ( rand() % 100 ) < 30 )
                 {
                     GenerateRandomConditionValue( mutated[ i ].cond[ cond_id ] );
+                    mutated[ i ].conserv /= 2.0f;
                 }
             }
             // add random condition with chance 10%
             if( ( rand() % 100 ) < 10 )
             {
                 mutated[ i ].cond.push_back( GenerateRandomCondition() );
+                mutated[ i ].conserv /= 2.0f;
             }
 
 
@@ -496,6 +502,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
             if( ( mutated[ i ].expr.size() > 1 ) && ( ( rand() % 100 ) < 5 ) )
             {
                 mutated[ i ].expr.erase( mutated[ i ].expr.begin() + ( rand() % mutated[ i ].expr.size() ) );
+                mutated[ i ].conserv /= 2.0f;
             }
             for( size_t expr_id = 0; expr_id < mutated[ i ].expr.size(); ++expr_id )
             {
@@ -523,18 +530,21 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
                         if( type != new_type )
                         {
                             mutated[ i ].expr[ expr_id ].type = new_type;
+                            mutated[ i ].conserv /= 2.0f;
                         }
                     }
                 }
                 if( ( rand() % 100 ) < 30 )
                 {
                     GenerateRandomExpressionValue( mutated[ i ].expr[ expr_id ] );
+                    mutated[ i ].conserv /= 2.0f;
                 }
             }
             // add random expression with chance 10%
             if( ( rand() % 100 ) < 10 )
             {
                 mutated[ i ].expr.push_back( GenerateRandomExpression() );
+                mutated[ i ].conserv /= 2.0f;
             }
         }
     }
@@ -653,7 +663,7 @@ Ontogenesis::DumpGenome( Logger* file, std::vector< Ontogenesis::Gene >& genome 
 {
     for( size_t i = 0; i < genome.size(); ++i )
     {
-        file->Log( "\n    " );
+        file->Log( "\n    " + IntToString( ( int )genome[ i ].conserv ) + ": " );
 
         for( size_t cond_id = 0; cond_id < genome[ i ].cond.size(); ++cond_id )
         {

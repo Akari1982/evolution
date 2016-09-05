@@ -134,14 +134,20 @@ DebugDraw::SetTextAlignment( TextAlignment alignment )
 void
 DebugDraw::Line( const float x1, const float y1, const float x2, const float y2 )
 {
+    Ogre::RenderTarget* window  = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" );
+    if( window->isActive() == false )
+    {
+        return;
+    }
+
     if( m_LineRenderOp.vertexData->vertexCount + 2 > m_LineMaxVertexCount )
     {
         LOG_ERROR( "Max number of lines reached. Can't create more than " + Ogre::StringConverter::toString( m_LineMaxVertexCount / 2 ) + " lines." );
         return;
     }
 
-    float width = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualWidth();
-    float height = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualHeight();
+    float width = window->getViewport( 0 )->getActualWidth();
+    float height = window->getViewport( 0 )->getActualHeight();
 
     float new_x1 = ( m_ScreenSpace == true ) ? ( ( int ) x1 / width ) * 2 - 1 : x1;
     float new_y1 = ( m_ScreenSpace == true ) ? -( ( ( int ) y1 / height ) * 2 - 1 ) : y1;
@@ -163,6 +169,12 @@ DebugDraw::Line( const float x1, const float y1, const float x2, const float y2 
 void
 DebugDraw::Line3d( const Ogre::Vector3& point1, const Ogre::Vector3& point2 )
 {
+    Ogre::RenderTarget* window  = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" );
+    if( ( Ogre::RenderWindow* )window->isActive() == false )
+    {
+        return;
+    }
+
     if( m_Line3dRenderOp.vertexData->vertexCount + 2 > m_Line3dMaxVertexCount )
     {
         LOG_ERROR( "Max number of 3d lines reached. Can't create more than " + Ogre::StringConverter::toString( m_Line3dMaxVertexCount / 2 ) + " 3d lines." );
@@ -184,6 +196,12 @@ DebugDraw::Line3d( const Ogre::Vector3& point1, const Ogre::Vector3& point2 )
 void
 DebugDraw::Triangle3d( const Ogre::Vector3& point1, const Ogre::Vector3& point2, const Ogre::Vector3& point3 )
 {
+    Ogre::RenderTarget* window  = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" );
+    if( ( Ogre::RenderWindow* )window->isActive() == false )
+    {
+        return;
+    }
+
     if( m_Triangle3dRenderOp.vertexData->vertexCount + 3 > m_Triangle3dMaxVertexCount )
     {
         LOG_ERROR( "Max number of 3d triangles reached. Can't create more than " + Ogre::StringConverter::toString( m_Triangle3dMaxVertexCount / 3 ) + " 3d triangles." );
@@ -206,14 +224,20 @@ DebugDraw::Triangle3d( const Ogre::Vector3& point1, const Ogre::Vector3& point2,
 void
 DebugDraw::Quad( const float x1, const float y1, const float x2, const float y2, const float x3, const float y3, const float x4, const float y4 )
 {
+    Ogre::RenderTarget* window  = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" );
+    if( ( Ogre::RenderWindow* )window->isActive() == false )
+    {
+        return;
+    }
+
     if( m_QuadRenderOp.vertexData->vertexCount + 6 > m_QuadMaxVertexCount )
     {
         LOG_ERROR( "Max number of quads reached. Can't create more than " + Ogre::StringConverter::toString( m_QuadMaxVertexCount / 6 ) + " quads." );
         return;
     }
 
-    float width = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualWidth();
-    float height = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualHeight();
+    float width = window->getViewport( 0 )->getActualWidth();
+    float height = window->getViewport( 0 )->getActualHeight();
 
     float new_x1 = ( m_ScreenSpace == true ) ? ( ( int ) x1 / width ) * 2 - 1 : x1;
     float new_y1 = ( m_ScreenSpace == true ) ? -( ( ( int ) y1 / height ) * 2 - 1 ) : y1;
@@ -243,14 +267,20 @@ DebugDraw::Quad( const float x1, const float y1, const float x2, const float y2,
 void
 DebugDraw::Circle( const float x, const float y, const float radius )
 {
+    Ogre::RenderTarget* window  = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" );
+    if( ( Ogre::RenderWindow* )window->isActive() == false )
+    {
+        return;
+    }
+
     if( m_CircleRenderOp.vertexData->vertexCount + 16 > m_CircleMaxVertexCount )
     {
         LOG_ERROR( "Max number of circles reached. Can't create more than " + Ogre::StringConverter::toString( m_CircleMaxVertexCount / 16 ) + " circles." );
         return;
     }
 
-    float width = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualWidth();
-    float height = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualHeight();
+    float width = window->getViewport( 0 )->getActualWidth();
+    float height = window->getViewport( 0 )->getActualHeight();
 
     float radius23 = radius * ( 2.2f / 3.0f );
 
@@ -317,14 +347,20 @@ DebugDraw::Circle( const float x, const float y, const float radius )
 void
 DebugDraw::Disc( const float x, const float y, const float radius )
 {
+    Ogre::RenderTarget* window  = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" );
+    if( ( Ogre::RenderWindow* )window->isActive() == false )
+    {
+        return;
+    }
+
     if( m_DiscRenderOp.vertexData->vertexCount + 24 > m_DiscMaxVertexCount )
     {
         LOG_ERROR( "Max number of discs reached. Can't create more than " + Ogre::StringConverter::toString( m_DiscMaxVertexCount / 24 ) + " discs." );
         return;
     }
 
-    float width = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualWidth();
-    float height = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualHeight();
+    float width = window->getViewport( 0 )->getActualWidth();
+    float height = window->getViewport( 0 )->getActualHeight();
 
     float radius23 = radius * ( 2.2f / 3.0f );
 
@@ -399,6 +435,12 @@ DebugDraw::Disc( const float x, const float y, const float radius )
 void
 DebugDraw::Text( const float x, const float y, const Ogre::String& text )
 {
+    Ogre::RenderTarget* window = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" );
+    if( ( Ogre::RenderWindow* )window->isActive() == false )
+    {
+        return;
+    }
+
     if( m_TextRenderOp.vertexData->vertexCount + text.size() * 6 > m_TextMaxVertexCount )
     {
         LOG_ERROR( "Max number of text reached. Can't add text \"" + text + "\". Max number of letters is " + Ogre::StringConverter::toString( m_TextMaxVertexCount / 6 ) + "." );
@@ -408,8 +450,8 @@ DebugDraw::Text( const float x, const float y, const Ogre::String& text )
     float* writeIterator = ( float* ) m_TextVertexBuffer->lock( Ogre::HardwareBuffer::HBL_NORMAL );
     writeIterator += m_TextRenderOp.vertexData->vertexCount * 9;
 
-    float width = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualWidth();
-    float height = Ogre::Root::getSingleton().getRenderTarget( "QGearsWindow" )->getViewport( 0 )->getActualHeight();
+    float width = window->getViewport( 0 )->getActualWidth();
+    float height = window->getViewport( 0 )->getActualHeight();
 
     float length = 0;
     if( m_TextAlignment != LEFT )

@@ -29,6 +29,7 @@ public:
     float GetRightImpulse() const;
     void SetRightImpulse( const float right_impulse );
 
+    bool IsDead() const;
     float GetEnergy() const;
     void SetEnergy( const float energy );
     float GetFitness() const;
@@ -57,6 +58,7 @@ private:
     float m_LeftImpulse;
     float m_RightImpulse;
 
+    float m_Life;
     float m_Energy;
     float m_Fitness;
 

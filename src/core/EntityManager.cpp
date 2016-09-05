@@ -80,7 +80,7 @@ EntityManager::Update()
         float right_impulse = entity->GetRightImpulse();
         if( left_impulse > 0.0f )
         {
-            rotation -= 10.0f * delta;
+            rotation -= 90.0f * delta;
             if( rotation < 0.0f )
             {
                 rotation = ceil( -rotation / 360.0f ) * 360.0 - rotation;
@@ -92,7 +92,7 @@ EntityManager::Update()
         }
         if( right_impulse > 0.0f )
         {
-            rotation += 10.0f * delta;
+            rotation += 90.0f * delta;
             if( rotation > 360.0f )
             {
                 rotation -= ceil( rotation / 360.0f ) * 360.0;
@@ -106,42 +106,38 @@ EntityManager::Update()
         {
             float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 40.0f;
             float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 40.0f;
-            if( ( pos_x - radius > m_X ) && ( pos_x + radius < m_X + m_Width ) && ( pos_y - radius > m_Y ) && ( pos_y + radius < m_Y + m_Height ) )
-            {
-                entity->SetX( pos_x );
-                entity->SetY( pos_y );
-            }
+            pos_x = ( pos_x < m_X ) ? m_Width + pos_x : pos_x;
+            pos_x = ( pos_x > m_X + m_Width ) ? 2 * m_X + m_Width - pos_x : pos_x;
+            pos_y = ( pos_y < m_Y ) ? m_Height + pos_y : pos_y;
+            pos_y = ( pos_y > m_Y + m_Height ) ? 2 * m_Y + m_Height - pos_y : pos_y;
+            entity->SetX( pos_x );
+            entity->SetY( pos_y );
             forward_impulse -= delta;
             forward_impulse = ( forward_impulse < 0.0f ) ? 0.0f : forward_impulse;
             entity->SetForwardImpulse( forward_impulse );
-        }
 
-        // check entity [ food collision
-        for( std::vector< Food >::iterator it = m_Food.begin(); it != m_Food.end(); )
-        {
-            float x1 = ( *it ).x;
-            float y1 = ( *it ).y;
-            float x2 = entity->GetX();
-            float y2 = entity->GetY();
-            float distance = sqrt( ( x2 - x1 ) * ( x2 - x1 ) + ( y2 - y1 ) * ( y2 - y1 ) );
-            if( distance <= entity->GetRadius() )
+            // check entity [ food collision
+            for( std::vector< Food >::iterator it = m_Food.begin(); it != m_Food.end(); )
             {
-                float energy = entity->GetEnergy() + ( *it ).power;
-                energy = ( energy > 100.0f) ? 100.0f : energy;
-                entity->SetEnergy( energy );
-                entity->SetFitness( entity->GetFitness() + ( *it ).power );
-                it = m_Food.erase( it );
-            }
-            else
-            {
-                ++it;
+                float x1 = ( *it ).x;
+                float y1 = ( *it ).y;
+                float x2 = entity->GetX();
+                float y2 = entity->GetY();
+                float distance = sqrt( ( x2 - x1 ) * ( x2 - x1 ) + ( y2 - y1 ) * ( y2 - y1 ) );
+                if( distance <= entity->GetRadius() )
+                {
+                    float energy = entity->GetEnergy() + ( *it ).power;
+                    energy = ( energy > 100.0f) ? 100.0f : energy;
+                    entity->SetEnergy( energy );
+                    entity->SetFitness( entity->GetFitness() + ( *it ).power );
+                    it = m_Food.erase( it );
+                }
+                else
+                {
+                    ++it;
+                }
             }
         }
-
-
-
-        // consume energy
-        entity->SetEnergy( entity->GetEnergy() - delta * 5.0f );
     }
 
 
@@ -149,7 +145,7 @@ EntityManager::Update()
     // remove dead entity
     for( std::vector< Entity* >::iterator it = m_Entity.begin(); it != m_Entity.end(); )
     {
-        if( ( *it )->GetEnergy() <= 0 )
+        if( ( ( *it )->GetEnergy() <= 0 ) || ( ( *it )->IsDead() == true ) )
         {
             switch( ( *it )->GetType() )
             {

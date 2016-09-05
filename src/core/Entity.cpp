@@ -21,6 +21,7 @@ Entity::Entity( const int type, const float x, const float y ):
     m_ForwardImpulse( 0.0f ),
     m_LeftImpulse( 0.0f ),
     m_RightImpulse( 0.0f ),
+    m_Life( 400.0f ),
     m_Energy( 100.0f ),
     m_Fitness( 0.0f ),
     m_Type( type ),
@@ -56,6 +57,9 @@ Entity::Update()
 
         m_Think = 0.1f;
     }
+
+    m_Life -= delta * 5.0;
+    m_Energy -= delta * 5.0f;
 }
 
 
@@ -101,8 +105,8 @@ Entity::Draw( const unsigned int x, const unsigned int y )
 
     // draw info about entity
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-    DEBUG_DRAW.Text( x - 40, y - 70, "gen:" + IntToString( m_GenerationId ) + " spe:" + IntToString( m_SpeciesId ) );
-    DEBUG_DRAW.Text( x - 40, y - 50, "fitness:" + IntToString( ( int )m_Fitness ) );
+    DEBUG_DRAW.Text( x - 40, y - 70, "gen:" + IntToString( m_GenerationId ) + " (" + IntToString( m_SpeciesId ) + ")" );
+    DEBUG_DRAW.Text( x - 40, y - 50, "fit:" + IntToString( ( int )m_Fitness ) + " (" + IntToString( ( int )m_Life ) + ")" );
 }
 
 
@@ -207,6 +211,14 @@ void
 Entity::SetRightImpulse( const float right_impulse )
 {
     m_RightImpulse = right_impulse;
+}
+
+
+
+bool
+Entity::IsDead() const
+{
+    return ( m_Life <= 0 );
 }
 
 

@@ -101,15 +101,15 @@ Cell::Update()
 
             if( m_Name == ACTIVATOR_FORWARD )
             {
-                m_Entity->SetForwardImpulse( 2.0f );
+                m_Entity->SetForwardImpulse( 1.0f );
             }
             else if( m_Name == ACTIVATOR_LEFT )
             {
-                 m_Entity->SetLeftImpulse( 2.0f );
+                 m_Entity->SetLeftImpulse( 1.0f );
             }
             else if( m_Name == ACTIVATOR_RIGHT )
             {
-                 m_Entity->SetRightImpulse( 2.0f );
+                 m_Entity->SetRightImpulse( 1.0f );
             }
         }
     }
@@ -130,7 +130,36 @@ Cell::Draw( const unsigned int x, const unsigned int y )
     }
     else if( m_Type == SENSOR )
     {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
+        float value = 0.0f;
+        switch( m_Name )
+        {
+            case SENSOR_FOOD_LEFT:
+            {
+                value = m_Entity->GetSensorFoodLeft();
+            }
+            break;
+
+            case SENSOR_FOOD_RIGHT:
+            {
+                value = m_Entity->GetSensorFoodRight();
+            }
+            break;
+
+            case SENSOR_ENERGY:
+            {
+                value = m_Entity->GetSensorEnergy();
+            }
+            break;
+        }
+
+        if( value > 0.0f)
+        {
+            DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
+        }
+        else
+        {
+            DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
+        }
     }
     else
     {
@@ -140,8 +169,9 @@ Cell::Draw( const unsigned int x, const unsigned int y )
     float scale = 8.0f;
     DEBUG_DRAW.Disc( x + m_X * scale, y + m_Y * scale, radius );
 
-    //DEBUG_DRAW.SetColour( Ogre::ColourValue( 0.5f, 0.5f, 0.5f, 1 ) );
-    //DEBUG_DRAW.Circle( x + m_X * scale, y + m_Y * scale, m_ProteinRadius * scale );
+    // draw protein
+    //DEBUG_DRAW.SetColour( Ogre::ColourValue( 0.5f, 0.5f, 0.5f, 0.1 ) );
+    //DEBUG_DRAW.Circle( x + m_X * scale, y + m_Y * scale, m_OuterProteinRadius * scale );
 
     for( size_t i = 0; i < m_Synapses.size(); ++i )
     {
