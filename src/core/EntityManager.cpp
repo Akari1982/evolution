@@ -30,8 +30,8 @@ EntityManager::EntityManager():
 {
     InitCommands();
 
-    m_Ontogenesis0 = new Ontogenesis( "specie0" );
-    m_Ontogenesis1 = new Ontogenesis( "specie1" );
+    m_Ontogenesis0 = new Ontogenesis( "specie0", 0 );
+    m_Ontogenesis1 = new Ontogenesis( "specie1", 1 );
 }
 
 
@@ -272,13 +272,13 @@ EntityManager::ResetType( const int type, Ogre::String& file_name )
     {
         m_TypeNum0 = 0;
         delete m_Ontogenesis0;
-        m_Ontogenesis0 = new Ontogenesis( "specie0" );
+        m_Ontogenesis0 = new Ontogenesis( "specie0", 0 );
     }
     else
     {
         m_TypeNum1 = 0;
         delete m_Ontogenesis1;
-        m_Ontogenesis1 = new Ontogenesis( "specie1" );
+        m_Ontogenesis1 = new Ontogenesis( "specie1", 1 );
     }
 }
 

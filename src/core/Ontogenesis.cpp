@@ -11,7 +11,8 @@ const int GENES_PER_GENOME = 5;
 
 
 
-Ontogenesis::Ontogenesis( const Ogre::String& file_prefix ):
+Ontogenesis::Ontogenesis( const Ogre::String& file_prefix, const int type ):
+    m_Type( type ),
     m_FilePrefix( file_prefix ),
     m_GeneUniqueId( 0 )
 {
@@ -199,6 +200,9 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             if( place == true )
                             {
                                 Cell* cell = new Cell( entity, ( Cell::CellName )expr.value, x, y );
+                                cell->SetOuterProtein( species.network[ i ]->GetOuterProtein() );
+                                cell->SetOuterProteinRadius( species.network[ i ]->GetOuterProteinRadius() );
+                                cell->SetInnerProtein( species.network[ i ]->GetInnerProtein() );
                                 species.network.push_back( cell );
                             }
                         }
@@ -415,138 +419,196 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
 
 
 
-    // insert new genes if genome is empty or if 20% chance
-    // add one random condition and one random expression
-    if( ( genome.size() == 0 ) || ( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) ) )
+    if( m_Type == 1 )
+    {
+        // insert new genes if genome is empty or if 20% chance
+        // add one random condition and one random expression
+        if( ( genome.size() == 0 ) || ( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) ) )
+        {
+            Gene gene;
+            gene.unique_id = m_GeneUniqueId;
+            gene.conserv = 0.0f;
+            Condition cond = GenerateRandomCondition();
+            gene.cond.push_back( cond );
+            Expression expr = GenerateRandomExpression();
+            gene.expr.push_back( expr );
+            mutated.push_back( gene );
+            ++m_GeneUniqueId;
+        }
+
+
+
+        // copy existed genome to mutated and do some mutation
+        for( size_t i = 0; i < genome.size(); ++i )
+        {
+            Gene gene = genome[ i ];
+
+            // chance to be deleted 0-20% (reduced if this is conservative gene)
+            // don't delete if this is only gene in genome
+            // just don't copy it to new genome
+            if( ( genome.size() == 1 ) || ( ( rand() % ( int )( 5.0f * ( gene.conserv + 1.0f ) ) ) != 1 ) )
+            {
+                gene.conserv += ( 100.0f - gene.conserv ) / 4.0f;
+                gene.conserv = ( gene.conserv > 99.0f ) ? 99.0f : gene.conserv;
+                mutated.push_back( gene );
+
+                // chance to be duplicated 20% (not affected by conservativeness)
+                if( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) )
+                {
+                    Gene dup_gene = gene;
+                    dup_gene.unique_id = m_GeneUniqueId;
+                    dup_gene.conserv = 0.0f;
+                    mutated.push_back( dup_gene );
+                    ++m_GeneUniqueId;
+                }
+            }
+        }
+
+
+
+
+        for( size_t i = 0; i < mutated.size(); ++i )
+        {
+            // mutate only if conserv roll pass
+            if( ( rand() % 100 ) < 100.0f - mutated[ i ].conserv )
+            {
+                // remove random condition if there are more than one condition
+                // chance 10%
+                if( ( mutated[ i ].cond.size() > 1 ) && ( ( rand() % 100 ) < 10 ) )
+                {
+                    mutated[ i ].cond.erase( mutated[ i ].cond.begin() + ( rand() % mutated[ i ].cond.size() ) );
+                    mutated[ i ].conserv /= 2.0f;
+                }
+                for( size_t cond_id = 0; cond_id < mutated[ i ].cond.size(); ++cond_id )
+                {
+                    // conditions can interchangebly mutate as they want
+                    // chance of mutation 0-30%
+                    if( ( rand() % 100 ) < 30 )
+                    {
+                        mutated[ i ].cond[ cond_id ].type = ( ConditionType )( rand() % C_TOTAL );
+                        mutated[ i ].conserv /= 2.0f;
+                    }
+                    if( ( rand() % 100 ) < 30 )
+                    {
+                        GenerateRandomConditionValue( mutated[ i ].cond[ cond_id ] );
+                        mutated[ i ].conserv /= 2.0f;
+                    }
+                }
+                // add random condition with chance 10%
+                if( ( rand() % 100 ) < 10 )
+                {
+                    mutated[ i ].cond.push_back( GenerateRandomCondition() );
+                    mutated[ i ].conserv /= 2.0f;
+                }
+
+
+
+                // remove random expression if there are more than one expression
+                // chance 10%
+                if( ( mutated[ i ].expr.size() > 1 ) && ( ( rand() % 100 ) < 5 ) )
+                {
+                    mutated[ i ].expr.erase( mutated[ i ].expr.begin() + ( rand() % mutated[ i ].expr.size() ) );
+                    mutated[ i ].conserv /= 2.0f;
+                }
+                for( size_t expr_id = 0; expr_id < mutated[ i ].expr.size(); ++expr_id )
+                {
+                    // only protein expression can mutate
+                    // don't mutate SPLIT because this is the only expression
+                    // uses cell types instead of protein
+                    // chance of mutation 0-30%
+                    ExpressionType type = mutated[ i ].expr[ expr_id ].type;
+                    if( ( rand() % 100 ) < 30 )
+                    {
+                        if( type == E_MIGRATE || type == E_O_PROTEIN || type == E_I_PROTEIN || type == E_DENDRITE || type == E_DENDRITE_I || type == E_AXON || type == E_AXON_I )
+                        {
+                            ExpressionType new_type;
+                            switch( rand() % 7 )
+                            {
+                                case 0: new_type = E_MIGRATE; break;
+                                case 1: new_type = E_O_PROTEIN; break;
+                                case 2: new_type = E_I_PROTEIN; break;
+                                case 3: new_type = E_DENDRITE; break;
+                                case 4: new_type = E_DENDRITE_I; break;
+                                case 5: new_type = E_AXON; break;
+                                case 6: new_type = E_AXON_I; break;
+                            }
+
+                            if( type != new_type )
+                            {
+                                mutated[ i ].expr[ expr_id ].type = new_type;
+                                mutated[ i ].conserv /= 2.0f;
+                            }
+                        }
+                    }
+                    if( ( rand() % 100 ) < 30 )
+                    {
+                        GenerateRandomExpressionValue( mutated[ i ].expr[ expr_id ] );
+                        mutated[ i ].conserv /= 2.0f;
+                    }
+                }
+                // add random expression with chance 10%
+                if( ( rand() % 100 ) < 10 )
+                {
+                    mutated[ i ].expr.push_back( GenerateRandomExpression() );
+                    mutated[ i ].conserv /= 2.0f;
+                }
+            }
+        }
+    }
+    else
     {
         Gene gene;
         gene.unique_id = m_GeneUniqueId;
         gene.conserv = 0.0f;
-        Condition cond = GenerateRandomCondition();
+        Condition cond;
+        cond.type = C_I_PROTEIN;
+        cond.value = -1;
         gene.cond.push_back( cond );
-        Expression expr = GenerateRandomExpression();
+        Expression expr;
+        expr.type = E_AXON_I;
+        expr.value = 2;
+        gene.expr.push_back( expr );
+        expr.type = E_I_PROTEIN;
+        expr.value = 0;
+        gene.expr.push_back( expr );
+        expr.type = E_SPLIT;
+        expr.value = Cell::NEURON_COMMON;
         gene.expr.push_back( expr );
         mutated.push_back( gene );
         ++m_GeneUniqueId;
-    }
 
+        gene.unique_id = m_GeneUniqueId;
+        gene.conserv = 0.0f;
+        Condition cond;
+        cond.type = C_I_PROTEIN;
+        cond.value = 0;
+        gene.cond.push_back( cond );
+        Expression expr;
+        expr.type = E_SPLIT;
+        expr.value = Cell::NEURON_COMMON;
+        gene.expr.push_back( expr );
+        expr.type = E_I_PROTEIN;
+        expr.value = 1;
+        gene.expr.push_back( expr );
+        mutated.push_back( gene );
+        ++m_GeneUniqueId;
 
+        gene.unique_id = m_GeneUniqueId;
+        gene.conserv = 0.0f;
+        Condition cond;
+        cond.type = C_I_PROTEIN;
+        cond.value = 1;
+        gene.cond.push_back( cond );
+        Expression expr;
+        expr.type = E_DENDRITE;
+        expr.value = 0;
+        gene.expr.push_back( expr );
+        expr.type = E_I_PROTEIN;
+        expr.value = 2;
+        gene.expr.push_back( expr );
+        mutated.push_back( gene );
+        ++m_GeneUniqueId;
 
-    // copy existed genome to mutated and do some mutation
-    for( size_t i = 0; i < genome.size(); ++i )
-    {
-        Gene gene = genome[ i ];
-
-        // chance to be deleted 0-20% (reduced if this is conservative gene)
-        // don't delete if this is only gene in genome
-        // just don't copy it to new genome
-        if( ( genome.size() == 1 ) || ( ( rand() % ( int )( 5.0f * ( gene.conserv + 1.0f ) ) ) != 1 ) )
-        {
-            gene.conserv += ( 100.0f - gene.conserv ) / 4.0f;
-            gene.conserv = ( gene.conserv > 99.0f ) ? 99.0f : gene.conserv;
-            mutated.push_back( gene );
-
-            // chance to be duplicated 20% (not affected by conservativeness)
-            if( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) )
-            {
-                Gene dup_gene = gene;
-                dup_gene.unique_id = m_GeneUniqueId;
-                dup_gene.conserv = 0.0f;
-                mutated.push_back( dup_gene );
-                ++m_GeneUniqueId;
-            }
-        }
-    }
-
-
-
-
-    for( size_t i = 0; i < mutated.size(); ++i )
-    {
-        // mutate only if conserv roll pass
-        if( ( rand() % 100 ) < 100.0f - mutated[ i ].conserv )
-        {
-            // remove random condition if there are more than one condition
-            // chance 10%
-            if( ( mutated[ i ].cond.size() > 1 ) && ( ( rand() % 100 ) < 10 ) )
-            {
-                mutated[ i ].cond.erase( mutated[ i ].cond.begin() + ( rand() % mutated[ i ].cond.size() ) );
-                mutated[ i ].conserv /= 2.0f;
-            }
-            for( size_t cond_id = 0; cond_id < mutated[ i ].cond.size(); ++cond_id )
-            {
-                // conditions can interchangebly mutate as they want
-                // chance of mutation 0-30%
-                if( ( rand() % 100 ) < 30 )
-                {
-                    mutated[ i ].cond[ cond_id ].type = ( ConditionType )( rand() % C_TOTAL );
-                    mutated[ i ].conserv /= 2.0f;
-                }
-                if( ( rand() % 100 ) < 30 )
-                {
-                    GenerateRandomConditionValue( mutated[ i ].cond[ cond_id ] );
-                    mutated[ i ].conserv /= 2.0f;
-                }
-            }
-            // add random condition with chance 10%
-            if( ( rand() % 100 ) < 10 )
-            {
-                mutated[ i ].cond.push_back( GenerateRandomCondition() );
-                mutated[ i ].conserv /= 2.0f;
-            }
-
-
-
-            // remove random expression if there are more than one expression
-            // chance 10%
-            if( ( mutated[ i ].expr.size() > 1 ) && ( ( rand() % 100 ) < 5 ) )
-            {
-                mutated[ i ].expr.erase( mutated[ i ].expr.begin() + ( rand() % mutated[ i ].expr.size() ) );
-                mutated[ i ].conserv /= 2.0f;
-            }
-            for( size_t expr_id = 0; expr_id < mutated[ i ].expr.size(); ++expr_id )
-            {
-                // only protein expression can mutate
-                // don't mutate SPLIT because this is the only expression
-                // uses cell types instead of protein
-                // chance of mutation 0-30%
-                ExpressionType type = mutated[ i ].expr[ expr_id ].type;
-                if( ( rand() % 100 ) < 30 )
-                {
-                    if( type == E_MIGRATE || type == E_O_PROTEIN || type == E_I_PROTEIN || type == E_DENDRITE || type == E_DENDRITE_I || type == E_AXON || type == E_AXON_I )
-                    {
-                        ExpressionType new_type;
-                        switch( rand() % 7 )
-                        {
-                            case 0: new_type = E_MIGRATE; break;
-                            case 1: new_type = E_O_PROTEIN; break;
-                            case 2: new_type = E_I_PROTEIN; break;
-                            case 3: new_type = E_DENDRITE; break;
-                            case 4: new_type = E_DENDRITE_I; break;
-                            case 5: new_type = E_AXON; break;
-                            case 6: new_type = E_AXON_I; break;
-                        }
-
-                        if( type != new_type )
-                        {
-                            mutated[ i ].expr[ expr_id ].type = new_type;
-                            mutated[ i ].conserv /= 2.0f;
-                        }
-                    }
-                }
-                if( ( rand() % 100 ) < 30 )
-                {
-                    GenerateRandomExpressionValue( mutated[ i ].expr[ expr_id ] );
-                    mutated[ i ].conserv /= 2.0f;
-                }
-            }
-            // add random expression with chance 10%
-            if( ( rand() % 100 ) < 10 )
-            {
-                mutated[ i ].expr.push_back( GenerateRandomExpression() );
-                mutated[ i ].conserv /= 2.0f;
-            }
-        }
     }
 
 
@@ -577,7 +639,7 @@ Ontogenesis::GenerateRandomConditionValue( Condition& cond )
         case C_I_PROTEIN:
         case C_NI_PROTEIN:
         {
-            cond.value = rand() % MAX_PROTEIN;
+            cond.value = ( rand() % ( MAX_PROTEIN + 1 ) ) - 1;
         }
         break;
     }
@@ -616,7 +678,7 @@ Ontogenesis::GenerateRandomExpressionValue( Expression& expr )
         case E_AXON:
         case E_AXON_I:
         {
-            expr.value = rand() % MAX_PROTEIN;
+            cond.value = ( rand() % ( MAX_PROTEIN + 1 ) ) - 1;
         }
         break;
     }

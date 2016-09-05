@@ -13,7 +13,7 @@
 class Ontogenesis
 {
 public:
-    Ontogenesis( const Ogre::String& file_prefix );
+    Ontogenesis( const Ogre::String& file_prefix, const int type );
     virtual ~Ontogenesis();
 
     void Draw( const unsigned int x, const unsigned int y );
@@ -105,6 +105,7 @@ private:
     void DumpGenome( Logger* file, std::vector< Gene >& genome );
 
 private:
+    int m_Type;
     Ogre::String m_FilePrefix;
 
     unsigned int m_GeneUniqueId;
