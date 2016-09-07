@@ -15,7 +15,7 @@ extern QG_STATE g_ApplicationState;
 
 
 
-#define QG_VERSION_NAME "N-Gears v0.01 (Is it possible to think?)"
+#define QG_VERSION_NAME "N-Gears v0.02 (Is it possible to evolve?)"
 
 
 

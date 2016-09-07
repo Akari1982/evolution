@@ -38,6 +38,7 @@ public:
     enum ExpressionType
     {
         E_SPLIT = 0,
+        E_SPAWN,
         E_MIGRATE,
         E_O_PROTEIN,
         E_I_PROTEIN,
@@ -52,13 +53,13 @@ public:
     struct Condition
     {
         ConditionType type;
-        int value;
+        int value[ 1 ];
     };
 
     struct Expression
     {
         ExpressionType type;
-        int value;
+        int value[ 3 ];
     };
 
     struct Gene
