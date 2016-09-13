@@ -14,9 +14,10 @@ Cell::Cell( Entity* entity, const CellName name, const int x, const int y ):
     m_Name( name ),
     m_X( x ),
     m_Y( y ),
+    m_InnerProtein( -1 ),
+    m_InnerProteinPower( 0.0f ),
     m_OuterProtein( -1 ),
     m_OuterProteinRadius( 0 ),
-    m_InnerProtein( -1 ),
     m_Threshold( 1.0f ),
     m_Value( 0.0f ),
     m_Fired( false )
@@ -279,9 +280,26 @@ Cell::GetInnerProtein() const
 
 
 void
-Cell::SetInnerProtein( const int protein )
+Cell::SetInnerProtein( const int protein, const float power )
 {
     m_InnerProtein = protein;
+    m_InnerProteinPower = power;
+}
+
+
+
+float
+Cell::GetInnerProteinPower() const
+{
+    return m_InnerProteinPower;
+}
+
+
+
+void
+Cell::SetInnerProteinPower( const float power )
+{
+    m_InnerProteinPower = power;
 }
 
 

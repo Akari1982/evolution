@@ -43,12 +43,14 @@ public:
     void SetX( const int x );
     int GetY() const;
     void SetY( const int y );
+    int GetInnerProtein() const;
+    void SetInnerProtein( const int protein, const float power );
+    float GetInnerProteinPower() const;
+    void SetInnerProteinPower( const float power );
     int GetOuterProtein() const;
     void SetOuterProtein( const int protein );
     int GetOuterProteinRadius() const;
     void SetOuterProteinRadius( const int protein_radius );
-    int GetInnerProtein() const;
-    void SetInnerProtein( const int protein );
 
     void AddSynapse( const float power, const bool inverted, Cell* cell );
 
@@ -65,9 +67,10 @@ protected:
     int m_X;
     int m_Y;
 
+    int m_InnerProtein;
+    int m_InnerProteinPower;
     int m_OuterProtein;
     int m_OuterProteinRadius;
-    int m_InnerProtein;
 
     float m_Threshold;
     float m_Value;

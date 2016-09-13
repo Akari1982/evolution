@@ -27,6 +27,7 @@ private:
 public:
     enum ConditionType
     {
+        // сигналом для дальнейшей экспрессии в клетках может быть
         C_O_PROTEIN = 0,
         C_NO_PROTEIN,
         C_I_PROTEIN,
@@ -37,6 +38,11 @@ public:
 
     enum ExpressionType
     {
+        // реальные клетки могут делится на 2 одинаковые и на 2 неодинаковые части.
+        // протеины заключенные в клетке могут поделится полностью или
+        // каждый отдельный протеин может сконцентрироватся только в одной дочерней клетке
+        // клетка делится только на 2 части
+        // [bool = 1] - внутренний протеин наследуется
         E_SPLIT = 0,
         E_SPAWN,
         E_MIGRATE,
@@ -53,13 +59,14 @@ public:
     struct Condition
     {
         ConditionType type;
-        int value[ 1 ];
+        int value_i[ 1 ];
+        int value_f[ 1 ];
     };
 
     struct Expression
     {
         ExpressionType type;
-        int value[ 3 ];
+        int value_i[ 3 ];
     };
 
     struct Gene
@@ -92,7 +99,7 @@ private:
         float power;
         size_t cell_id;
     };
-    bool SearchOuterProtein( std::vector< Cell* >& network, const int protein, const int x, const int y, std::vector< PowerProtein >& powers );
+    float SearchOuterProtein( std::vector< Cell* >& network, const int protein, const int x, const int y, std::vector< PowerProtein >& powers );
     bool FindPlaceForCell( std::vector< Cell* >& network, const int x, const int y, const int radius, int &new_x, int &new_y );
     bool IsCell( std::vector< Cell* >& network, const int x, const int y );
     std::vector< Gene > Mutate( std::vector< Gene >& genome );
