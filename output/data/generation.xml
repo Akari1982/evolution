@@ -1,0 +1,17 @@
+<generation id="1">
+    <base_genome>
+        <gene id="1" conserv="0">
+            <condition type="O_PROTEIN" value_i="1" />
+            <condition type="NO_PROTEIN" value_i="2" />
+            <expression type="DENDRITE" value_i="4" />
+        </gene>
+    </base_genome>
+
+    <specie id="1" fitness="100">
+        <gene id="1" conserv="0">
+            <condition type="O_PROTEIN" value_i="1" />
+            <condition type="NO_PROTEIN" value_i="2" />
+            <expression type="DENDRITE" value_i="4" />
+        </gene>
+    </specie>
+</generation>

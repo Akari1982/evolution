@@ -15,7 +15,7 @@ CommandRunGeneration( const Ogre::StringVector& params )
         return;
     }
 
-    EntityManager::getSingleton().ResetType( Ogre::StringConverter::parseInt( params[ 1 ] ), Ogre::String( params[ 2 ] ) );
+    EntityManager::getSingleton().RunGeneration( Ogre::StringConverter::parseInt( params[ 1 ] ), Ogre::String( params[ 2 ] ) );
 }
 
 

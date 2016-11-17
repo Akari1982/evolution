@@ -7,6 +7,7 @@
 
 
 XmlFile::XmlFile( const Ogre::String& file ):
+    m_FileName( file ),
     m_File( file.c_str() )
 {
     m_File.SetCondenseWhiteSpace( false );

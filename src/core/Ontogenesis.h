@@ -21,6 +21,8 @@ public:
     void LoadNetwork( Entity* entity );
     void EntityDeath( Entity* entity );
 
+    void LoadGeneration( const Generation& generation );
+
 private:
     Ontogenesis();
 
@@ -59,19 +61,21 @@ public:
     struct Condition
     {
         ConditionType type;
-        int value_i[ 1 ];
-        int value_f[ 1 ];
+        float value1;
+        float value2;
     };
 
     struct Expression
     {
         ExpressionType type;
-        int value_i[ 3 ];
+        float value1;
+        float value2;
+        float value3;
     };
 
     struct Gene
     {
-        unsigned int unique_id;
+        int id;
         float conserv;
         std::vector< Condition > cond;
         std::vector< Expression > expr;
@@ -79,18 +83,20 @@ public:
 
     struct Species
     {
+        float fitness;
         std::vector< Gene > genome;
         std::vector< Cell* > network;
     };
 
     struct Generation
     {
+        int id;
         float top_fitness;
         size_t top_id;
         std::vector< Gene > base_genome;
         std::vector< Species > species;
 
-        Logger* file;
+        Ogre::String file_name;
     };
 
 private:
@@ -109,8 +115,11 @@ private:
     void GenerateRandomExpressionValue( Expression& expr );
 
     Ogre::String ConditionTypeToString( const ConditionType type );
+    ConditionType ConditionStringToType( const Ogre::String& type );
     Ogre::String ExpressionTypeToString( const ExpressionType type );
+    ExpressionType ExpressionTypeToString( const Ogre::String& type );
     void DumpGenome( Logger* file, std::vector< Gene >& genome );
+    void DumpGeneration( const Generation& generation );
 
 private:
     int m_Type;
