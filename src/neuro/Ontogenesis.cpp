@@ -82,8 +82,8 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
     // Default cells
     int protein_stem = 0;
-    int protein_sensor_food_left = 1;
-    int protein_sensor_food_right = 2;
+    int protein_sensor_food = 1;
+    int protein_sensor_enemy = 2;
     int protein_activator_forward = 3;
     int protein_activator_left = 4;
     int protein_activator_right = 5;
@@ -92,27 +92,32 @@ Ontogenesis::LoadNetwork( Entity* entity )
     cell->SetInnerProtein( protein_stem, 1.0f );
     species.network.push_back( cell );
 
-    cell = new Cell( entity, Cell::SENSOR_FOOD_LEFT, -5, -3 );
-    cell->SetOuterProtein( protein_sensor_food_left );
+    cell = new Cell( entity, Cell::SENSOR_FOOD_LEFT, 5, -3 );
+    cell->SetOuterProtein( protein_sensor_food );
     cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
-    cell = new Cell( entity, Cell::SENSOR_FOOD_RIGHT, -5, 3 );
-    cell->SetOuterProtein( protein_sensor_food_right );
+    cell = new Cell( entity, Cell::SENSOR_FOOD_RIGHT, 5, 3 );
+    cell->SetOuterProtein( protein_sensor_food );
     cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
-    cell = new Cell( entity, Cell::ACTIVATOR_FORWARD, 5, 0 );
+    cell = new Cell( entity, Cell::SENSOR_ENEMY, 10, 0 );
+    cell->SetOuterProtein( protein_sensor_enemy );
+    cell->SetOuterProteinRadius( 8 );
+    species.network.push_back( cell );
+
+    cell = new Cell( entity, Cell::ACTIVATOR_FORWARD, -5, 0 );
     cell->SetOuterProtein( protein_activator_forward );
     cell->SetOuterProteinRadius( 6 );
     species.network.push_back( cell );
 
-    cell = new Cell( entity, Cell::ACTIVATOR_LEFT, 3, -3 );
+    cell = new Cell( entity, Cell::ACTIVATOR_LEFT, -3, -3 );
     cell->SetOuterProtein( protein_activator_left );
     cell->SetOuterProteinRadius( 5 );
     species.network.push_back( cell );
 
-    cell = new Cell( entity, Cell::ACTIVATOR_RIGHT, 3, 3 );
+    cell = new Cell( entity, Cell::ACTIVATOR_RIGHT, -3, 3 );
     cell->SetOuterProtein( protein_activator_right );
     cell->SetOuterProteinRadius( 5 );
     species.network.push_back( cell );
