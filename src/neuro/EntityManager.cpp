@@ -151,7 +151,7 @@ EntityManager::Update()
                     float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
                     if( distance <= radius + radius1 )
                     {
-                        if( radius >= radius1 * 2 )
+                        if( radius >= radius1 )
                         {
                             float energy = entity->GetEnergy() + m_Entity[ i ]->GetEnergy();
                             energy = ( energy > 100.0f) ? 100.0f : energy;

@@ -14,7 +14,7 @@ const float SENSOR_RIGHT_ROT = -45.0f;
 
 
 Entity::Entity( const int type, const float x, const float y ):
-    m_Radius( 15.0f ),
+    m_Radius( 12.0f ),
     m_X( x ),
     m_Y( y ),
     m_Rotation( 0.0f ),
@@ -22,7 +22,7 @@ Entity::Entity( const int type, const float x, const float y ):
     m_LeftImpulse( 0.0f ),
     m_RightImpulse( 0.0f ),
     m_Life( 200.0f ),
-    m_Energy( 100.0f ),
+    m_Energy( 20.0f ),
     m_Fitness( 0.0f ),
     m_Type( type ),
     m_Think( 0.1f )
@@ -59,7 +59,7 @@ Entity::Update()
     }
 
     m_Life -= delta * 5.0;
-    m_Energy -= delta * 5.0f;
+    SetEnergy( m_Energy - delta * 5.0f );
 }
 
 
@@ -250,6 +250,7 @@ void
 Entity::SetEnergy( const float energy )
 {
     m_Energy = energy;
+    m_Radius = 10.0f + energy / 10.0f;
 }
 
 
