@@ -3,7 +3,7 @@
 
 #include "XmlFile.h"
 #include "Entity.h"
-
+#include "Ontogenesis.h"
 
 
 class XmlGenerationFile : public XmlFile

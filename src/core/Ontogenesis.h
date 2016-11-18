@@ -13,20 +13,6 @@
 class Ontogenesis
 {
 public:
-    Ontogenesis( const Ogre::String& file_prefix, const int type );
-    virtual ~Ontogenesis();
-
-    void Draw( const unsigned int x, const unsigned int y );
-
-    void LoadNetwork( Entity* entity );
-    void EntityDeath( Entity* entity );
-
-    void LoadGeneration( const Generation& generation );
-
-private:
-    Ontogenesis();
-
-public:
     enum ConditionType
     {
         // сигналом для дальнейшей экспрессии в клетках может быть
@@ -99,6 +85,22 @@ public:
         Ogre::String file_name;
     };
 
+public:
+    Ontogenesis( const Ogre::String& file_prefix, const int type );
+    virtual ~Ontogenesis();
+
+    void Draw( const unsigned int x, const unsigned int y );
+
+    void LoadNetwork( Entity* entity );
+    void EntityDeath( Entity* entity );
+
+    ConditionType ConditionStringToType( const Ogre::String& type );
+    ExpressionType ExpressionStringToType( const Ogre::String& type );
+    void LoadGeneration( const Generation& generation );
+
+private:
+    Ontogenesis();
+
 private:
     struct PowerProtein
     {
@@ -115,11 +117,9 @@ private:
     void GenerateRandomExpressionValue( Expression& expr );
 
     Ogre::String ConditionTypeToString( const ConditionType type );
-    ConditionType ConditionStringToType( const Ogre::String& type );
     Ogre::String ExpressionTypeToString( const ExpressionType type );
-    ExpressionType ExpressionTypeToString( const Ogre::String& type );
     void DumpGenome( Logger* file, std::vector< Gene >& genome );
-    void DumpGeneration( const Generation& generation );
+    void DumpGeneration( Generation& generation );
 
 private:
     int m_Type;

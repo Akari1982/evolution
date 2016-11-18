@@ -80,6 +80,7 @@
     <ClCompile Include="core\Timer.cpp" />
     <ClCompile Include="core\Utilites.cpp" />
     <ClCompile Include="core\XmlFile.cpp" />
+    <ClCompile Include="core\XmlGenerationFile.cpp" />
     <ClCompile Include="core\XmlNetworkFile.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
@@ -214,6 +215,7 @@
     <ClInclude Include="core\Timer.h" />
     <ClInclude Include="core\Utilites.h" />
     <ClInclude Include="core\XmlFile.h" />
+    <ClInclude Include="core\XmlGenerationFile.h" />
     <ClInclude Include="core\XmlNetworkFile.h" />
     <ClInclude Include="Main.h" />
   </ItemGroup>

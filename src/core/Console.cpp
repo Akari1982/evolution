@@ -95,6 +95,18 @@ Console::Input( const Event& event )
         AddTextToOutput( m_InputLine );
         AddInputToHistory();
 
+        // backslashed text are console commands, otherwise - script commands
+        if( '\\' == m_InputLine[ 0 ] || '/' == m_InputLine[ 0 ] )
+        {
+            if( m_InputLine.size() > 1 )
+            {
+                // remove backslash
+                m_InputLine.erase( 0, 1 );
+
+                ExecuteCommand( m_InputLine );
+            }
+        }
+
         m_InputLine.clear();
         m_CursorPosition = 0;
         ResetAutoCompletion();

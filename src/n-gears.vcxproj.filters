@@ -229,6 +229,9 @@
     <ClCompile Include="core\Cell.cpp">
       <Filter>N-Gears files</Filter>
     </ClCompile>
+    <ClCompile Include="core\XmlGenerationFile.cpp">
+      <Filter>N-Gears files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Main.h">
@@ -625,6 +628,9 @@
       <Filter>N-Gears files</Filter>
     </ClInclude>
     <ClInclude Include="core\EntityManagerCommands.h">
+      <Filter>N-Gears files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\XmlGenerationFile.h">
       <Filter>N-Gears files</Filter>
     </ClInclude>
   </ItemGroup>

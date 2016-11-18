@@ -7,7 +7,8 @@
 
 const int MAX_PROTEIN = 6;
 const int MAX_CELL_PER_SPLIT = 4;
-const int SPECIES_PER_GENERATION = 100;
+const int MAX_CELL = 10;
+const int SPECIES_PER_GENERATION = 50;
 const int GENES_PER_GENOME = 5;
 
 
@@ -35,8 +36,8 @@ Ontogenesis::Draw( const unsigned int x, const unsigned int y )
     if( cur_gen >= 0 )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-        DEBUG_DRAW.Text( x, y, "Generation " + IntToString( cur_gen ) );
-        DEBUG_DRAW.Text( x + 200, y, "Top fitness: " + IntToString( m_Generations[ cur_gen ].top_fitness ) + " (" + IntToString( m_Generations[ cur_gen ].top_id ) + ")" );
+        DEBUG_DRAW.Text( x, y, "Generation " + IntToString( m_Generations[ cur_gen ].id ) );
+        DEBUG_DRAW.Text( x + 200, y, "Top fitness: " + IntToString( ( int )m_Generations[ cur_gen ].top_fitness ) + " (" + IntToString( m_Generations[ cur_gen ].top_id ) + ")" );
         DEBUG_DRAW.Text( x + 400, y, "Number of species: " + IntToString( m_Generations[ cur_gen ].species.size() ) );
     }
 }
@@ -49,10 +50,6 @@ Ontogenesis::LoadNetwork( Entity* entity )
     int cur_gen = m_Generations.size() - 1;
     if( ( cur_gen < 0 ) || ( m_Generations[ cur_gen ].species.size() >= SPECIES_PER_GENERATION ) )
     {
-        // save old generation
-        // this save all species from this generation
-        DumpGeneration( m_Generations[ cur_gen ] );
-
         Generation generation;
         generation.top_fitness = 0.0f;
         generation.top_id = 0;
@@ -60,12 +57,15 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
         if( ( cur_gen >= 0 ) && ( m_Generations[ cur_gen ].species.size() >= SPECIES_PER_GENERATION ) )
         {
+            // save old generation, this save all species from this generation
+            DumpGeneration( m_Generations[ cur_gen ] );
+
             generation.base_genome = m_Generations[ cur_gen ].species[ m_Generations[ cur_gen ].top_id ].genome;
             generation.id = m_Generations[ cur_gen ].id + 1;
         }
 
         ++cur_gen;
-        generation.file_name = m_FilePrefix + "_" + IntToString( generation.id ) + ".txt";
+        generation.file_name = m_FilePrefix + "_" + IntToString( generation.id ) + ".xml";
         m_Generations.push_back( generation );
 
         // save new generation
@@ -75,6 +75,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
 
     Species species;
+    species.fitness = -1;
     species.genome = Mutate( m_Generations[ cur_gen ].base_genome );
 
 
@@ -88,7 +89,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
     int protein_activator_right = 5;
 
     Cell* cell = new Cell( entity, Cell::NEURON_COMMON, 0, 0 );
-    cell->SetInnerProtein( stem_protein, 1.0f );
+    cell->SetInnerProtein( protein_stem, 1.0f );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::SENSOR_FOOD_LEFT, -5, -3 );
@@ -123,7 +124,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
     {
         ++cycles;
 
-        for( size_t i = 0; i < species.network.size(); ++i )
+        for( size_t i = 0; i < species.network.size() && i < MAX_CELL; ++i )
         {
             // express genes only for neurons
             if( species.network[ i ]->GetType() != Cell::NEURON )
@@ -146,7 +147,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         case C_NO_PROTEIN:
                         {
                             std::vector< PowerProtein > powers;
-                            float power = SearchOuterProtein( species.network, cond.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
+                            float power = SearchOuterProtein( species.network, ( int )cond.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                             if( ( ( cond.type == C_O_PROTEIN ) && ( power < cond.value2 ) ) || ( ( cond.type == C_NO_PROTEIN ) && ( power > cond.value2 ) ) )
                             {
                                 exec = false;
@@ -156,7 +157,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                         case C_I_PROTEIN:
                         case C_NI_PROTEIN:
                         {
-                            float power = ( species.network[ i ]->GetInnerProtein() == cond.value1 ) : species.network[ i ]->GetInnerProteinPower() : 0.0f;
+                            float power = ( species.network[ i ]->GetInnerProtein() == cond.value1 ) ? species.network[ i ]->GetInnerProteinPower() : 0.0f;
                             if( ( ( cond.type == C_I_PROTEIN ) && ( power < cond.value2 ) ) || ( ( cond.type == C_NI_PROTEIN ) && ( power > cond.value2 ) ) )
                             {
                                 exec = false;
@@ -193,12 +194,12 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             break;
                             case E_SPAWN:
                             {
-                                int x = expr.value2;
-                                int y = expr.value3;
+                                int x = ( int )expr.value2;
+                                int y = ( int )expr.value3;
                                 bool occupied = IsCell( species.network, x, y );
                                 if( occupied == false )
                                 {
-                                    Cell* cell = new Cell( entity, ( Cell::CellName )expr.value1, x, y );
+                                    Cell* cell = new Cell( entity, ( Cell::CellName )( int )expr.value1, x, y );
                                     species.network.push_back( cell );
                                 }
                             }
@@ -206,7 +207,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             case E_MIGRATE:
                             {
                                 std::vector< PowerProtein > powers;
-                                SearchOuterProtein( species.network, expr.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
+                                SearchOuterProtein( species.network, ( int )expr.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                                 for( size_t c = 0; c < powers.size(); ++c )
                                 {
                                     Cell* cell = species.network[ powers[ c ].cell_id ];
@@ -226,7 +227,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             {
                                 if( species.network[ i ]->GetOuterProtein() != expr.value1 )
                                 {
-                                    species.network[ i ]->SetOuterProtein( expr.value1 );
+                                    species.network[ i ]->SetOuterProtein( ( int )expr.value1 );
                                 }
                             }
                             break;
@@ -234,7 +235,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             {
                                 if( species.network[ i ]->GetInnerProtein() != expr.value1 )
                                 {
-                                    species.network[ i ]->SetInnerProtein( expr.value1 );
+                                    species.network[ i ]->SetInnerProtein( ( int )expr.value1, 1.0f );
                                 }
                             }
                             break;
@@ -244,7 +245,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             case E_AXON_I:
                             {
                                 std::vector< PowerProtein > powers;
-                                SearchOuterProtein( species.network, expr.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
+                                SearchOuterProtein( species.network, ( int )expr.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                                 for( size_t c = 0; c < powers.size(); ++c )
                                 {
                                     bool inverted = ( expr.type == E_DENDRITE_I ) || ( expr.type == E_AXON_I );
@@ -425,7 +426,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
     if( ( genome.size() == 0 ) || ( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) ) )
     {
         Gene gene;
-        gene.unique_id = m_GeneUniqueId;
+        gene.id = m_GeneUniqueId;
         gene.conserv = 0.0f;
         Condition cond = GenerateRandomCondition();
         gene.cond.push_back( cond );
@@ -447,15 +448,15 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
         // just don't copy it to new genome
         if( ( genome.size() == 1 ) || ( ( rand() % ( int )( 5.0f * ( gene.conserv + 1.0f ) ) ) != 1 ) )
         {
-            gene.conserv += ( 100.0f - gene.conserv ) / 4.0f;
-            gene.conserv = ( gene.conserv > 99.0f ) ? 99.0f : gene.conserv;
+            //gene.conserv += ( 100.0f - gene.conserv ) / 4.0f;
+            //gene.conserv = ( gene.conserv > 99.0f ) ? 99.0f : gene.conserv;
             mutated.push_back( gene );
 
             // chance to be duplicated 20% (not affected by conservativeness)
             if( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) )
             {
                 Gene dup_gene = gene;
-                dup_gene.unique_id = m_GeneUniqueId;
+                dup_gene.id = m_GeneUniqueId;
                 dup_gene.conserv = 0.0f;
                 mutated.push_back( dup_gene );
                 ++m_GeneUniqueId;
@@ -476,7 +477,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
             if( ( mutated[ i ].cond.size() > 1 ) && ( ( rand() % 100 ) < 10 ) )
             {
                 mutated[ i ].cond.erase( mutated[ i ].cond.begin() + ( rand() % mutated[ i ].cond.size() ) );
-                mutated[ i ].conserv /= 2.0f;
+                //mutated[ i ].conserv /= 2.0f;
             }
             for( size_t cond_id = 0; cond_id < mutated[ i ].cond.size(); ++cond_id )
             {
@@ -485,19 +486,19 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
                 if( ( rand() % 100 ) < 30 )
                 {
                     mutated[ i ].cond[ cond_id ].type = ( ConditionType )( rand() % C_TOTAL );
-                    mutated[ i ].conserv /= 2.0f;
+                    //mutated[ i ].conserv /= 2.0f;
                 }
                 if( ( rand() % 100 ) < 30 )
                 {
                     GenerateRandomConditionValue( mutated[ i ].cond[ cond_id ] );
-                    mutated[ i ].conserv /= 2.0f;
+                    //mutated[ i ].conserv /= 2.0f;
                 }
             }
             // add random condition with chance 10%
             if( ( rand() % 100 ) < 10 )
             {
                 mutated[ i ].cond.push_back( GenerateRandomCondition() );
-                mutated[ i ].conserv /= 2.0f;
+                //mutated[ i ].conserv /= 2.0f;
             }
 
 
@@ -507,7 +508,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
             if( ( mutated[ i ].expr.size() > 1 ) && ( ( rand() % 100 ) < 5 ) )
             {
                 mutated[ i ].expr.erase( mutated[ i ].expr.begin() + ( rand() % mutated[ i ].expr.size() ) );
-                mutated[ i ].conserv /= 2.0f;
+                //mutated[ i ].conserv /= 2.0f;
             }
             for( size_t expr_id = 0; expr_id < mutated[ i ].expr.size(); ++expr_id )
             {
@@ -535,21 +536,21 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
                         if( type != new_type )
                         {
                             mutated[ i ].expr[ expr_id ].type = new_type;
-                            mutated[ i ].conserv /= 2.0f;
+                            //mutated[ i ].conserv /= 2.0f;
                         }
                     }
                 }
                 if( ( rand() % 100 ) < 30 )
                 {
                     GenerateRandomExpressionValue( mutated[ i ].expr[ expr_id ] );
-                    mutated[ i ].conserv /= 2.0f;
+                    //mutated[ i ].conserv /= 2.0f;
                 }
             }
             // add random expression with chance 10%
             if( ( rand() % 100 ) < 10 )
             {
                 mutated[ i ].expr.push_back( GenerateRandomExpression() );
-                mutated[ i ].conserv /= 2.0f;
+                //mutated[ i ].conserv /= 2.0f;
             }
         }
     }
@@ -629,7 +630,7 @@ Ontogenesis::GenerateRandomExpressionValue( Expression& expr )
         case E_AXON:
         case E_AXON_I:
         {
-            cond.value1 = ( rand() % ( MAX_PROTEIN + 1 ) ) - 1;
+            expr.value1 = ( float )( ( rand() % ( MAX_PROTEIN + 1 ) ) - 1 );
         }
         break;
     }
@@ -652,8 +653,8 @@ Ontogenesis::ConditionTypeToString( const ConditionType type )
 
 
 
-ConditionType
-Ontogenesis::ConditionTypeToString( const Ogre::String& type )
+Ontogenesis::ConditionType
+Ontogenesis::ConditionStringToType( const Ogre::String& type )
 {
     if( type == "O_PROTEIN" )
     {
@@ -696,8 +697,8 @@ Ontogenesis::ExpressionTypeToString( const ExpressionType type )
 
 
 
-ExpressionType
-Ontogenesis::ExpressionTypeToString( const Ogre::String& type )
+Ontogenesis::ExpressionType
+Ontogenesis::ExpressionStringToType( const Ogre::String& type )
 {
     if( type == "SPLIT" )
     {
@@ -767,7 +768,7 @@ Ontogenesis::DumpGenome( Logger* file, std::vector< Ontogenesis::Gene >& genome 
         for( size_t expr_id = 0; expr_id < genome[ i ].expr.size(); ++expr_id )
         {
             Expression expr = genome[ i ].expr[ expr_id ];
-            file->Log( "            <condition type=\"" + ExpressionTypeToString( expr.type ) + "\" " );
+            file->Log( "            <expression type=\"" + ExpressionTypeToString( expr.type ) + "\" " );
             switch( expr.type )
             {
                 case E_SPLIT:
@@ -784,7 +785,7 @@ Ontogenesis::DumpGenome( Logger* file, std::vector< Ontogenesis::Gene >& genome 
                 break;
                 case E_SPAWN:
                 {
-                    file->Log( "value1=\"" + FloatToString( cond.value1 ) + "\" value2=\"" + FloatToString( cond.value2 ) + "\" value3=\"" + FloatToString( cond.value3 ) + "\" />\n" );
+                    file->Log( "value1=\"" + FloatToString( expr.value1 ) + "\" value2=\"" + FloatToString( expr.value2 ) + "\" value3=\"" + FloatToString( expr.value3 ) + "\" />\n" );
                 }
                 break;
             }
@@ -797,7 +798,7 @@ Ontogenesis::DumpGenome( Logger* file, std::vector< Ontogenesis::Gene >& genome 
 
 
 void
-Ontogenesis::DumpGeneration( const Generation& generation )
+Ontogenesis::DumpGeneration( Generation& generation )
 {
     Logger* dump = new Logger( generation.file_name );
     dump->Log( "<generation id=\"" + IntToString( generation.id ) + "\">\n" );

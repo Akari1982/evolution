@@ -21,13 +21,13 @@ Entity::Entity( const int type, const float x, const float y ):
     m_ForwardImpulse( 0.0f ),
     m_LeftImpulse( 0.0f ),
     m_RightImpulse( 0.0f ),
-    m_Life( 400.0f ),
+    m_Life( 200.0f ),
     m_Energy( 100.0f ),
     m_Fitness( 0.0f ),
     m_Type( type ),
     m_Think( 0.1f )
 {
-    m_Rotation = rand() % 360;
+    m_Rotation = ( float )( rand() % 360 );
 }
 
 
