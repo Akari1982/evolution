@@ -12,7 +12,7 @@ public:
     virtual ~Entity();
 
     void Update();
-    void Draw( const unsigned int x, const unsigned int y );
+    void Draw( const float x, const float y );
 
     float GetRadius() const;
     float GetX() const;
@@ -44,6 +44,7 @@ public:
     float GetSensorFoodLeft() const;
     float GetSensorFoodRight() const;
     float GetSensorEnergy() const;
+    float GetSensorEnemy( const float x, const float y ) const;
 
 private:
     Entity();

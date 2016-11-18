@@ -12,7 +12,7 @@
 #include "core/GameFrameListner.h"
 #include "core/InputManager.h"
 #include "core/Logger.h"
-#include "core/EntityManager.h"
+#include "neuro/EntityManager.h"
 #include "core/Timer.h"
 
 

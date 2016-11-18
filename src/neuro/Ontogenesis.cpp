@@ -1,7 +1,7 @@
 #include "Ontogenesis.h"
 
-#include "DebugDraw.h"
-#include "Logger.h"
+#include "../core/DebugDraw.h"
+#include "../core/Logger.h"
 
 
 

@@ -6,7 +6,7 @@
 
 #include "Cell.h"
 #include "Entity.h"
-#include "Logger.h"
+#include "../core/Logger.h"
 
 
 

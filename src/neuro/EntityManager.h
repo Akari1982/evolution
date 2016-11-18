@@ -3,7 +3,7 @@
 
 #include <OgreSingleton.h>
 
-#include "Event.h"
+#include "../core/Event.h"
 #include "Entity.h"
 #include "Ontogenesis.h"
 
@@ -23,6 +23,7 @@ public:
     void RunGeneration( const int type, Ogre::String& file_name );
 
     float FeelFood( const float x, const float y );
+    float FeelEnemy( const int type, const float x, const float y );
     bool CheckMove( Entity* entity, const float move_x, const float move_y );
 
 private:

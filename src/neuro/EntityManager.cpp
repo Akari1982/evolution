@@ -1,10 +1,10 @@
 #include "EntityManager.h"
 #include "EntityManagerCommands.h"
 
-#include "DebugDraw.h"
-#include "InputManager.h"
-#include "Logger.h"
-#include "Timer.h"
+#include "../core/DebugDraw.h"
+#include "../core/InputManager.h"
+#include "../core/Logger.h"
+#include "../core/Timer.h"
 #include "XmlGenerationFile.h"
 
 
@@ -75,7 +75,6 @@ EntityManager::Update()
         float start_x = entity->GetX();
         float start_y = entity->GetY();
         float rotation = entity->GetRotation();
-        float radius = entity->GetRadius();
         float forward_impulse = entity->GetForwardImpulse();
         float left_impulse = entity->GetLeftImpulse();
         float right_impulse = entity->GetRightImpulse();
@@ -117,15 +116,16 @@ EntityManager::Update()
             forward_impulse = ( forward_impulse < 0.0f ) ? 0.0f : forward_impulse;
             entity->SetForwardImpulse( forward_impulse );
 
-            // check entity [ food collision
+            // check entity / food collision
+            float radius = entity->GetRadius();
+            float x = entity->GetX();
+            float y = entity->GetY();
             for( std::vector< Food >::iterator it = m_Food.begin(); it != m_Food.end(); )
             {
                 float x1 = ( *it ).x;
                 float y1 = ( *it ).y;
-                float x2 = entity->GetX();
-                float y2 = entity->GetY();
-                float distance = sqrt( ( x2 - x1 ) * ( x2 - x1 ) + ( y2 - y1 ) * ( y2 - y1 ) );
-                if( distance <= entity->GetRadius() )
+                float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
+                if( distance <= radius )
                 {
                     float energy = entity->GetEnergy() + ( *it ).power;
                     energy = ( energy > 100.0f) ? 100.0f : energy;
@@ -136,6 +136,30 @@ EntityManager::Update()
                 else
                 {
                     ++it;
+                }
+            }
+
+            // check entity / entity collision
+            int type = entity->GetType();
+            for( size_t j = 0; j < m_Entity.size(); ++j )
+            {
+                if( m_Entity[ i ]->GetType() != type )
+                {
+                    float x1 = m_Entity[ i ]->GetX();
+                    float y1 = m_Entity[ i ]->GetY();
+                    float radius1 = m_Entity[ i ]->GetRadius();
+                    float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
+                    if( distance <= radius + radius1 )
+                    {
+                        if( radius >= radius1 * 2 )
+                        {
+                            float energy = entity->GetEnergy() + m_Entity[ i ]->GetEnergy();
+                            energy = ( energy > 100.0f) ? 100.0f : energy;
+                            entity->SetEnergy( energy );
+                            entity->SetFitness( entity->GetFitness() + m_Entity[ i ]->GetEnergy() );
+                            m_Entity[ i ]->SetEnergy( 0 );
+                        }
+                    }
                 }
             }
         }
@@ -302,6 +326,29 @@ EntityManager::FeelFood( const float x, const float y )
         if( distance < radius )
         {
             ret += 1.0f - distance / radius;
+        }
+    }
+    return ( ret > 1.0f ) ? 1.0f: ret;
+}
+
+
+
+float
+EntityManager::FeelEnemy( const int type, const float x, const float y )
+{
+    float ret = 0.0f;
+    for( size_t i = 0; i < m_Entity.size(); ++i )
+    {
+        if( m_Entity[ i ]->GetType() != type )
+        {
+            float x1 = m_Entity[ i ]->GetX();
+            float y1 = m_Entity[ i ]->GetY();
+            float radius = m_Entity[ i ]->GetEnergy();
+            float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
+            if( distance < radius )
+            {
+                ret += 1.0f - distance / radius;
+            }
         }
     }
     return ( ret > 1.0f ) ? 1.0f: ret;

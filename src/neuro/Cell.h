@@ -21,6 +21,7 @@ public:
         SENSOR_FOOD_LEFT,
         SENSOR_FOOD_RIGHT,
         SENSOR_ENERGY,
+        SENSOR_ENEMY,
         ACTIVATOR_FORWARD,
         ACTIVATOR_LEFT,
         ACTIVATOR_RIGHT
@@ -32,17 +33,17 @@ public:
         ACTIVATOR
     };
 
-    Cell( Entity* entity, const CellName name, const int x, const int y );
+    Cell( Entity* entity, const CellName name, const float x, const float y );
     virtual ~Cell();
     void Update();
-    void Draw( const unsigned int x, const unsigned int y );
+    void Draw( const float x, const float y );
 
     const CellName GetName() const;
     const CellType GetType() const;
-    int GetX() const;
-    void SetX( const int x );
-    int GetY() const;
-    void SetY( const int y );
+    float GetX() const;
+    void SetX( const float x );
+    float GetY() const;
+    void SetY( const float y );
     int GetInnerProtein() const;
     void SetInnerProtein( const int protein, const float power );
     float GetInnerProteinPower() const;
@@ -64,8 +65,8 @@ protected:
     CellName m_Name;
     CellType m_Type;
 
-    int m_X;
-    int m_Y;
+    float m_X;
+    float m_Y;
 
     int m_InnerProtein;
     int m_InnerProteinPower;
@@ -81,8 +82,6 @@ protected:
         float power;
         bool inverted;
         Cell* cell;
-        float x;
-        float y;
     };
 
     std::vector< Synapse > m_Synapses;

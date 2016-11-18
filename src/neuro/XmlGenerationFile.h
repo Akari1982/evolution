@@ -1,7 +1,7 @@
 #ifndef XML_GENERATION_FILE_H
 #define XML_GENERATION_FILE_H
 
-#include "XmlFile.h"
+#include "../core/XmlFile.h"
 #include "Entity.h"
 #include "Ontogenesis.h"
 

@@ -1,7 +1,7 @@
 #include "XmlNetworkFile.h"
 
-#include "Logger.h"
-#include "Utilites.h"
+#include "../core/Logger.h"
+#include "../core/Utilites.h"
 
 
 

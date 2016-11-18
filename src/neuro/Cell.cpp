@@ -2,14 +2,14 @@
 
 #include <OgreMath.h>
 
-#include "DebugDraw.h"
+#include "../core/DebugDraw.h"
 #include "Entity.h"
-#include "Logger.h"
-#include "Timer.h"
+#include "../core/Logger.h"
+#include "../core/Timer.h"
 
 
 
-Cell::Cell( Entity* entity, const CellName name, const int x, const int y ):
+Cell::Cell( Entity* entity, const CellName name, const float x, const float y ):
     m_Entity( entity ),
     m_Name( name ),
     m_X( x ),
@@ -28,6 +28,7 @@ Cell::Cell( Entity* entity, const CellName name, const int x, const int y ):
         case SENSOR_FOOD_LEFT:  m_Type = SENSOR;    break;
         case SENSOR_FOOD_RIGHT: m_Type = SENSOR;    break;
         case SENSOR_ENERGY:     m_Type = SENSOR;    break;
+        case SENSOR_ENEMY:      m_Type = SENSOR;    break;
         case ACTIVATOR_FORWARD: m_Type = ACTIVATOR; break;
         case ACTIVATOR_LEFT:    m_Type = ACTIVATOR; break;
         case ACTIVATOR_RIGHT:   m_Type = ACTIVATOR; break;
@@ -83,6 +84,12 @@ Cell::Update()
                     value = m_Entity->GetSensorEnergy();
                 }
                 break;
+
+                case SENSOR_ENEMY:
+                {
+                    value = m_Entity->GetSensorEnemy( m_X, m_Y );
+                }
+                break;
             }
 
             if( m_Synapses[ i ].inverted == false )
@@ -119,7 +126,7 @@ Cell::Update()
 
 
 void
-Cell::Draw( const unsigned int x, const unsigned int y )
+Cell::Draw( const float x, const float y )
 {
     if( m_Fired == true )
     {
@@ -207,7 +214,7 @@ Cell::GetType() const
 
 
 
-int
+float
 Cell::GetX() const
 {
     return m_X;
@@ -216,14 +223,14 @@ Cell::GetX() const
 
 
 void
-Cell::SetX( const int x )
+Cell::SetX( const float x )
 {
     m_X = x;
 }
 
 
 
-int
+float
 Cell::GetY() const
 {
     return m_Y;
@@ -232,7 +239,7 @@ Cell::GetY() const
 
 
 void
-Cell::SetY( const int y )
+Cell::SetY( const float y )
 {
     m_Y = y;
 }
@@ -343,6 +350,7 @@ Cell::CellTypeToString( const CellType type )
         case SENSOR_FOOD_LEFT: return "SENSOR_FOOD_LEFT";
         case SENSOR_FOOD_RIGHT: return "SENSOR_FOOD_RIGHT";
         case SENSOR_ENERGY: return "SENSOR_ENERGY";
+        case SENSOR_ENEMY: return "SENSOR_ENEMY";
         case ACTIVATOR_FORWARD: return "ACTIVATOR_FORWARD";
         case ACTIVATOR_LEFT: return "ACTIVATOR_LEFT";
         case ACTIVATOR_RIGHT: return "ACTIVATOR_RIGHT";

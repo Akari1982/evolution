@@ -1,9 +1,9 @@
 #include "Entity.h"
 
-#include "DebugDraw.h"
-#include "Logger.h"
+#include "../core/DebugDraw.h"
+#include "../core/Logger.h"
 #include "EntityManager.h"
-#include "Timer.h"
+#include "../core/Timer.h"
 
 
 
@@ -65,7 +65,7 @@ Entity::Update()
 
 
 void
-Entity::Draw( const unsigned int x, const unsigned int y )
+Entity::Draw( const float x, const float y )
 {
     // draw entity itself
     if( m_Type == 0 )
@@ -97,6 +97,20 @@ Entity::Draw( const unsigned int x, const unsigned int y )
     for( size_t i = 0; i < m_Network.size(); ++i )
     {
         m_Network[ i ]->Draw( x, y );
+
+        Cell::CellName name = m_Network[ i ]->GetName();
+        if( name == Cell::SENSOR_ENEMY )
+        {
+            Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
+            Ogre::Quaternion q( 0.0f, 0.0f, 0.0f, 1.0f );
+            q.FromAngleAxis( Ogre::Radian( Ogre::Degree( m_Rotation ) ), Ogre::Vector3::UNIT_Z );
+            rotation.x = x;
+            rotation.y = y;
+            rotation.z = 0;
+            rotation = q * rotation;
+            DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.4f ) );
+            DEBUG_DRAW.Line( m_X, m_Y, m_X + rotation.x, m_Y + rotation.y );
+        }
     }
 
     // line connecting neural network and entity
@@ -315,4 +329,19 @@ float
 Entity::GetSensorEnergy() const
 {
     return m_Energy / 100.0f;
+}
+
+
+
+float
+Entity::GetSensorEnemy( const float x, const float y ) const
+{
+    Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
+    Ogre::Quaternion q( 0.0f, 0.0f, 0.0f, 1.0f );
+    q.FromAngleAxis( Ogre::Radian( Ogre::Degree( m_Rotation ) ), Ogre::Vector3::UNIT_Z );
+    rotation.x = x;
+    rotation.y = y;
+    rotation.z = 0;
+    rotation = q * rotation;
+    return EntityManager::getSingleton().FeelEnemy( m_Type, m_X + rotation.x, m_Y + rotation.y );
 }
