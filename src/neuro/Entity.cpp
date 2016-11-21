@@ -104,10 +104,11 @@ Entity::Draw( const float x, const float y )
             Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
             Ogre::Quaternion q( 0.0f, 0.0f, 0.0f, 1.0f );
             q.FromAngleAxis( Ogre::Radian( Ogre::Degree( m_Rotation ) ), Ogre::Vector3::UNIT_Z );
-            rotation.x = x;
-            rotation.y = y;
+            rotation.x = m_Network[ i ]->GetX();
+            rotation.y = m_Network[ i ]->GetY();
             rotation.z = 0;
             rotation = q * rotation;
+            rotation *= 4.0f;
             DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.4f ) );
             DEBUG_DRAW.Line( m_X, m_Y, m_X + rotation.x, m_Y + rotation.y );
         }
@@ -344,5 +345,6 @@ Entity::GetSensorEnemy( const float x, const float y ) const
     rotation.y = y;
     rotation.z = 0;
     rotation = q * rotation;
+    rotation *= 4.0f;
     return EntityManager::getSingleton().FeelEnemy( m_Type, m_X + rotation.x, m_Y + rotation.y );
 }

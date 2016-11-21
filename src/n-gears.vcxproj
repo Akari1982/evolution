@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="core\CameraManager.cpp" />
-    <ClCompile Include="core\Cell.cpp" />
     <ClCompile Include="core\ConfigCmd.cpp" />
     <ClCompile Include="core\ConfigCmdManager.cpp" />
     <ClCompile Include="core\ConfigFile.cpp" />
@@ -20,8 +19,6 @@
     <ClCompile Include="core\ConfigVarManager.cpp" />
     <ClCompile Include="core\Console.cpp" />
     <ClCompile Include="core\DebugDraw.cpp" />
-    <ClCompile Include="core\Entity.cpp" />
-    <ClCompile Include="core\EntityManager.cpp" />
     <ClCompile Include="core\GameFrameListner.cpp" />
     <ClCompile Include="core\InputManager.cpp" />
     <ClCompile Include="core\library\luabind\class.cpp" />
@@ -76,19 +73,21 @@
     <ClCompile Include="core\library\tinyxml\tinyxmlerror.cpp" />
     <ClCompile Include="core\library\tinyxml\tinyxmlparser.cpp" />
     <ClCompile Include="core\Logger.cpp" />
-    <ClCompile Include="core\Ontogenesis.cpp" />
     <ClCompile Include="core\Timer.cpp" />
     <ClCompile Include="core\Utilites.cpp" />
     <ClCompile Include="core\XmlFile.cpp" />
-    <ClCompile Include="core\XmlGenerationFile.cpp" />
-    <ClCompile Include="core\XmlNetworkFile.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="neuro\Cell.cpp" />
+    <ClCompile Include="neuro\Entity.cpp" />
+    <ClCompile Include="neuro\EntityManager.cpp" />
+    <ClCompile Include="neuro\Ontogenesis.cpp" />
+    <ClCompile Include="neuro\XmlGenerationFile.cpp" />
+    <ClCompile Include="neuro\XmlNetworkFile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\Assert.h" />
     <ClInclude Include="core\CameraManager.h" />
     <ClInclude Include="core\CameraManagerCommands.h" />
-    <ClInclude Include="core\Cell.h" />
     <ClInclude Include="core\ConfigCmd.h" />
     <ClInclude Include="core\ConfigCmdManager.h" />
     <ClInclude Include="core\ConfigCmdManagerCommands.h" />
@@ -97,9 +96,6 @@
     <ClInclude Include="core\ConfigVarManager.h" />
     <ClInclude Include="core\Console.h" />
     <ClInclude Include="core\DebugDraw.h" />
-    <ClInclude Include="core\Entity.h" />
-    <ClInclude Include="core\EntityManager.h" />
-    <ClInclude Include="core\EntityManagerCommands.h" />
     <ClInclude Include="core\Event.h" />
     <ClInclude Include="core\GameFrameListner.h" />
     <ClInclude Include="core\InputManager.h" />
@@ -211,13 +207,17 @@
     <ClInclude Include="core\library\tinyxml\tinystr.h" />
     <ClInclude Include="core\library\tinyxml\tinyxml.h" />
     <ClInclude Include="core\Logger.h" />
-    <ClInclude Include="core\Ontogenesis.h" />
     <ClInclude Include="core\Timer.h" />
     <ClInclude Include="core\Utilites.h" />
     <ClInclude Include="core\XmlFile.h" />
-    <ClInclude Include="core\XmlGenerationFile.h" />
-    <ClInclude Include="core\XmlNetworkFile.h" />
     <ClInclude Include="Main.h" />
+    <ClInclude Include="neuro\Cell.h" />
+    <ClInclude Include="neuro\Entity.h" />
+    <ClInclude Include="neuro\EntityManager.h" />
+    <ClInclude Include="neuro\EntityManagerCommands.h" />
+    <ClInclude Include="neuro\Ontogenesis.h" />
+    <ClInclude Include="neuro\XmlGenerationFile.h" />
+    <ClInclude Include="neuro\XmlNetworkFile.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E51D599E-B1F2-45CA-A98A-1A12140EDC45}</ProjectGuid>

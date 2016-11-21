@@ -8,7 +8,7 @@
 #include "DebugDraw.h"
 #include "InputManager.h"
 #include "Logger.h"
-#include "EntityManager.h"
+#include "../neuro/EntityManager.h"
 #include "Timer.h"
 #include "../Main.h"
 

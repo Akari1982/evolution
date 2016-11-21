@@ -1,0 +1,48 @@
+<generation id="1039">
+    <base_genome>
+        <gene id="23739" conserv="0">
+            <condition type="NO_PROTEIN" value1="2" value2="0.6" />
+            <expression type="AXON_I" value1="0" />
+            <expression type="AXON" value1="5" />
+            <expression type="AXON" value1="4" />
+            <expression type="DENDRITE_I" value1="5" />
+        </gene>
+        <gene id="24218" conserv="0">
+            <condition type="NI_PROTEIN" value1="5" value2="0.98" />
+            <condition type="NI_PROTEIN" value1="3" value2="0.25" />
+            <expression type="AXON_I" value1="3" />
+            <expression type="DENDRITE" value1="3" />
+            <expression type="DENDRITE" value1="5" />
+            <expression type="O_PROTEIN" value1="5" />
+            <expression type="DENDRITE_I" value1="4" />
+            <expression type="SPLIT" value1="0" />
+        </gene>
+        <gene id="24081" conserv="0">
+            <condition type="I_PROTEIN" value1="2" value2="0.02" />
+            <condition type="O_PROTEIN" value1="5" value2="0.06" />
+            <expression type="O_PROTEIN" value1="-1" />
+            <expression type="AXON" value1="4" />
+            <expression type="O_PROTEIN" value1="-1" />
+            <expression type="I_PROTEIN" value1="5" />
+            <expression type="DENDRITE" value1="4" />
+            <expression type="I_PROTEIN" value1="4" />
+        </gene>
+        <gene id="24119" conserv="0">
+            <condition type="NO_PROTEIN" value1="5" value2="0.91" />
+            <expression type="AXON_I" value1="2" />
+            <expression type="O_PROTEIN" value1="2" />
+            <expression type="DENDRITE" value1="5" />
+            <expression type="AXON_I" value1="2" />
+            <expression type="DENDRITE" value1="1" />
+        </gene>
+        <gene id="24219" conserv="0">
+            <condition type="NO_PROTEIN" value1="0" value2="0.54" />
+            <condition type="NI_PROTEIN" value1="5" value2="0.11" />
+            <expression type="I_PROTEIN" value1="0" />
+            <expression type="DENDRITE" value1="0" />
+            <expression type="MIGRATE" value1="1" />
+            <expression type="O_PROTEIN" value1="5" />
+        </gene>
+    </base_genome>
+
+</generation>
