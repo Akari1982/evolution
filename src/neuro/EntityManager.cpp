@@ -143,7 +143,7 @@ EntityManager::Update()
             int type = entity->GetType();
             for( size_t j = 0; j < m_Entity.size(); ++j )
             {
-                if( m_Entity[ i ]->GetType() != type )
+                if( m_Entity[ j ]->GetType() != type )
                 {
                     float x1 = m_Entity[ j ]->GetX();
                     float y1 = m_Entity[ j ]->GetY();

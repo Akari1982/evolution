@@ -1,2 +1,0 @@
-/run_generation 1 specie0_1035.xml
-/run_generation 0 specie0_1035.xml
