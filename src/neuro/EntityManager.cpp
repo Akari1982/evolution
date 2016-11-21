@@ -145,19 +145,19 @@ EntityManager::Update()
             {
                 if( m_Entity[ i ]->GetType() != type )
                 {
-                    float x1 = m_Entity[ i ]->GetX();
-                    float y1 = m_Entity[ i ]->GetY();
-                    float radius1 = m_Entity[ i ]->GetRadius();
+                    float x1 = m_Entity[ j ]->GetX();
+                    float y1 = m_Entity[ j ]->GetY();
+                    float radius1 = m_Entity[ j ]->GetRadius();
                     float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
                     if( distance <= radius + radius1 )
                     {
                         if( radius >= radius1 )
                         {
-                            float energy = entity->GetEnergy() + m_Entity[ i ]->GetEnergy();
+                            float energy = entity->GetEnergy() + m_Entity[ j ]->GetEnergy();
                             energy = ( energy > 100.0f) ? 100.0f : energy;
                             entity->SetEnergy( energy );
-                            entity->SetFitness( entity->GetFitness() + m_Entity[ i ]->GetEnergy() );
-                            m_Entity[ i ]->SetEnergy( 0 );
+                            entity->SetFitness( entity->GetFitness() + m_Entity[ j ]->GetEnergy() );
+                            m_Entity[ j ]->SetEnergy( 0 );
                         }
                     }
                 }
