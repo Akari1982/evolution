@@ -450,10 +450,10 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
     {
         Gene gene = genome[ i ];
 
-        // chance to be deleted 0-20% (reduced if this is conservative gene)
+        // chance to be deleted 0-5% (reduced if this is conservative gene)
         // don't delete if this is only gene in genome
         // just don't copy it to new genome
-        if( ( changes >= CHANGES_PER_MUTATION ) || ( genome.size() == 1 ) || ( ( rand() % ( int )( 5.0f * ( gene.conserv + 1.0f ) ) ) != 1 ) )
+        if( ( changes >= CHANGES_PER_MUTATION ) || ( genome.size() == 1 ) || ( ( rand() % ( int )( 20.0f * ( gene.conserv + 1.0f ) ) ) != 1 ) )
         {
             //gene.conserv += ( 100.0f - gene.conserv ) / 4.0f;
             //gene.conserv = ( gene.conserv > 99.0f ) ? 99.0f : gene.conserv;
