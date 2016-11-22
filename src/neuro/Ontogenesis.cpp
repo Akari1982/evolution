@@ -5,11 +5,13 @@
 
 
 
-const int MAX_PROTEIN = 6;
+const int MAX_PROTEIN = 7;
 const int MAX_CELL_PER_SPLIT = 4;
 const int MAX_CELL = 10;
 const int SPECIES_PER_GENERATION = 50;
-const int GENES_PER_GENOME = 5;
+const int GENES_PER_GENOME = 6;
+const int COND_PER_GENE = 3;
+const int EXPR_PER_GENE = 5;
 const int CHANGES_PER_MUTATION = 1;
 
 
@@ -83,6 +85,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
 
     // Default cells
     int protein_stem = 0;
+    int protein_sensor_energy = 6;
     int protein_sensor_food = 1;
     int protein_sensor_enemy = 2;
     int protein_activator_forward = 3;
@@ -93,17 +96,22 @@ Ontogenesis::LoadNetwork( Entity* entity )
     cell->SetInnerProtein( protein_stem, 1.0f );
     species.network.push_back( cell );
 
-    cell = new Cell( entity, Cell::SENSOR_FOOD_LEFT, 5, -3 );
+    cell = new Cell( entity, Cell::SENSOR_ENERGY, 0, 3 );
+    cell->SetOuterProtein( protein_sensor_energy );
+    cell->SetOuterProteinRadius( 8 );
+    species.network.push_back( cell );
+
+    cell = new Cell( entity, Cell::SENSOR_FOOD, 5, -5 );
     cell->SetOuterProtein( protein_sensor_food );
     cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
-    cell = new Cell( entity, Cell::SENSOR_FOOD_RIGHT, 5, 3 );
+    cell = new Cell( entity, Cell::SENSOR_FOOD, 5, 5 );
     cell->SetOuterProtein( protein_sensor_food );
     cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
-    cell = new Cell( entity, Cell::SENSOR_ENEMY, 10, 0 );
+    cell = new Cell( entity, Cell::SENSOR_ENEMY, 8, 0 );
     cell->SetOuterProtein( protein_sensor_enemy );
     cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
@@ -425,6 +433,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
 {
     std::vector< Gene > mutated;
     int changes = 0;
+
 
 
     // insert new genes if genome is empty or if 20% chance

@@ -25,8 +25,7 @@ Cell::Cell( Entity* entity, const CellName name, const float x, const float y ):
     switch( name )
     {
         case NEURON_COMMON:     m_Type = NEURON;    break;
-        case SENSOR_FOOD_LEFT:  m_Type = SENSOR;    break;
-        case SENSOR_FOOD_RIGHT: m_Type = SENSOR;    break;
+        case SENSOR_FOOD:       m_Type = SENSOR;    break;
         case SENSOR_ENERGY:     m_Type = SENSOR;    break;
         case SENSOR_ENEMY:      m_Type = SENSOR;    break;
         case ACTIVATOR_FORWARD: m_Type = ACTIVATOR; break;
@@ -67,21 +66,15 @@ Cell::Update()
                 }
                 break;
 
-                case SENSOR_FOOD_LEFT:
-                {
-                    value = m_Entity->GetSensorFoodLeft();
-                }
-                break;
-
-                case SENSOR_FOOD_RIGHT:
-                {
-                    value = m_Entity->GetSensorFoodRight();
-                }
-                break;
-
                 case SENSOR_ENERGY:
                 {
                     value = m_Entity->GetSensorEnergy();
+                }
+                break;
+
+                case SENSOR_FOOD:
+                {
+                    value = m_Entity->GetSensorFood( m_X, m_Y );
                 }
                 break;
 
@@ -141,21 +134,21 @@ Cell::Draw( const float x, const float y )
         float value = 0.0f;
         switch( m_Name )
         {
-            case SENSOR_FOOD_LEFT:
-            {
-                value = m_Entity->GetSensorFoodLeft();
-            }
-            break;
-
-            case SENSOR_FOOD_RIGHT:
-            {
-                value = m_Entity->GetSensorFoodRight();
-            }
-            break;
-
             case SENSOR_ENERGY:
             {
                 value = m_Entity->GetSensorEnergy();
+            }
+            break;
+
+            case SENSOR_FOOD:
+            {
+                value = m_Entity->GetSensorFood( m_X, m_Y );
+            }
+            break;
+
+            case SENSOR_ENEMY:
+            {
+                value = m_Entity->GetSensorEnemy( m_X, m_Y );
             }
             break;
         }
@@ -347,8 +340,7 @@ Cell::CellTypeToString( const CellType type )
     switch( type )
     {
         case NEURON: return "NEURON";
-        case SENSOR_FOOD_LEFT: return "SENSOR_FOOD_LEFT";
-        case SENSOR_FOOD_RIGHT: return "SENSOR_FOOD_RIGHT";
+        case SENSOR_FOOD: return "SENSOR_FOOD";
         case SENSOR_ENERGY: return "SENSOR_ENERGY";
         case SENSOR_ENEMY: return "SENSOR_ENEMY";
         case ACTIVATOR_FORWARD: return "ACTIVATOR_FORWARD";

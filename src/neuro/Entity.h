@@ -41,9 +41,8 @@ public:
 
     void AddNetwork( std::vector< Cell* >& network, const size_t generation_id, const size_t species_id );
 
-    float GetSensorFoodLeft() const;
-    float GetSensorFoodRight() const;
     float GetSensorEnergy() const;
+    float GetSensorFood( const float x, const float y ) const;
     float GetSensorEnemy( const float x, const float y ) const;
 
 private:

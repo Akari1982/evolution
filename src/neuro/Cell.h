@@ -18,8 +18,7 @@ public:
     enum CellName
     {
         NEURON_COMMON = 0,
-        SENSOR_FOOD_LEFT,
-        SENSOR_FOOD_RIGHT,
+        SENSOR_FOOD,
         SENSOR_ENERGY,
         SENSOR_ENEMY,
         ACTIVATOR_FORWARD,

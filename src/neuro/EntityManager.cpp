@@ -13,9 +13,9 @@ template<>EntityManager *Ogre::Singleton< EntityManager >::msSingleton = NULL;
 
 
 
-const float SPAWN_TIME = 2.0f;
+const float SPAWN_TIME = 1.0f;
 const size_t MAX_ENTITY = 20;
-const float FOOD_TIME = 1.0f;
+const float FOOD_TIME = 0.2f;
 
 
 
@@ -23,7 +23,7 @@ EntityManager::EntityManager():
     m_TypeNum0( 0 ),
     m_TypeNum1( 0 ),
     m_X( 100.0f ),
-    m_Y( 300.0f ),
+    m_Y( 400.0f ),
     m_Width( 1080.0f ),
     m_Height( 300.0f ),
     m_NextFoodTime( FOOD_TIME ),
@@ -232,8 +232,6 @@ EntityManager::Update()
 
 
     Draw();
-    m_Ontogenesis0->Draw( 10, 10 );
-    m_Ontogenesis1->Draw( 10, 160 );
 }
 
 
@@ -253,12 +251,12 @@ EntityManager::Draw()
     {
         if( m_Entity[ i ]->GetType() == 0 )
         {
-            m_Entity[ i ]->Draw( 50 + type0 * 120, 100 );
+            m_Entity[ i ]->Draw( 50 + type0 * 120, 120 );
             ++type0;
         }
         else
         {
-            m_Entity[ i ]->Draw( 50 + type1 * 120, 250 );
+            m_Entity[ i ]->Draw( 50 + type1 * 120, 300 );
             ++type1;
         }
     }
@@ -273,6 +271,9 @@ EntityManager::Draw()
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
         DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
     }
+
+    m_Ontogenesis0->Draw( 10, 10 );
+    m_Ontogenesis1->Draw( 10, 190 );
 }
 
 
