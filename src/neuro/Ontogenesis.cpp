@@ -10,6 +10,7 @@ const int MAX_CELL_PER_SPLIT = 4;
 const int MAX_CELL = 10;
 const int SPECIES_PER_GENERATION = 50;
 const int GENES_PER_GENOME = 5;
+const int CHANGES_PER_MUTATION = 1;
 
 
 
@@ -423,7 +424,7 @@ std::vector< Ontogenesis::Gene >
 Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
 {
     std::vector< Gene > mutated;
-
+    int changes = 0;
 
 
     // insert new genes if genome is empty or if 20% chance
@@ -439,6 +440,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
         gene.expr.push_back( expr );
         mutated.push_back( gene );
         ++m_GeneUniqueId;
+        ++changes;
     }
 
 
@@ -451,13 +453,13 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
         // chance to be deleted 0-20% (reduced if this is conservative gene)
         // don't delete if this is only gene in genome
         // just don't copy it to new genome
-        if( ( genome.size() == 1 ) || ( ( rand() % ( int )( 5.0f * ( gene.conserv + 1.0f ) ) ) != 1 ) )
+        if( ( changes >= CHANGES_PER_MUTATION ) || ( genome.size() == 1 ) || ( ( rand() % ( int )( 5.0f * ( gene.conserv + 1.0f ) ) ) != 1 ) )
         {
             //gene.conserv += ( 100.0f - gene.conserv ) / 4.0f;
             //gene.conserv = ( gene.conserv > 99.0f ) ? 99.0f : gene.conserv;
             mutated.push_back( gene );
 
-            // chance to be duplicated 20% (not affected by conservativeness)
+            // chance to be duplicated 20% (not affected by conservativeness not count as chagnes)
             if( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) )
             {
                 Gene dup_gene = gene;
@@ -466,6 +468,10 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
                 mutated.push_back( dup_gene );
                 ++m_GeneUniqueId;
             }
+        }
+        else
+        {
+            ++changes;
         }
     }
 
@@ -479,30 +485,34 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
         {
             // remove random condition if there are more than one condition
             // chance 10%
-            if( ( mutated[ i ].cond.size() > 1 ) && ( ( rand() % 100 ) < 10 ) )
+            if( ( changes < CHANGES_PER_MUTATION ) && ( mutated[ i ].cond.size() > 1 ) && ( ( rand() % 100 ) < 10 ) )
             {
                 mutated[ i ].cond.erase( mutated[ i ].cond.begin() + ( rand() % mutated[ i ].cond.size() ) );
+                ++changes;
                 //mutated[ i ].conserv /= 2.0f;
             }
             for( size_t cond_id = 0; cond_id < mutated[ i ].cond.size(); ++cond_id )
             {
                 // conditions can interchangebly mutate as they want
                 // chance of mutation 0-30%
-                if( ( rand() % 100 ) < 30 )
+                if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
                 {
                     mutated[ i ].cond[ cond_id ].type = ( ConditionType )( rand() % C_TOTAL );
+                    ++changes;
                     //mutated[ i ].conserv /= 2.0f;
                 }
-                if( ( rand() % 100 ) < 30 )
+                if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
                 {
                     GenerateRandomConditionValue( mutated[ i ].cond[ cond_id ] );
+                    ++changes;
                     //mutated[ i ].conserv /= 2.0f;
                 }
             }
             // add random condition with chance 10%
-            if( ( rand() % 100 ) < 10 )
+            if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 10 ) )
             {
                 mutated[ i ].cond.push_back( GenerateRandomCondition() );
+                ++changes;
                 //mutated[ i ].conserv /= 2.0f;
             }
 
@@ -510,9 +520,10 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
 
             // remove random expression if there are more than one expression
             // chance 10%
-            if( ( mutated[ i ].expr.size() > 1 ) && ( ( rand() % 100 ) < 5 ) )
+            if( ( changes < CHANGES_PER_MUTATION ) && ( mutated[ i ].expr.size() > 1 ) && ( ( rand() % 100 ) < 5 ) )
             {
                 mutated[ i ].expr.erase( mutated[ i ].expr.begin() + ( rand() % mutated[ i ].expr.size() ) );
+                ++changes;
                 //mutated[ i ].conserv /= 2.0f;
             }
             for( size_t expr_id = 0; expr_id < mutated[ i ].expr.size(); ++expr_id )
@@ -522,7 +533,7 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
                 // uses cell types instead of protein
                 // chance of mutation 0-30%
                 ExpressionType type = mutated[ i ].expr[ expr_id ].type;
-                if( ( rand() % 100 ) < 30 )
+                if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
                 {
                     if( type == E_MIGRATE || type == E_O_PROTEIN || type == E_I_PROTEIN || type == E_DENDRITE || type == E_DENDRITE_I || type == E_AXON || type == E_AXON_I )
                     {
@@ -541,20 +552,23 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
                         if( type != new_type )
                         {
                             mutated[ i ].expr[ expr_id ].type = new_type;
+                            ++changes;
                             //mutated[ i ].conserv /= 2.0f;
                         }
                     }
                 }
-                if( ( rand() % 100 ) < 30 )
+                if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
                 {
                     GenerateRandomExpressionValue( mutated[ i ].expr[ expr_id ] );
+                    ++changes;
                     //mutated[ i ].conserv /= 2.0f;
                 }
             }
             // add random expression with chance 10%
-            if( ( rand() % 100 ) < 10 )
+            if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 10 ) )
             {
                 mutated[ i ].expr.push_back( GenerateRandomExpression() );
+                ++changes;
                 //mutated[ i ].conserv /= 2.0f;
             }
         }
