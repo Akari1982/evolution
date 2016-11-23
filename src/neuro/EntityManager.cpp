@@ -15,6 +15,7 @@ template<>EntityManager *Ogre::Singleton< EntityManager >::msSingleton = NULL;
 
 const float SPAWN_TIME = 1.0f;
 const size_t MAX_ENTITY = 20;
+const size_t MAX_FOOD = 50;
 const float FOOD_TIME = 0.2f;
 
 
@@ -104,8 +105,8 @@ EntityManager::Update()
         }
         if( forward_impulse > 0.0f )
         {
-            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 40.0f;
-            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 40.0f;
+            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
+            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
             pos_x = ( pos_x < m_X ) ? m_Width + pos_x : pos_x;
             pos_x = ( pos_x > m_X + m_Width ) ? 2 * m_X + m_Width - pos_x : pos_x;
             pos_y = ( pos_y < m_Y ) ? m_Height + pos_y : pos_y;
@@ -219,7 +220,7 @@ EntityManager::Update()
 
 
 
-    if( m_NextFoodTime <= 0 && m_Food.size() < 100 )
+    if( m_NextFoodTime <= 0 && m_Food.size() < MAX_FOOD )
     {
         Food food;
         food.power = 20 + rand() % 50;
@@ -267,7 +268,7 @@ EntityManager::Draw()
         float x = m_Food[ i ].x;
         float y = m_Food[ i ].y;
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.1f ) );
-        DEBUG_DRAW.Circle( x, y, m_Food[ i ].power );
+        DEBUG_DRAW.Circle( x, y, m_Food[ i ].power / 2.0f );
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
         DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
     }
@@ -322,7 +323,7 @@ EntityManager::FeelFood( const float x, const float y )
     {
         float x1 = m_Food[ i ].x;
         float y1 = m_Food[ i ].y;
-        float radius = m_Food[ i ].power;
+        float radius = m_Food[ i ].power / 2.0f;
         float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
         if( distance < radius )
         {

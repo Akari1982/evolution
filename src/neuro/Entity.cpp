@@ -8,7 +8,7 @@
 
 
 Entity::Entity( const int type, const float x, const float y ):
-    m_Radius( 14.0f ),
+    m_Radius( 2.0f + 6.0f ),
     m_X( x ),
     m_Y( y ),
     m_Rotation( 0.0f ),
@@ -73,10 +73,10 @@ Entity::Draw( const float x, const float y )
     DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
 
     // draw energy
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 0, 1 ) );
-    DEBUG_DRAW.SetTextAlignment( DebugDraw::CENTER );
-    DEBUG_DRAW.Text( m_X, m_Y - 8, IntToString( ( int )m_Energy ) );
-    DEBUG_DRAW.SetTextAlignment( DebugDraw::LEFT );
+    // DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 0, 1 ) );
+    // DEBUG_DRAW.SetTextAlignment( DebugDraw::CENTER );
+    // DEBUG_DRAW.Text( m_X, m_Y - 8, IntToString( ( int )m_Energy ) );
+    // DEBUG_DRAW.SetTextAlignment( DebugDraw::LEFT );
 
     // draw network
     for( size_t i = 0; i < m_Network.size(); ++i )
@@ -93,7 +93,7 @@ Entity::Draw( const float x, const float y )
             rotation.y = m_Network[ i ]->GetY();
             rotation.z = 0;
             rotation = q * rotation;
-            rotation *= 10.0f;
+            rotation *= 5.0f;
             DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.4f ) );
             DEBUG_DRAW.Line( m_X, m_Y, m_X + rotation.x, m_Y + rotation.y );
         }
@@ -236,7 +236,7 @@ void
 Entity::SetEnergy( const float energy )
 {
     m_Energy = energy;
-    m_Radius = 10.0f + energy / 10.0f;
+    m_Radius = 2.0f + ( energy / 20.0f ) * 3.0f;
 }
 
 
@@ -310,7 +310,7 @@ Entity::GetSensorFood( const float x, const float y ) const
     rotation.y = y;
     rotation.z = 0;
     rotation = q * rotation;
-    rotation *= 10.0f;
+    rotation *= 5.0f;
     return EntityManager::getSingleton().FeelFood( m_X + rotation.x, m_Y + rotation.y );
 }
 
@@ -326,6 +326,6 @@ Entity::GetSensorEnemy( const float x, const float y ) const
     rotation.y = y;
     rotation.z = 0;
     rotation = q * rotation;
-    rotation *= 10.0f;
+    rotation *= 5.0f;
     return EntityManager::getSingleton().FeelEnemy( m_Type, m_X + rotation.x, m_Y + rotation.y );
 }
