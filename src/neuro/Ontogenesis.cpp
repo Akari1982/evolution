@@ -12,7 +12,7 @@ const int SPECIES_PER_GENERATION = 50;
 const int GENES_PER_GENOME = 6;
 const int COND_PER_GENE = 3;
 const int EXPR_PER_GENE = 5;
-const int CHANGES_PER_MUTATION = 1;
+const int CHANGES_PER_MUTATION = 2;
 
 
 
