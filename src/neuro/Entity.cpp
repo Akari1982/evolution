@@ -105,7 +105,7 @@ Entity::Draw( const float x, const float y )
 
     // draw info about entity
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-    DEBUG_DRAW.Text( x - 40, y - 90, "id:" + IntToString( m_SpeciesId ) + ")" );
+    DEBUG_DRAW.Text( x - 40, y - 90, "id:" + IntToString( m_SpeciesId ) );
     DEBUG_DRAW.Text( x - 40, y - 70, "fit:" + IntToString( ( int )m_Fitness ) + " (" + IntToString( ( int )m_Life ) + ")" );
 }
 

@@ -13,10 +13,10 @@ template<>EntityManager *Ogre::Singleton< EntityManager >::msSingleton = NULL;
 
 
 
-const float SPAWN_TIME = 1.0f;
+const float SPAWN_TIME = 0;
 const size_t MAX_ENTITY = 20;
 const size_t MAX_FOOD = 50;
-const float FOOD_TIME = 0.2f;
+const float FOOD_TIME = 0;
 
 
 

@@ -9,10 +9,10 @@ const int MAX_PROTEIN = 7;
 const int MAX_CELL_PER_SPLIT = 4;
 const int MAX_CELL = 10;
 const int SPECIES_PER_GENERATION = 50;
-const int GENES_PER_GENOME = 6;
+const int GENES_PER_GENOME = 7;
 const int COND_PER_GENE = 3;
 const int EXPR_PER_GENE = 5;
-const int CHANGES_PER_MUTATION = 2;
+const int CHANGES_PER_MUTATION = 3;
 
 
 
