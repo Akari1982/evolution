@@ -32,8 +32,8 @@ EntityManager::EntityManager():
 {
     InitCommands();
 
-    m_Ontogenesis0 = new Ontogenesis( "specie0", 0 );
-    m_Ontogenesis1 = new Ontogenesis( "specie1", 1 );
+    m_Ontogenesis0 = new Ontogenesis( "specie0" );
+    m_Ontogenesis1 = new Ontogenesis( "specie1" );
 }
 
 
@@ -223,7 +223,7 @@ EntityManager::Update()
     if( m_NextFoodTime <= 0 && m_Food.size() < MAX_FOOD )
     {
         Food food;
-        food.power = 20 + rand() % 50;
+        food.power = 5 + rand() % 20;
         food.x = m_X + rand() % ( int )m_Width;
         food.y = m_Y + rand() % ( int )m_Height;
         m_Food.push_back( food );
@@ -268,7 +268,7 @@ EntityManager::Draw()
         float x = m_Food[ i ].x;
         float y = m_Food[ i ].y;
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.1f ) );
-        DEBUG_DRAW.Circle( x, y, m_Food[ i ].power / 2.0f );
+        DEBUG_DRAW.Circle( x, y, m_Food[ i ].power );
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
         DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
     }
@@ -299,7 +299,7 @@ EntityManager::RunGeneration( const int type, Ogre::String& file_name )
     {
         m_TypeNum0 = 0;
         delete m_Ontogenesis0;
-        m_Ontogenesis0 = new Ontogenesis( "specie0", 0 );
+        m_Ontogenesis0 = new Ontogenesis( "specie0" );
         XmlGenerationFile file( file_name );
         file.LoadGeneration( m_Ontogenesis0 );
     }
@@ -307,7 +307,7 @@ EntityManager::RunGeneration( const int type, Ogre::String& file_name )
     {
         m_TypeNum1 = 0;
         delete m_Ontogenesis1;
-        m_Ontogenesis1 = new Ontogenesis( "specie1", 1 );
+        m_Ontogenesis1 = new Ontogenesis( "specie1" );
         XmlGenerationFile file( file_name );
         file.LoadGeneration( m_Ontogenesis1 );
     }
@@ -323,7 +323,7 @@ EntityManager::FeelFood( const float x, const float y )
     {
         float x1 = m_Food[ i ].x;
         float y1 = m_Food[ i ].y;
-        float radius = m_Food[ i ].power / 2.0f;
+        float radius = m_Food[ i ].power;
         float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
         if( distance < radius )
         {

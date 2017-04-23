@@ -12,8 +12,9 @@
 #include "core/GameFrameListner.h"
 #include "core/InputManager.h"
 #include "core/Logger.h"
-#include "neuro/EntityManager.h"
 #include "core/Timer.h"
+#include "neuro/EntityManager.h"
+#include "social/SocialManager.h"
 
 
 
@@ -82,7 +83,8 @@ main( int argc, char *argv[] )
 
     // create This earlier than DisplayFrameListener cause it can fire event there
     CameraManager* camera_manager = new CameraManager();
-    EntityManager* entity_manager = new EntityManager();
+    //EntityManager* entity_manager = new EntityManager();
+    SocialManager* entity_manager = new SocialManager();
     Console* console = new Console();
 
 

@@ -86,7 +86,7 @@ public:
     };
 
 public:
-    Ontogenesis( const Ogre::String& file_prefix, const int type );
+    Ontogenesis( const Ogre::String& file_prefix );
     virtual ~Ontogenesis();
 
     void Draw( const unsigned int x, const unsigned int y );
@@ -122,7 +122,6 @@ private:
     void DumpGeneration( Generation& generation );
 
 private:
-    int m_Type;
     Ogre::String m_FilePrefix;
 
     unsigned int m_GeneUniqueId;

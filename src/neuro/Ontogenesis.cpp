@@ -16,8 +16,7 @@ const int CHANGES_PER_MUTATION = 3;
 
 
 
-Ontogenesis::Ontogenesis( const Ogre::String& file_prefix, const int type ):
-    m_Type( type ),
+Ontogenesis::Ontogenesis( const Ogre::String& file_prefix ):
     m_FilePrefix( file_prefix ),
     m_GeneUniqueId( 0 )
 {

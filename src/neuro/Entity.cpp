@@ -8,15 +8,15 @@
 
 
 Entity::Entity( const int type, const float x, const float y ):
-    m_Radius( 2.0f + 6.0f ),
+    m_Radius( 2.0f + 3.0f ),
     m_X( x ),
     m_Y( y ),
     m_Rotation( 0.0f ),
     m_ForwardImpulse( 0.0f ),
     m_LeftImpulse( 0.0f ),
     m_RightImpulse( 0.0f ),
-    m_Life( 300.0f ),
-    m_Energy( 40.0f ),
+    m_Life( 100.0f ),
+    m_Energy( 20.0f ),
     m_Fitness( 0.0f ),
     m_Type( type ),
     m_Think( 0.1f )
@@ -52,8 +52,8 @@ Entity::Update()
         m_Think = 0.1f;
     }
 
-    m_Life -= delta * 5.0;
-    SetEnergy( m_Energy - delta * 5.0f );
+    m_Life -= delta;
+    SetEnergy( m_Energy - delta );
 }
 
 
@@ -62,14 +62,8 @@ void
 Entity::Draw( const float x, const float y )
 {
     // draw entity itself
-    if( m_Type == 0 )
-    {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
-    }
-    else
-    {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
-    }
+    int col = ( m_Type % 6 ) + 1;
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( col & 1, ( col & 2 ) >> 1, ( col & 4 ) >> 2, 1 ) );
     DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
 
     // draw energy

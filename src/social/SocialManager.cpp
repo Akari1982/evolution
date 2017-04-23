@@ -13,7 +13,7 @@ template<>SocialManager *Ogre::Singleton< SocialManager >::msSingleton = NULL;
 
 
 const size_t MAX_ENTITY = 100;
-const float SPAWN_TIME = 10.0f;
+const float SPAWN_TIME = 5.0f;
 
 
 
@@ -78,7 +78,7 @@ SocialManager::Update()
 
     if( m_SpawnTime <= 0 && m_Person.size() < MAX_ENTITY )
     {
-        Person* person = new Person( 1, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
+        Person* person = new Person( m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
         m_Person.push_back( person );
         m_SpawnTime = SPAWN_TIME;
     }
@@ -91,7 +91,7 @@ SocialManager::Update()
 
 
 void
-EntityManager::Draw()
+SocialManager::Draw()
 {
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
     DEBUG_DRAW.Line( m_X, m_Y, m_X, m_Y + m_Height );
