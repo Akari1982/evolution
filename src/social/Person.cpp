@@ -7,12 +7,13 @@
 
 
 Person::Person( const float x, const float y ):
-    m_TalkRadius( 0.0f ),
-    m_HearRadius( 10.0f ),
+    m_Radius( 5.0f ),
     m_X( x ),
     m_Y( y ),
+    m_Rotation( 0.0f ),
     m_Life( 200.0f )
 {
+    m_Rotation = ( float )( rand() % 360 );
 }
 
 
@@ -27,7 +28,20 @@ void
 Person::Update()
 {
     float delta = Timer::getSingleton().GetGameTimeDelta();
-    m_Life -= delta * 5.0;
+
+
+
+    static wait_rotation = 3.0f;
+    wait_rotation -= delta;
+    if( wait_rotation <= 0.0f )
+    {
+        m_Rotation = ( float )( rand() % 360 );
+        wait_rotation = 5.0f;
+    }
+
+
+
+    m_Life -= delta * 5.0f;
 }
 
 
@@ -37,24 +51,22 @@ Person::Draw()
 {
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
     DEBUG_DRAW.Disc( m_X, m_Y, 2 );
-    DEBUG_DRAW.Circle( m_X, m_Y, m_TalkRadius );
-    DEBUG_DRAW.Circle( m_X, m_Y, m_HearRadius );
+    DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
+
+    Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
+    Ogre::Quaternion q( 0.0f, 0.0f, 0.0f, 1.0f );
+    q.FromAngleAxis( Ogre::Radian( Ogre::Degree( m_Rotation ) ), Ogre::Vector3::UNIT_Z );
+    rotation *= 5.0f;
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.4f ) );
+    DEBUG_DRAW.Line( m_X, m_Y, m_X + rotation.x, m_Y + rotation.y );
 }
 
 
 
 float
-Person::GetTalkRadius() const
+Person::GetRadius() const
 {
-    return m_TalkRadius;
-}
-
-
-
-float
-Person::GetHearRadius() const
-{
-    return m_HearRadius;
+    return m_Radius;
 }
 
 
@@ -91,8 +103,44 @@ Person::SetY( const float y )
 
 
 
+float
+Person::GetRotation() const
+{
+    return m_Rotation;
+}
+
+
+
+void
+Person::SetRotation( const float rotation )
+{
+    m_Rotation = rotation;
+}
+
+
+
 bool
 Person::IsDead() const
 {
     return ( m_Life <= 0 );
+}
+
+
+
+float
+Person::GetKnowledge( const int know_id ) const
+{
+    if( m_Knowledge.size() > know_id )
+    {
+        return m_Knowledge[ know_id ];
+    }
+    return 0.0f;
+}
+
+
+
+void
+Person::ChangeKnowledge( const int person_id, const int know_id, const float opinion )
+{
+
 }

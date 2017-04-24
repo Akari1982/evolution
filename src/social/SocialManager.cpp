@@ -56,6 +56,41 @@ SocialManager::Update()
     {
         Person* person = m_Person[ i ];
         person->Update();
+
+
+
+        // perform movement
+        float start_x = person->GetX();
+        float start_y = person->GetY();
+        float rotation = person->GetRotation();
+        float radius = person->GetRadius();
+
+        float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
+        float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
+        pos_x = ( pos_x < m_X ) ? m_Width + pos_x : pos_x;
+        pos_x = ( pos_x > m_X + m_Width ) ? 2 * m_X + m_Width - pos_x : pos_x;
+        pos_y = ( pos_y < m_Y ) ? m_Height + pos_y : pos_y;
+        pos_y = ( pos_y > m_Y + m_Height ) ? 2 * m_Y + m_Height - pos_y : pos_y;
+        person->SetX( pos_x );
+        person->SetY( pos_y );
+
+
+
+        // check entity / entity collision
+        for( size_t j = 0; j < m_Person.size(); ++j )
+        {
+            float x1 = m_Person[ j ]->GetX();
+            float y1 = m_Person[ j ]->GetY();
+            float radius1 = m_Person[ j ]->GetRadius();
+            float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
+            if( distance <= radius + radius1 )
+            {
+                if( radius >= radius1 )
+                {
+                    //m_Person[ j ]->ChangeKnowledge( i, 1, person->GetKnowledge( 1 ) );
+                }
+            }
+        }
     }
 
 
