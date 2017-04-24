@@ -31,7 +31,7 @@ Person::Update()
 
 
 
-    static wait_rotation = 3.0f;
+    static float wait_rotation = 3.0f;
     wait_rotation -= delta;
     if( wait_rotation <= 0.0f )
     {

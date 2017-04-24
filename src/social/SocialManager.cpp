@@ -82,7 +82,7 @@ SocialManager::Update()
             float x1 = m_Person[ j ]->GetX();
             float y1 = m_Person[ j ]->GetY();
             float radius1 = m_Person[ j ]->GetRadius();
-            float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
+            float distance = sqrt( ( pos_x - x1 ) * ( pos_x - x1 ) + ( pos_y - y1 ) * ( pos_y - y1 ) );
             if( distance <= radius + radius1 )
             {
                 if( radius >= radius1 )
