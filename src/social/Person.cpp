@@ -176,8 +176,6 @@ Person::ChangeKnowledge( const int know_id, const float value )
     float diff = value - m_Knowledge[ know_id ];
     float moddiff = ( diff < 0 ) ? - diff : diff;
     m_Confidence[ know_id ] += ( moddiff < 0.5f ) ? 0.01f : -0.01f;
-
-    float diff = value - m_Knowledge[ know_id ];
     float unconf = 1 - m_Confidence[ know_id ];
     m_Knowledge[ know_id ] += unconf * diff;
 }

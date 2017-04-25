@@ -26,19 +26,19 @@ SocialManager::SocialManager():
     InitCommands();
 
     Area area;
-    area.x = 10.0f;
-    area.y = 10.0f;
-    area.radius = 30.0f;
-    area.know_id = 0;
-    m_Area.push_back( area );
     area.x = 100.0f;
     area.y = 100.0f;
-    area.radius = 30.0f;
+    area.radius = 130.0f;
+    area.know_id = 0;
+    m_Area.push_back( area );
+    area.x = 300.0f;
+    area.y = 200.0f;
+    area.radius = 130.0f;
     area.know_id = 1;
     m_Area.push_back( area );
-    area.x = 50.0f;
-    area.y = 70.0f;
-    area.radius = 20.0f;
+    area.x = 700.0f;
+    area.y = 300.0f;
+    area.radius = 100.0f;
     area.know_id = 2;
     m_Area.push_back( area );
 }
@@ -66,7 +66,7 @@ void
 SocialManager::Update()
 {
     float delta = Timer::getSingleton().GetGameTimeDelta();
-    const spawn_time = SPAWN_TIME;
+    static float spawn_time = SPAWN_TIME;
     spawn_time -= delta;
 
 
