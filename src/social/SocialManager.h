@@ -8,6 +8,16 @@
 
 
 
+struct Area
+{
+    float x;
+    float y;
+    float radius;
+    unsigned int know_id;
+};
+
+
+
 class SocialManager : public Ogre::Singleton< SocialManager >
 {
 public:
@@ -21,9 +31,8 @@ public:
     void InitCommands();
 
 private:
+    std::vector< Area > m_Area;
     std::vector< Person* > m_Person;
-
-    float m_SpawnTime;
 
     float m_X;
     float m_Y;

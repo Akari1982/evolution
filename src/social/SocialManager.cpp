@@ -21,10 +21,26 @@ SocialManager::SocialManager():
     m_X( 100.0f ),
     m_Y( 300.0f ),
     m_Width( 1080.0f ),
-    m_Height( 300.0f ),
-    m_SpawnTime( SPAWN_TIME )
+    m_Height( 300.0f )
 {
     InitCommands();
+
+    Area area;
+    area.x = 10.0f;
+    area.y = 10.0f;
+    area.radius = 30.0f;
+    area.know_id = 0;
+    m_Area.push_back( area );
+    area.x = 100.0f;
+    area.y = 100.0f;
+    area.radius = 30.0f;
+    area.know_id = 1;
+    m_Area.push_back( area );
+    area.x = 50.0f;
+    area.y = 70.0f;
+    area.radius = 20.0f;
+    area.know_id = 2;
+    m_Area.push_back( area );
 }
 
 
@@ -50,7 +66,10 @@ void
 SocialManager::Update()
 {
     float delta = Timer::getSingleton().GetGameTimeDelta();
-    m_SpawnTime -= delta;
+    const spawn_time = SPAWN_TIME;
+    spawn_time -= delta;
+
+
 
     for( size_t i = 0; i < m_Person.size(); ++i )
     {
@@ -74,7 +93,17 @@ SocialManager::Update()
         person->SetX( pos_x );
         person->SetY( pos_y );
 
-
+        // check entity / area collision
+        for( unsigned int i = 0; i < m_Area.size(); ++i )
+        {
+            float x1 = m_X + m_Area[ i ].x;
+            float y1 = m_Y + m_Area[ i ].y;
+            float distance = sqrt( ( pos_x - x1 ) * ( pos_x - x1 ) + ( pos_y - y1 ) * ( pos_y - y1 ) );
+            if( distance <= m_Area[ i ].radius )
+            {
+                person->ChangeKnowledge( m_Area[ i ].know_id, 1.0f );
+            }
+        }
 
         // check entity / entity collision
         for( size_t j = 0; j < m_Person.size(); ++j )
@@ -111,11 +140,11 @@ SocialManager::Update()
 
 
 
-    if( m_SpawnTime <= 0 && m_Person.size() < MAX_ENTITY )
+    if( spawn_time <= 0 && m_Person.size() < MAX_ENTITY )
     {
         Person* person = new Person( m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
         m_Person.push_back( person );
-        m_SpawnTime = SPAWN_TIME;
+        spawn_time = SPAWN_TIME;
     }
 
 
@@ -138,4 +167,11 @@ SocialManager::Draw()
     {
         m_Person[ i ]->Draw();
     }
+
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 0.3f ) );
+    DEBUG_DRAW.Disc( m_X + m_Area[ 0 ].x, m_Y + m_Area[ 0 ].y, m_Area[ 0 ].radius );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.3f ) );
+    DEBUG_DRAW.Disc( m_X + m_Area[ 1 ].x, m_Y + m_Area[ 1 ].y, m_Area[ 1 ].radius );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 1, 0.3f ) );
+    DEBUG_DRAW.Disc( m_X + m_Area[ 2 ].x, m_Y + m_Area[ 2 ].y, m_Area[ 2 ].radius );
 }

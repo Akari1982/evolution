@@ -27,6 +27,7 @@ public:
 
     float GetKnowledge( const int know_id ) const;
     void ChangeKnowledge( const int person_id, const int know_id, const float opinion );
+    void ChangeKnowledge( const int know_id, const float value );
 
 private:
     Person();
@@ -42,6 +43,8 @@ private:
     float m_DefaultRelationship;
     std::map< int, float > m_Relationship;
     std::vector< float > m_Knowledge;
+    std::vector< float > m_Confidence;
+    float m_KnowTime;
 };
 
 
