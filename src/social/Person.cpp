@@ -55,11 +55,16 @@ Person::Update()
 
 
 void
-Person::Draw()
+Person::Draw( const float x, const float y )
 {
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
     DEBUG_DRAW.Disc( m_X, m_Y, 2 );
     DEBUG_DRAW.Circle( m_X, m_Y, m_Radius );
+
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 0, 1 ) );
+    DEBUG_DRAW.SetTextAlignment( DebugDraw::CENTER );
+    DEBUG_DRAW.Text( m_X, m_Y - 8, IntToString( ( int )m_Life ) );
+    DEBUG_DRAW.SetTextAlignment( DebugDraw::LEFT );
 
     Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
     Ogre::Quaternion q( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -67,6 +72,22 @@ Person::Draw()
     rotation *= 10.0f;
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.4f ) );
     DEBUG_DRAW.Line( m_X, m_Y, m_X + rotation.x, m_Y + rotation.y );
+
+    // line connecting
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 0.1f ) );
+    DEBUG_DRAW.Line( m_X, m_Y, x, y );
+
+    // knowledge data
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, m_Knowledge[ 0 ] ) );
+    DEBUG_DRAW.Quad( x +  0, y, x + 10, y, x + 10, y + 10, x +  0, y + 10 );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, m_Knowledge[ 1 ] ) );
+    DEBUG_DRAW.Quad( x + 10, y, x + 20, y, x + 20, y + 10, x + 10, y + 10 );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 1, m_Knowledge[ 2 ] ) );
+    DEBUG_DRAW.Quad( x + 20, y, x + 30, y, x + 30, y + 10, x + 20, y + 10 );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+    DEBUG_DRAW.Text( x -  5, y - 5, FloatToString( m_Confidence[ 0 ] ) );
+    DEBUG_DRAW.Text( x +  5, y - 5, FloatToString( m_Confidence[ 1 ] ) );
+    DEBUG_DRAW.Text( x + 15, y - 5, FloatToString( m_Confidence[ 2 ] ) );
 }
 
 

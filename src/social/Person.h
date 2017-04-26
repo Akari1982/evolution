@@ -13,7 +13,7 @@ public:
     virtual ~Person();
 
     void Update();
-    void Draw();
+    void Draw( const float x, const float y );
 
     float GetRadius() const;
     float GetX() const;

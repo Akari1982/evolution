@@ -165,7 +165,7 @@ SocialManager::Draw()
 
     for( size_t i = 0; i < m_Person.size(); ++i )
     {
-        m_Person[ i ]->Draw();
+        m_Person[ i ]->Draw( 50 + i * 120, 120 );
     }
 
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 0.3f ) );
