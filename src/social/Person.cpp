@@ -18,7 +18,7 @@ Person::Person( const float x, const float y ):
 {
     m_Rotation = ( float )( rand() % 360 );
 
-    m_Knowledge.push_back( 0.1f ); m_Confidence.push_back( 0.5f );
+    m_Knowledge.push_back( 0.7f ); m_Confidence.push_back( 0.5f );
     m_Knowledge.push_back( 0.9f ); m_Confidence.push_back( 0.5f );
     m_Knowledge.push_back( 0.5f ); m_Confidence.push_back( 0.5f );
 }
@@ -84,10 +84,10 @@ Person::Draw( const float x, const float y )
     DEBUG_DRAW.Quad( x + 10, y, x + 20, y, x + 20, y + 10, x + 10, y + 10 );
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 1, m_Knowledge[ 2 ] ) );
     DEBUG_DRAW.Quad( x + 20, y, x + 30, y, x + 30, y + 10, x + 20, y + 10 );
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-    DEBUG_DRAW.Text( x -  5, y - 5, FloatToString( m_Confidence[ 0 ] ) );
-    DEBUG_DRAW.Text( x +  5, y - 5, FloatToString( m_Confidence[ 1 ] ) );
-    DEBUG_DRAW.Text( x + 15, y - 5, FloatToString( m_Confidence[ 2 ] ) );
+    //DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+    //DEBUG_DRAW.Text( x +  5, y + 5, FloatToString( m_Confidence[ 0 ] ) );
+    //DEBUG_DRAW.Text( x + 15, y + 5, FloatToString( m_Confidence[ 1 ] ) );
+    //DEBUG_DRAW.Text( x + 25, y + 5, FloatToString( m_Confidence[ 2 ] ) );
 }
 
 
