@@ -34,10 +34,13 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
     {
         if( node->Type() == TiXmlNode::TINYXML_ELEMENT && node->ValueStr() == "neuron" )
         {
-            //entity->AddNeuron( GetInt( node, "x" ), GetInt( node, "y" ), GetFloat( node, "motor_x", 0.0f ), GetFloat( node, "motor_y", 0.0f ) );
+            Cell* cell = new Cell( entity, Cell::NEURON_COMMON, GetInt( node, "x" ), GetInt( node, "y" ) );
+            species.network.push_back( cell );
         }
         node = node->NextSibling();
     }
+
+    std::vector< Cell* > network;
 
     unsigned int self_id = 0;
     node = m_File.RootElement()->FirstChild();
@@ -50,7 +53,7 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
             {
                 if( node2->Type() == TiXmlNode::TINYXML_ELEMENT && node2->ValueStr() == "synapse" )
                 {
-                    //entity->AddSynapse( self_id, GetString( node2, "type" ), GetFloat( node2, "power" ), GetBool( node2, "inverted", false ), GetInt( node2, "neuron_id" ), GetFloat( node2, "length" ), GetFloat( node2, "degree" ) );
+                    network[ self_id ]->AddSynapse( GetFloat( node2, "power" ), GetBool( node2, "inverted", false ), network[ GetInt( node2, "neuron_id" ) ] );
                 }
                 node2 = node2->NextSibling();
             }

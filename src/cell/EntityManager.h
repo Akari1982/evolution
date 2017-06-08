@@ -5,6 +5,7 @@
 
 #include "../core/Event.h"
 #include "Entity.h"
+#include "Ontogenesis.h"
 
 
 
@@ -19,12 +20,15 @@ public:
     void Draw();
 
     void InitCommands();
+    void RunGeneration( const int type, Ogre::String& file_name );
 
     float FeelFood( const float x, const float y );
     float FeelEnemy( const int type, const float x, const float y );
     bool CheckMove( Entity* entity, const float move_x, const float move_y );
 
 private:
+    Ontogenesis* m_Ontogenesis0;
+    Ontogenesis* m_Ontogenesis1;
     std::vector< Entity* > m_Entity;
     int m_TypeNum0;
     int m_TypeNum1;

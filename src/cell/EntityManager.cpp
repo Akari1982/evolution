@@ -5,6 +5,7 @@
 #include "../core/InputManager.h"
 #include "../core/Logger.h"
 #include "../core/Timer.h"
+#include "XmlGenerationFile.h"
 
 
 
@@ -30,6 +31,9 @@ EntityManager::EntityManager():
     m_SpawnTime( SPAWN_TIME )
 {
     InitCommands();
+
+    m_Ontogenesis0 = new Ontogenesis( "specie0" );
+    m_Ontogenesis1 = new Ontogenesis( "specie1" );
 }
 
 
@@ -40,6 +44,9 @@ EntityManager::~EntityManager()
     {
         delete m_Entity[ i ];
     }
+
+    delete m_Ontogenesis0;
+    delete m_Ontogenesis1;
 }
 
 
@@ -172,6 +179,15 @@ EntityManager::Update()
                 case 1: --m_TypeNum1; break;
             }
 
+            if( ( *it )->GetType() == 0 )
+            {
+                m_Ontogenesis0->EntityDeath( ( *it ) );
+            }
+            else
+            {
+                m_Ontogenesis1->EntityDeath( ( *it ) );
+            }
+
             delete ( *it );
             it = m_Entity.erase( it );
         }
@@ -186,10 +202,18 @@ EntityManager::Update()
     if( m_SpawnTime <= 0 && m_Entity.size() < MAX_ENTITY )
     {
         Entity* entity;
-        entity = new Entity( 1, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
-        XmlNetworkFile* network = new XmlNetworkFile( "data/network.xml" );
-        network->LoadNetwork( entity );
-        delete network;
+        if( m_TypeNum0 > m_TypeNum1 )
+        {
+            entity = new Entity( 1, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
+            m_Ontogenesis1->LoadNetwork( entity );
+            ++m_TypeNum1;
+        }
+        else
+        {
+            entity = new Entity( 0, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
+            m_Ontogenesis0->LoadNetwork( entity );
+            ++m_TypeNum0;
+        }
         m_Entity.push_back( entity );
         m_SpawnTime = SPAWN_TIME;
     }
@@ -247,6 +271,45 @@ EntityManager::Draw()
         DEBUG_DRAW.Circle( x, y, m_Food[ i ].power );
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
         DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
+    }
+
+    m_Ontogenesis0->Draw( 10, 10 );
+    m_Ontogenesis1->Draw( 10, 190 );
+}
+
+
+
+void
+EntityManager::RunGeneration( const int type, Ogre::String& file_name )
+{
+    for( std::vector< Entity* >::iterator it = m_Entity.begin(); it != m_Entity.end(); )
+    {
+        if( ( *it )->GetType() == type )
+        {
+            delete ( *it );
+            it = m_Entity.erase( it );
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    if( type == 0 )
+    {
+        m_TypeNum0 = 0;
+        delete m_Ontogenesis0;
+        m_Ontogenesis0 = new Ontogenesis( "specie0" );
+        XmlGenerationFile file( file_name );
+        file.LoadGeneration( m_Ontogenesis0 );
+    }
+    else
+    {
+        m_TypeNum1 = 0;
+        delete m_Ontogenesis1;
+        m_Ontogenesis1 = new Ontogenesis( "specie1" );
+        XmlGenerationFile file( file_name );
+        file.LoadGeneration( m_Ontogenesis1 );
     }
 }
 
