@@ -229,12 +229,6 @@
     <ClCompile Include="neuro\EntityManager.cpp">
       <Filter>N-Gears files\neuro</Filter>
     </ClCompile>
-    <ClCompile Include="neuro\Ontogenesis.cpp">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClCompile>
-    <ClCompile Include="neuro\XmlGenerationFile.cpp">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClCompile>
     <ClCompile Include="neuro\XmlNetworkFile.cpp">
       <Filter>N-Gears files\neuro</Filter>
     </ClCompile>
@@ -636,12 +630,6 @@
     <ClInclude Include="neuro\EntityManagerCommands.h">
       <Filter>N-Gears files\neuro</Filter>
     </ClInclude>
-    <ClInclude Include="neuro\Ontogenesis.h">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClInclude>
-    <ClInclude Include="neuro\XmlGenerationFile.h">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClInclude>
     <ClInclude Include="neuro\XmlNetworkFile.h">
       <Filter>N-Gears files\neuro</Filter>
     </ClInclude>
@@ -657,10 +645,5 @@
     <ClInclude Include="Main.h">
       <Filter>N-Gears files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="neuro\idea.txt">
-      <Filter>N-Gears files\neuro</Filter>
-    </Text>
   </ItemGroup>
 </Project>

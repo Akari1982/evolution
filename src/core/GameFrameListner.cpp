@@ -98,8 +98,8 @@ GameFrameListener::frameStarted( const Ogre::FrameEvent& evt )
 
         if( console_active != true )
         {
-            //EntityManager::getSingleton().Input( input_event_array[ i ] );
-            SocialManager::getSingleton().Input( input_event_array[ i ] );
+            EntityManager::getSingleton().Input( input_event_array[ i ] );
+            //SocialManager::getSingleton().Input( input_event_array[ i ] );
             CameraManager::getSingleton().Input( input_event_array[ i ] );
         }
     }
@@ -107,8 +107,8 @@ GameFrameListener::frameStarted( const Ogre::FrameEvent& evt )
     Console::getSingleton().Update();
 
     CameraManager::getSingleton().Update();
-    //EntityManager::getSingleton().Update();
-    SocialManager::getSingleton().Update();
+    EntityManager::getSingleton().Update();
+    //SocialManager::getSingleton().Update();
 
     return true;
 }

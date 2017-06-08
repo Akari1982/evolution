@@ -8,7 +8,7 @@
 class Entity
 {
 public:
-    Entity( const int type, const float x, const float y );
+    Entity( const float x, const float y );
     virtual ~Entity();
 
     void Update();
@@ -32,18 +32,11 @@ public:
     bool IsDead() const;
     float GetEnergy() const;
     void SetEnergy( const float energy );
-    float GetFitness() const;
-    void SetFitness( const float fitness );
 
-    size_t GetGenerationId() const;
-    size_t GetSpeciesId() const;
-    int GetType() const;
-
-    void AddNetwork( std::vector< Cell* >& network, const size_t generation_id, const size_t species_id );
+    void AddNetwork( std::vector< Cell* >& network );
 
     float GetSensorEnergy() const;
     float GetSensorFood( const float x, const float y ) const;
-    float GetSensorEnemy( const float x, const float y ) const;
 
 private:
     Entity();
@@ -60,11 +53,6 @@ private:
 
     float m_Life;
     float m_Energy;
-    float m_Fitness;
-
-    size_t m_GenerationId;
-    size_t m_SpeciesId;
-    int m_Type;
 
     float m_Think;
     std::vector< Cell* > m_Network;

@@ -14,10 +14,6 @@ Cell::Cell( Entity* entity, const CellName name, const float x, const float y ):
     m_Name( name ),
     m_X( x ),
     m_Y( y ),
-    m_InnerProtein( -1 ),
-    m_InnerProteinPower( 0.0f ),
-    m_OuterProtein( -1 ),
-    m_OuterProteinRadius( 0 ),
     m_Threshold( 1.0f ),
     m_Value( 0.0f ),
     m_Fired( false )
@@ -27,7 +23,6 @@ Cell::Cell( Entity* entity, const CellName name, const float x, const float y ):
         case NEURON_COMMON:     m_Type = NEURON;    break;
         case SENSOR_FOOD:       m_Type = SENSOR;    break;
         case SENSOR_ENERGY:     m_Type = SENSOR;    break;
-        case SENSOR_ENEMY:      m_Type = SENSOR;    break;
         case ACTIVATOR_FORWARD: m_Type = ACTIVATOR; break;
         case ACTIVATOR_LEFT:    m_Type = ACTIVATOR; break;
         case ACTIVATOR_RIGHT:   m_Type = ACTIVATOR; break;
@@ -51,48 +46,39 @@ Cell::Update()
     }
     else
     {
-        for( size_t i = 0; i < m_Synapses.size(); ++i )
+        switch( m_Name )
         {
-            float value = 0;
-
-            switch( m_Synapses[ i ].cell->m_Name )
+            case NEURON_COMMON:
             {
-                case NEURON_COMMON:
+                for( size_t i = 0; i < m_Synapses.size(); ++i )
                 {
                     if( m_Synapses[ i ].cell->m_Fired == true )
                     {
-                        value = 1;
+                        if( m_Synapses[ i ].inverted == false )
+                        {
+                            m_Value += m_Synapses[ i ].power;
+                        }
+                        else
+                        {
+                            m_Value -= m_Synapses[ i ].power;
+                            m_Value = ( m_Value < 0 ) ? 0 : m_Value;
+                        }
                     }
                 }
-                break;
-
-                case SENSOR_ENERGY:
-                {
-                    value = m_Entity->GetSensorEnergy();
-                }
-                break;
-
-                case SENSOR_FOOD:
-                {
-                    value = m_Entity->GetSensorFood( m_X, m_Y );
-                }
-                break;
-
-                case SENSOR_ENEMY:
-                {
-                    value = m_Entity->GetSensorEnemy( m_X, m_Y );
-                }
-                break;
             }
+            break;
 
-            if( m_Synapses[ i ].inverted == false )
+            case SENSOR_ENERGY:
             {
-                m_Value += value * m_Synapses[ i ].power;
+                m_Value += m_Entity->GetSensorEnergy();
             }
-            else
+            break;
+
+            case SENSOR_FOOD:
             {
-                m_Value += ( 1 - value ) * m_Synapses[ i ].power;
+                m_Value += m_Entity->GetSensorFood( m_X, m_Y );
             }
+            break;
         }
 
         if( m_Value >= m_Threshold )
@@ -121,58 +107,33 @@ Cell::Update()
 void
 Cell::Draw( const float x, const float y )
 {
+    float scale = 8.0f;
+
     if( m_Fired == true )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
-    }
-    else if( m_Type == ACTIVATOR )
-    {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 1 ) );
-    }
-    else if( m_Type == SENSOR )
-    {
-        float value = 0.0f;
-        switch( m_Name )
-        {
-            case SENSOR_ENERGY:
-            {
-                value = m_Entity->GetSensorEnergy();
-            }
-            break;
-
-            case SENSOR_FOOD:
-            {
-                value = m_Entity->GetSensorFood( m_X, m_Y );
-            }
-            break;
-
-            case SENSOR_ENEMY:
-            {
-                value = m_Entity->GetSensorEnemy( m_X, m_Y );
-            }
-            break;
-        }
-
-        if( value > 0.0f)
-        {
-            DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
-        }
-        else
-        {
-            DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
-        }
     }
     else
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
     }
     float radius = 2.0f;
-    float scale = 8.0f;
     DEBUG_DRAW.Disc( x + m_X * scale, y + m_Y * scale, radius );
 
-    // draw protein
-    //DEBUG_DRAW.SetColour( Ogre::ColourValue( 0.5f, 0.5f, 0.5f, 0.1 ) );
-    //DEBUG_DRAW.Circle( x + m_X * scale, y + m_Y * scale, m_OuterProteinRadius * scale );
+    if( m_Type == ACTIVATOR )
+    {
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 1 ) );
+    }
+    else if( m_Type == SENSOR )
+    {
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
+    }
+    else
+    {
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+    }
+    radius = 5.0f;
+    DEBUG_DRAW.Circle( x + m_X * scale, y + m_Y * scale, radius );
 
     for( size_t i = 0; i < m_Synapses.size(); ++i )
     {
@@ -239,71 +200,6 @@ Cell::SetY( const float y )
 
 
 
-int
-Cell::GetOuterProtein() const
-{
-    return m_OuterProtein;
-}
-
-
-
-void
-Cell::SetOuterProtein( const int protein )
-{
-    m_OuterProtein = protein;
-}
-
-
-
-int
-Cell::GetOuterProteinRadius() const
-{
-    return m_OuterProteinRadius;
-}
-
-
-
-void
-Cell::SetOuterProteinRadius( const int protein_radius )
-{
-    m_OuterProteinRadius = protein_radius;
-}
-
-
-
-int
-Cell::GetInnerProtein() const
-{
-    return m_InnerProtein;
-}
-
-
-
-void
-Cell::SetInnerProtein( const int protein, const float power )
-{
-    m_InnerProtein = protein;
-    m_InnerProteinPower = power;
-}
-
-
-
-float
-Cell::GetInnerProteinPower() const
-{
-    return m_InnerProteinPower;
-}
-
-
-
-void
-Cell::SetInnerProteinPower( const float power )
-{
-    m_InnerProteinPower = power;
-}
-
-
-
 void
 Cell::AddSynapse( const float power, const bool inverted, Cell* cell )
 {
@@ -342,7 +238,6 @@ Cell::CellTypeToString( const CellType type )
         case NEURON: return "NEURON";
         case SENSOR_FOOD: return "SENSOR_FOOD";
         case SENSOR_ENERGY: return "SENSOR_ENERGY";
-        case SENSOR_ENEMY: return "SENSOR_ENEMY";
         case ACTIVATOR_FORWARD: return "ACTIVATOR_FORWARD";
         case ACTIVATOR_LEFT: return "ACTIVATOR_LEFT";
         case ACTIVATOR_RIGHT: return "ACTIVATOR_RIGHT";

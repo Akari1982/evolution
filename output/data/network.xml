@@ -1,59 +1,15 @@
 <network>
-    <neuron id="0" x="25" y="0">
-        <synapse power="1" type="food" length="20" degree="0" />
+    <neuron type="sensor_food" x="5" y="-3" />
+    <neuron type="sensor_food" x="5" y="3" />
+    <neuron type="activator_forward" x="-2" y="0">
+        <synapse power="1" neuron_id="0" />
+        <synapse power="1" neuron_id="1" />
     </neuron>
-    <neuron id="1" x="25" y="20">
-        <synapse power="1" type="food" length="20" degree="45" />
+    <neuron type="activator_right" x="-2" y="-3">
+        <synapse power="1" neuron_id="0" />
     </neuron>
-    <neuron id="2" x="25" y="40">
-        <synapse power="1" type="food" length="20" degree="90" />
-    </neuron>
-    <neuron id="3" x="25" y="60">
-        <synapse power="1" type="food" length="20" degree="135" />
-    </neuron>
-    <neuron id="4" x="25" y="80">
-        <synapse power="1" type="food" length="20" degree="180" />
-    </neuron>
-    <neuron id="5" x="25" y="100">
-        <synapse power="1" type="food" length="20" degree="225" />
-    </neuron>
-    <neuron id="6" x="25" y="120">
-        <synapse power="1" type="food" length="20" degree="270" />
-    </neuron>
-    <neuron id="7" x="25" y="140">
-        <synapse power="1" type="food" length="20" degree="315" />
+    <neuron type="activator_left" x="-2" y="3">
+        <synapse power="1" neuron_id="1" />
     </neuron>
 
-    <neuron id="8" x="0" y="70">
-        <synapse power="1.0" type="energy" inverted="true" />
-    </neuron>
-
-    <neuron id="9" x="50" y="40" motor_y="-1">
-        <synapse power="0.5" type="neuron" neuron_id="0" />
-        <synapse power="0.1" type="neuron" neuron_id="1" />
-        <synapse power="0.1" type="neuron" neuron_id="7" />
-        <synapse power="0.1" type="neuron" inverted="true" neuron_id="10" />
-        <synapse power="0.1" type="neuron" inverted="true" neuron_id="12" />
-    </neuron>
-    <neuron id="10" x="50" y="60" motor_x="1">
-        <synapse power="0.5" type="neuron" neuron_id="2" />
-        <synapse power="0.1" type="neuron" neuron_id="3" />
-        <synapse power="0.1" type="neuron" neuron_id="1" />
-        <synapse power="0.1" type="neuron" inverted="true" neuron_id="9" />
-        <synapse power="0.1" type="neuron" inverted="true" neuron_id="11" />
-    </neuron>
-    <neuron id="11" x="50" y="80" motor_y="1">
-        <synapse power="0.5" type="neuron" neuron_id="4" />
-        <synapse power="0.1" type="neuron" neuron_id="5" />
-        <synapse power="0.1" type="neuron" neuron_id="3" />
-        <synapse power="0.1" type="neuron" inverted="true" neuron_id="10" />
-        <synapse power="0.1" type="neuron" inverted="true" neuron_id="12" />
-    </neuron>
-    <neuron id="12" x="50" y="100" motor_x="-1">
-        <synapse power="0.5" type="neuron" neuron_id="6" />
-        <synapse power="0.1" type="neuron" neuron_id="7" />
-        <synapse power="0.1" type="neuron" neuron_id="5" />
-        <synapse power="0.1" type="neuron" inverted="true" neuron_id="9" />
-        <synapse power="0.1" type="neuron" inverted="true" neuron_id="11" />
-    </neuron>
 </network>

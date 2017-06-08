@@ -7,7 +7,7 @@
 
 
 
-Entity::Entity( const int type, const float x, const float y ):
+Entity::Entity( const float x, const float y ):
     m_Radius( 2.0f + 3.0f ),
     m_X( x ),
     m_Y( y ),
@@ -17,8 +17,6 @@ Entity::Entity( const int type, const float x, const float y ):
     m_RightImpulse( 0.0f ),
     m_Life( 100.0f ),
     m_Energy( 20.0f ),
-    m_Fitness( 0.0f ),
-    m_Type( type ),
     m_Think( 0.1f )
 {
     m_Rotation = ( float )( rand() % 360 );
@@ -62,8 +60,7 @@ void
 Entity::Draw( const float x, const float y )
 {
     // draw entity itself
-    int col = ( m_Type % 6 ) + 1;
-    DEBUG_DRAW.SetColour( Ogre::ColourValue( col & 1, ( col & 2 ) >> 1, ( col & 4 ) >> 2, 1 ) );
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
     DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
 
     // draw energy
@@ -78,7 +75,7 @@ Entity::Draw( const float x, const float y )
         m_Network[ i ]->Draw( x, y );
 
         Cell::CellName name = m_Network[ i ]->GetName();
-        if( name == Cell::SENSOR_FOOD || name == Cell::SENSOR_ENEMY )
+        if( name == Cell::SENSOR_FOOD )
         {
             Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
             Ogre::Quaternion q( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -99,8 +96,7 @@ Entity::Draw( const float x, const float y )
 
     // draw info about entity
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-    DEBUG_DRAW.Text( x - 40, y - 90, "id:" + IntToString( m_SpeciesId ) );
-    DEBUG_DRAW.Text( x - 40, y - 70, "fit:" + IntToString( ( int )m_Fitness ) + " (" + IntToString( ( int )m_Life ) + ")" );
+    DEBUG_DRAW.Text( x - 40, y - 90, "life:" + IntToString( ( int )m_Life ) + "" );
 }
 
 
@@ -235,53 +231,10 @@ Entity::SetEnergy( const float energy )
 
 
 
-float
-Entity::GetFitness() const
-{
-    return m_Fitness;
-}
-
-
-
-
 void
-Entity::SetFitness( const float fitness )
-{
-    m_Fitness = fitness;
-}
-
-
-
-size_t
-Entity::GetGenerationId() const
-{
-    return m_GenerationId;
-}
-
-
-
-size_t
-Entity::GetSpeciesId() const
-{
-    return m_SpeciesId;
-}
-
-
-
-int
-Entity::GetType() const
-{
-    return m_Type;
-}
-
-
-
-void
-Entity::AddNetwork( std::vector< Cell* >& network, const size_t generation_id, const size_t species_id )
+Entity::AddNetwork( std::vector< Cell* >& network )
 {
     m_Network = network;
-    m_GenerationId = generation_id;
-    m_SpeciesId = species_id;
 }
 
 
@@ -306,20 +259,4 @@ Entity::GetSensorFood( const float x, const float y ) const
     rotation = q * rotation;
     rotation *= 5.0f;
     return EntityManager::getSingleton().FeelFood( m_X + rotation.x, m_Y + rotation.y );
-}
-
-
-
-float
-Entity::GetSensorEnemy( const float x, const float y ) const
-{
-    Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
-    Ogre::Quaternion q( 0.0f, 0.0f, 0.0f, 1.0f );
-    q.FromAngleAxis( Ogre::Radian( Ogre::Degree( m_Rotation ) ), Ogre::Vector3::UNIT_Z );
-    rotation.x = x;
-    rotation.y = y;
-    rotation.z = 0;
-    rotation = q * rotation;
-    rotation *= 5.0f;
-    return EntityManager::getSingleton().FeelEnemy( m_Type, m_X + rotation.x, m_Y + rotation.y );
 }

@@ -80,8 +80,6 @@
     <ClCompile Include="neuro\Cell.cpp" />
     <ClCompile Include="neuro\Entity.cpp" />
     <ClCompile Include="neuro\EntityManager.cpp" />
-    <ClCompile Include="neuro\Ontogenesis.cpp" />
-    <ClCompile Include="neuro\XmlGenerationFile.cpp" />
     <ClCompile Include="neuro\XmlNetworkFile.cpp" />
     <ClCompile Include="social\Person.cpp" />
     <ClCompile Include="social\SocialManager.cpp" />
@@ -217,15 +215,10 @@
     <ClInclude Include="neuro\Entity.h" />
     <ClInclude Include="neuro\EntityManager.h" />
     <ClInclude Include="neuro\EntityManagerCommands.h" />
-    <ClInclude Include="neuro\Ontogenesis.h" />
-    <ClInclude Include="neuro\XmlGenerationFile.h" />
     <ClInclude Include="neuro\XmlNetworkFile.h" />
     <ClInclude Include="social\Person.h" />
     <ClInclude Include="social\SocialManager.h" />
     <ClInclude Include="social\SocialManagerCommands.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="neuro\idea.txt" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E51D599E-B1F2-45CA-A98A-1A12140EDC45}</ProjectGuid>

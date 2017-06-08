@@ -29,18 +29,41 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
         return;
     }
 
+    std::vector< Cell* > network;
+
     node = node->FirstChild();
     while( node != NULL )
     {
         if( node->Type() == TiXmlNode::TINYXML_ELEMENT && node->ValueStr() == "neuron" )
         {
-            Cell* cell = new Cell( entity, Cell::NEURON_COMMON, GetInt( node, "x" ), GetInt( node, "y" ) );
-            species.network.push_back( cell );
+            Cell* cell;
+            Ogre::String type = GetString( node, "type" );
+
+            if( type == "sensor_food" )
+            {
+                cell = new Cell( entity, Cell::SENSOR_FOOD, GetInt( node, "x" ), GetInt( node, "y" ) );
+            }
+            else if( type == "activator_forward" )
+            {
+                cell = new Cell( entity, Cell::ACTIVATOR_FORWARD, GetInt( node, "x" ), GetInt( node, "y" ) );
+            }
+            else if( type == "activator_right" )
+            {
+                cell = new Cell( entity, Cell::ACTIVATOR_RIGHT, GetInt( node, "x" ), GetInt( node, "y" ) );
+            }
+            else if( type == "activator_left" )
+            {
+                cell = new Cell( entity, Cell::ACTIVATOR_LEFT, GetInt( node, "x" ), GetInt( node, "y" ) );
+            }
+            else
+            {
+                cell = new Cell( entity, Cell::NEURON_COMMON, GetInt( node, "x" ), GetInt( node, "y" ) );
+            }
+
+            network.push_back( cell );
         }
         node = node->NextSibling();
     }
-
-    std::vector< Cell* > network;
 
     unsigned int self_id = 0;
     node = m_File.RootElement()->FirstChild();
@@ -61,4 +84,6 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
         }
         node = node->NextSibling();
     }
+
+    entity->AddNetwork( network );
 }

@@ -1,5 +1,6 @@
 #include "EntityManager.h"
 #include "EntityManagerCommands.h"
+#include "XmlNetworkFile.h"
 
 #include "../core/DebugDraw.h"
 #include "../core/InputManager.h"
@@ -12,7 +13,7 @@ template<>EntityManager *Ogre::Singleton< EntityManager >::msSingleton = NULL;
 
 
 
-const float SPAWN_TIME = 0;
+const float SPAWN_TIME = 3;
 const size_t MAX_ENTITY = 20;
 const size_t MAX_FOOD = 50;
 const float FOOD_TIME = 0;
@@ -20,8 +21,6 @@ const float FOOD_TIME = 0;
 
 
 EntityManager::EntityManager():
-    m_TypeNum0( 0 ),
-    m_TypeNum1( 0 ),
     m_X( 100.0f ),
     m_Y( 400.0f ),
     m_Width( 1080.0f ),
@@ -124,36 +123,11 @@ EntityManager::Update()
                     float energy = entity->GetEnergy() + ( *it ).power;
                     energy = ( energy > 100.0f) ? 100.0f : energy;
                     entity->SetEnergy( energy );
-                    entity->SetFitness( entity->GetFitness() + ( *it ).power );
                     it = m_Food.erase( it );
                 }
                 else
                 {
                     ++it;
-                }
-            }
-
-            // check entity / entity collision
-            int type = entity->GetType();
-            for( size_t j = 0; j < m_Entity.size(); ++j )
-            {
-                if( m_Entity[ j ]->GetType() != type )
-                {
-                    float x1 = m_Entity[ j ]->GetX();
-                    float y1 = m_Entity[ j ]->GetY();
-                    float radius1 = m_Entity[ j ]->GetRadius();
-                    float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
-                    if( distance <= radius + radius1 )
-                    {
-                        if( radius >= radius1 )
-                        {
-                            float energy = entity->GetEnergy() + m_Entity[ j ]->GetEnergy();
-                            energy = ( energy > 100.0f) ? 100.0f : energy;
-                            entity->SetEnergy( energy );
-                            entity->SetFitness( entity->GetFitness() + m_Entity[ j ]->GetEnergy() );
-                            m_Entity[ j ]->SetEnergy( 0 );
-                        }
-                    }
                 }
             }
         }
@@ -166,12 +140,6 @@ EntityManager::Update()
     {
         if( ( ( *it )->GetEnergy() <= 0 ) || ( ( *it )->IsDead() == true ) )
         {
-            switch( ( *it )->GetType() )
-            {
-                case 0: --m_TypeNum0; break;
-                case 1: --m_TypeNum1; break;
-            }
-
             delete ( *it );
             it = m_Entity.erase( it );
         }
@@ -186,7 +154,7 @@ EntityManager::Update()
     if( m_SpawnTime <= 0 && m_Entity.size() < MAX_ENTITY )
     {
         Entity* entity;
-        entity = new Entity( 1, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
+        entity = new Entity( m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
         XmlNetworkFile* network = new XmlNetworkFile( "data/network.xml" );
         network->LoadNetwork( entity );
         delete network;
@@ -199,7 +167,7 @@ EntityManager::Update()
     if( m_NextFoodTime <= 0 && m_Food.size() < MAX_FOOD )
     {
         Food food;
-        food.power = 5 + rand() % 20;
+        food.power = 10 + rand() % 20;
         food.x = m_X + rand() % ( int )m_Width;
         food.y = m_Y + rand() % ( int )m_Height;
         m_Food.push_back( food );
@@ -222,20 +190,9 @@ EntityManager::Draw()
     DEBUG_DRAW.Line( m_X, m_Y, m_X + m_Width, m_Y );
     DEBUG_DRAW.Line( m_X, m_Y + m_Height, m_X + m_Width, m_Y + m_Height );
 
-    int type0 = 0;
-    int type1 = 0;
     for( size_t i = 0; i < m_Entity.size(); ++i )
     {
-        if( m_Entity[ i ]->GetType() == 0 )
-        {
-            m_Entity[ i ]->Draw( 50 + type0 * 120, 120 );
-            ++type0;
-        }
-        else
-        {
-            m_Entity[ i ]->Draw( 50 + type1 * 120, 300 );
-            ++type1;
-        }
+        m_Entity[ i ]->Draw( 50 + i * 120, 120 );
     }
 
     for( size_t i = 0; i < m_Food.size(); ++i )
@@ -265,29 +222,6 @@ EntityManager::FeelFood( const float x, const float y )
         if( distance < radius )
         {
             ret += 1.0f - distance / radius;
-        }
-    }
-    return ( ret > 1.0f ) ? 1.0f: ret;
-}
-
-
-
-float
-EntityManager::FeelEnemy( const int type, const float x, const float y )
-{
-    float ret = 0.0f;
-    for( size_t i = 0; i < m_Entity.size(); ++i )
-    {
-        if( m_Entity[ i ]->GetType() != type )
-        {
-            float x1 = m_Entity[ i ]->GetX();
-            float y1 = m_Entity[ i ]->GetY();
-            float radius = m_Entity[ i ]->GetEnergy();
-            float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
-            if( distance < radius )
-            {
-                ret += 1.0f - distance / radius;
-            }
         }
     }
     return ( ret > 1.0f ) ? 1.0f: ret;
