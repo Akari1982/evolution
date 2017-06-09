@@ -34,6 +34,7 @@ public:
     void SetEnergy( const float energy );
 
     void AddNetwork( std::vector< Cell* >& network );
+    std::vector< Cell* >& GetNetwork();
 
     float GetSensorFood( const float x, const float y ) const;
 

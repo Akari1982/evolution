@@ -28,6 +28,8 @@ public:
 
     Cell( Entity* entity, const float x, const float y );
     virtual ~Cell();
+    void Copy( Cell* cell );
+
     void Update();
     void UpdateFire();
     void Draw( const float ui_x, const float ui_y, const float x, const float y, const Ogre::Quaternion& rotation );

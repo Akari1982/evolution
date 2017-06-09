@@ -230,6 +230,14 @@ Entity::AddNetwork( std::vector< Cell* >& network )
 
 
 
+std::vector< Cell* >&
+Entity::GetNetwork()
+{
+    return m_Network;
+}
+
+
+
 float
 Entity::GetSensorFood( const float x, const float y ) const
 {

@@ -28,6 +28,27 @@ Cell::~Cell()
 
 
 void
+Cell::Copy( Cell* cell )
+{
+    m_X = cell->m_X;
+    m_Y = cell->m_Y;
+
+    for( size_t i = 0; i < cell->m_Synapses.size(); ++i )
+    {
+        //AddSynapse( const float power, const bool inverted, Cell* cell )
+        //AddFoodSynapse( const float power, const bool inverted )
+    }
+
+    for( size_t i = 0; i < cell->m_Activators.size(); ++i )
+    {
+        //AddMoveActivator( const float move )
+        //AddRotateActivator( const float rotate )
+    }
+}
+
+
+
+void
 Cell::Update()
 {
     for( size_t i = 0; i < m_Synapses.size(); ++i )
@@ -164,54 +185,6 @@ Cell::Draw( const float ui_x, const float ui_y, const float x, const float y, co
             DEBUG_DRAW.Circle( x + pos.x, y + pos.y, radius );
         }
     }
-}
-
-
-
-const Cell::CellName
-Cell::GetName() const
-{
-    return m_Name;
-}
-
-
-
-const Cell::CellType
-Cell::GetType() const
-{
-    return m_Type;
-}
-
-
-
-float
-Cell::GetX() const
-{
-    return m_X;
-}
-
-
-
-void
-Cell::SetX( const float x )
-{
-    m_X = x;
-}
-
-
-
-float
-Cell::GetY() const
-{
-    return m_Y;
-}
-
-
-
-void
-Cell::SetY( const float y )
-{
-    m_Y = y;
 }
 
 
