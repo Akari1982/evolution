@@ -13,10 +13,8 @@ template<>EntityManager *Ogre::Singleton< EntityManager >::msSingleton = NULL;
 
 
 
-const float SPAWN_TIME = 3;
 const size_t MAX_ENTITY = 20;
 const size_t MAX_FOOD = 50;
-const float FOOD_TIME = 0;
 
 
 
@@ -24,9 +22,7 @@ EntityManager::EntityManager():
     m_X( 100.0f ),
     m_Y( 400.0f ),
     m_Width( 1080.0f ),
-    m_Height( 300.0f ),
-    m_NextFoodTime( FOOD_TIME ),
-    m_SpawnTime( SPAWN_TIME )
+    m_Height( 300.0f )
 {
     InitCommands();
 }
@@ -54,8 +50,6 @@ void
 EntityManager::Update()
 {
     float delta = Timer::getSingleton().GetGameTimeDelta();
-    m_NextFoodTime -= delta;
-    m_SpawnTime -= delta;
 
     for( size_t i = 0; i < m_Entity.size(); ++i )
     {
@@ -65,70 +59,61 @@ EntityManager::Update()
 
 
         // perform movement
-        float start_x = entity->GetX();
-        float start_y = entity->GetY();
         float rotation = entity->GetRotation();
-        float forward_impulse = entity->GetForwardImpulse();
-        float left_impulse = entity->GetLeftImpulse();
-        float right_impulse = entity->GetRightImpulse();
-        if( left_impulse > 0.0f )
+        float move_time = entity->GetMoveTime();
+        float rotate_time = entity->GetRotateTime();
+        if( rotate_time > 0.0f )
         {
-            rotation -= 90.0f * delta;
+            float rotate_power = entity->GetRotatePower();
+            rotation += 90.0f * delta * rotate_power;
             if( rotation < 0.0f )
             {
                 rotation = ceil( -rotation / 360.0f ) * 360.0 - rotation;
             }
             entity->SetRotation( rotation );
-            left_impulse -= delta;
-            left_impulse = ( left_impulse < 0.0f ) ? 0.0f : left_impulse;
-            entity->SetLeftImpulse( left_impulse );
+            rotate_time -= delta;
+            rotate_time = ( rotate_time < 0.0f ) ? 0.0f : rotate_time;
+            entity->SetRotate( rotate_power, rotate_time );
         }
-        if( right_impulse > 0.0f )
+        if( move_time > 0.0f )
         {
-            rotation += 90.0f * delta;
-            if( rotation > 360.0f )
-            {
-                rotation -= ceil( rotation / 360.0f ) * 360.0;
-            }
-            entity->SetRotation( rotation );
-            right_impulse -= delta;
-            right_impulse = ( right_impulse < 0.0f ) ? 0.0f : right_impulse;
-            entity->SetRightImpulse( right_impulse );
-        }
-        if( forward_impulse > 0.0f )
-        {
-            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
-            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
+            float start_x = entity->GetX();
+            float start_y = entity->GetY();
+            float move_power = entity->GetMovePower();
+            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * move_power * 20.0f;
+            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * move_power * 20.0f;
             pos_x = ( pos_x < m_X ) ? m_Width + pos_x : pos_x;
             pos_x = ( pos_x > m_X + m_Width ) ? 2 * m_X + m_Width - pos_x : pos_x;
             pos_y = ( pos_y < m_Y ) ? m_Height + pos_y : pos_y;
             pos_y = ( pos_y > m_Y + m_Height ) ? 2 * m_Y + m_Height - pos_y : pos_y;
             entity->SetX( pos_x );
             entity->SetY( pos_y );
-            forward_impulse -= delta;
-            forward_impulse = ( forward_impulse < 0.0f ) ? 0.0f : forward_impulse;
-            entity->SetForwardImpulse( forward_impulse );
+            move_time -= delta;
+            move_time = ( move_time < 0.0f ) ? 0.0f : move_time;
+            entity->SetMove( move_power, move_time );
+        }
 
-            // check entity / food collision
-            float radius = entity->GetRadius();
-            float x = entity->GetX();
-            float y = entity->GetY();
-            for( std::vector< Food >::iterator it = m_Food.begin(); it != m_Food.end(); )
+
+
+        // check entity+food collision
+        float radius = entity->GetRadius();
+        float x = entity->GetX();
+        float y = entity->GetY();
+        for( std::vector< Food >::iterator it = m_Food.begin(); it != m_Food.end(); )
+        {
+            float x1 = ( *it ).x;
+            float y1 = ( *it ).y;
+            float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
+            if( distance <= radius )
             {
-                float x1 = ( *it ).x;
-                float y1 = ( *it ).y;
-                float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
-                if( distance <= radius )
-                {
-                    float energy = entity->GetEnergy() + ( *it ).power;
-                    energy = ( energy > 100.0f) ? 100.0f : energy;
-                    entity->SetEnergy( energy );
-                    it = m_Food.erase( it );
-                }
-                else
-                {
-                    ++it;
-                }
+                float energy = entity->GetEnergy() + ( *it ).power;
+                energy = ( energy > 100.0f ) ? 100.0f : energy;
+                entity->SetEnergy( energy );
+                it = m_Food.erase( it );
+            }
+            else
+            {
+                ++it;
             }
         }
     }
@@ -151,27 +136,47 @@ EntityManager::Update()
 
 
 
-    if( m_SpawnTime <= 0 && m_Entity.size() < MAX_ENTITY )
+    if( m_Entity.size() < MAX_ENTITY )
     {
-        Entity* entity;
-        entity = new Entity( m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
-        XmlNetworkFile* network = new XmlNetworkFile( "data/network.xml" );
-        network->LoadNetwork( entity );
-        delete network;
-        m_Entity.push_back( entity );
-        m_SpawnTime = SPAWN_TIME;
+        bool born = false;
+
+        for( size_t i = 0; i < m_Entity.size(); ++i )
+        {
+            Entity* entity = m_Entity[ i ];
+            if( entity->GetEnergy() >= 80.0f )
+            {
+                entity->SetEnergy( 20.0f );
+
+                Entity* child;
+                child = new Entity( entity->GetX(), entity->GetY() );
+                XmlNetworkFile* network = new XmlNetworkFile( "data/network.xml" );
+                network->LoadNetwork( child );
+                delete network;
+                m_Entity.push_back( child );
+                born = true;
+            }
+        }
+
+        if( born == false )
+        {
+            Entity* entity;
+            entity = new Entity( m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
+            XmlNetworkFile* network = new XmlNetworkFile( "data/network.xml" );
+            network->LoadNetwork( entity );
+            delete network;
+            m_Entity.push_back( entity );
+        }
     }
 
 
 
-    if( m_NextFoodTime <= 0 && m_Food.size() < MAX_FOOD )
+    if( m_Food.size() < MAX_FOOD )
     {
         Food food;
         food.power = 10 + rand() % 20;
         food.x = m_X + rand() % ( int )m_Width;
         food.y = m_Y + rand() % ( int )m_Height;
         m_Food.push_back( food );
-        m_NextFoodTime = FOOD_TIME;
     }
 
 

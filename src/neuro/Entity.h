@@ -22,12 +22,12 @@ public:
     float GetRotation() const;
     void SetRotation( const float rotation );
 
-    float GetForwardImpulse() const;
-    void SetForwardImpulse( const float forward_impulse );
-    float GetLeftImpulse() const;
-    void SetLeftImpulse( const float left_impulse );
-    float GetRightImpulse() const;
-    void SetRightImpulse( const float right_impulse );
+    float GetMovePower() const;
+    float GetMoveTime() const;
+    void SetMove( const float power, const float time );
+    float GetRotatePower() const;
+    float GetRotateTime() const;
+    void SetRotate( const float power, const float time );
 
     bool IsDead() const;
     float GetEnergy() const;
@@ -35,7 +35,6 @@ public:
 
     void AddNetwork( std::vector< Cell* >& network );
 
-    float GetSensorEnergy() const;
     float GetSensorFood( const float x, const float y ) const;
 
 private:
@@ -47,9 +46,10 @@ private:
     float m_Y;
     float m_Rotation;
 
-    float m_ForwardImpulse;
-    float m_LeftImpulse;
-    float m_RightImpulse;
+    float m_MovePower;
+    float m_MoveTime
+    float m_RotatePower;
+    float m_RotateTime;
 
     float m_Life;
     float m_Energy;

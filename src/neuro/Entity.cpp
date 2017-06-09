@@ -12,11 +12,14 @@ Entity::Entity( const float x, const float y ):
     m_X( x ),
     m_Y( y ),
     m_Rotation( 0.0f ),
-    m_ForwardImpulse( 0.0f ),
-    m_LeftImpulse( 0.0f ),
-    m_RightImpulse( 0.0f ),
+    m_MovePower( 0.0f ),
+    m_MoveTime( 0.0f ),
+    m_RotatePower( 0.0f ),
+    m_RotateTime( 0.0f ),
+
     m_Life( 100.0f ),
     m_Energy( 20.0f ),
+
     m_Think( 0.1f )
 {
     m_Rotation = ( float )( rand() % 360 );
@@ -46,11 +49,16 @@ Entity::Update()
         {
             m_Network[ i ]->Update();
         }
+        for( size_t i = 0; i < m_Network.size(); ++i )
+        {
+            m_Network[ i ]->UpdateFire();
+        }
 
         m_Think = 0.1f;
     }
 
     m_Life -= delta;
+
     SetEnergy( m_Energy - delta );
 }
 
@@ -63,31 +71,12 @@ Entity::Draw( const float x, const float y )
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
     DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
 
-    // draw energy
-    // DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 0, 1 ) );
-    // DEBUG_DRAW.SetTextAlignment( DebugDraw::CENTER );
-    // DEBUG_DRAW.Text( m_X, m_Y - 8, IntToString( ( int )m_Energy ) );
-    // DEBUG_DRAW.SetTextAlignment( DebugDraw::LEFT );
-
     // draw network
     for( size_t i = 0; i < m_Network.size(); ++i )
     {
-        m_Network[ i ]->Draw( x, y );
-
-        Cell::CellName name = m_Network[ i ]->GetName();
-        if( name == Cell::SENSOR_FOOD )
-        {
-            Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
-            Ogre::Quaternion q( 0.0f, 0.0f, 0.0f, 1.0f );
-            q.FromAngleAxis( Ogre::Radian( Ogre::Degree( m_Rotation ) ), Ogre::Vector3::UNIT_Z );
-            rotation.x = m_Network[ i ]->GetX();
-            rotation.y = m_Network[ i ]->GetY();
-            rotation.z = 0;
-            rotation = q * rotation;
-            rotation *= 5.0f;
-            DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 0.4f ) );
-            DEBUG_DRAW.Line( m_X, m_Y, m_X + rotation.x, m_Y + rotation.y );
-        }
+        Ogre::Quaternion rotation( 0.0f, 0.0f, 0.0f, 1.0f );
+        rotation.FromAngleAxis( Ogre::Radian( Ogre::Degree( m_Rotation ) ), Ogre::Vector3::UNIT_Z );
+        m_Network[ i ]->Draw( x, y, m_X, m_Y, rotation );
     }
 
     // line connecting neural network and entity
@@ -96,7 +85,7 @@ Entity::Draw( const float x, const float y )
 
     // draw info about entity
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-    DEBUG_DRAW.Text( x - 40, y - 90, "life:" + IntToString( ( int )m_Life ) + "" );
+    DEBUG_DRAW.Text( x - 40, y - 90, "Life:" + IntToString( ( int )m_Life ) + "" );
 }
 
 
@@ -158,49 +147,51 @@ Entity::SetRotation( const float rotation )
 
 
 float
-Entity::GetForwardImpulse() const
+Entity::GetMovePower() const
 {
-    return m_ForwardImpulse;
-}
-
-
-
-void
-Entity::SetForwardImpulse( const float forward_impulse )
-{
-    m_ForwardImpulse = forward_impulse;
+    return m_Move;
 }
 
 
 
 float
-Entity::GetLeftImpulse() const
+Entity::GetMoveTime() const
 {
-    return m_LeftImpulse;
+    return m_MoveTime;
 }
 
 
 
 void
-Entity::SetLeftImpulse( const float left_impulse )
+Entity::SetMove( const float power, const float time )
 {
-    m_LeftImpulse = left_impulse;
+    m_MovePower = power;
+    m_MoveTime = time;
 }
 
 
 
 float
-Entity::GetRightImpulse() const
+Entity::GetRotatePower() const
 {
-    return m_RightImpulse;
+    return m_RotatePower;
+}
+
+
+
+float
+Entity::GetRotateTime() const
+{
+    return m_RotateTime;
 }
 
 
 
 void
-Entity::SetRightImpulse( const float right_impulse )
+Entity::SetRotate( const float power, const float time )
 {
-    m_RightImpulse = right_impulse;
+    m_RotatePower = power;
+    m_RotateTime = time;
 }
 
 
@@ -240,14 +231,6 @@ Entity::AddNetwork( std::vector< Cell* >& network )
 
 
 float
-Entity::GetSensorEnergy() const
-{
-    return m_Energy / 100.0f;
-}
-
-
-
-float
 Entity::GetSensorFood( const float x, const float y ) const
 {
     Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
@@ -257,6 +240,5 @@ Entity::GetSensorFood( const float x, const float y ) const
     rotation.y = y;
     rotation.z = 0;
     rotation = q * rotation;
-    rotation *= 5.0f;
     return EntityManager::getSingleton().FeelFood( m_X + rotation.x, m_Y + rotation.y );
 }

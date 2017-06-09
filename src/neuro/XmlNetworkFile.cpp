@@ -39,11 +39,7 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
             Cell* cell;
             Ogre::String type = GetString( node, "type" );
 
-            if( type == "sensor_food" )
-            {
-                cell = new Cell( entity, Cell::SENSOR_FOOD, GetInt( node, "x" ), GetInt( node, "y" ) );
-            }
-            else if( type == "activator_forward" )
+            if( type == "activator_forward" )
             {
                 cell = new Cell( entity, Cell::ACTIVATOR_FORWARD, GetInt( node, "x" ), GetInt( node, "y" ) );
             }
@@ -76,7 +72,27 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
             {
                 if( node2->Type() == TiXmlNode::TINYXML_ELEMENT && node2->ValueStr() == "synapse" )
                 {
-                    network[ self_id ]->AddSynapse( GetFloat( node2, "power" ), GetBool( node2, "inverted", false ), network[ GetInt( node2, "neuron_id" ) ] );
+                    Ogre::String type = GetString( node2, "type" );
+                    if( type == "food" )
+                    {
+                        network[ self_id ]->AddFoodSynapse( GetFloat( node2, "power" ), GetBool( node2, "inverted", false ) );
+                    }
+                    else
+                    {
+                        network[ self_id ]->AddSynapse( GetFloat( node2, "power" ), GetBool( node2, "inverted", false ), network[ GetInt( node2, "neuron_id" ) ] );
+                    }
+                }
+                if( node2->Type() == TiXmlNode::TINYXML_ELEMENT && node2->ValueStr() == "activator" )
+                {
+                    Ogre::String type = GetString( node2, "type" );
+                    if( type == "move" )
+                    {
+                        network[ self_id ]->AddMoveActivator( GetFloat( node2, "move" ) );
+                    }
+                    else if( type == "rotate" )
+                    {
+                        network[ self_id ]->AddRotateActivator( GetFloat( node2, "rotate" ) );
+                    }
                 }
                 node2 = node2->NextSibling();
             }

@@ -9,24 +9,14 @@
 
 
 
-Cell::Cell( Entity* entity, const CellName name, const float x, const float y ):
+Cell::Cell( Entity* entity, const float x, const float y ):
     m_Entity( entity ),
-    m_Name( name ),
     m_X( x ),
     m_Y( y ),
     m_Threshold( 1.0f ),
     m_Value( 0.0f ),
     m_Fired( false )
 {
-    switch( name )
-    {
-        case NEURON_COMMON:     m_Type = NEURON;    break;
-        case SENSOR_FOOD:       m_Type = SENSOR;    break;
-        case SENSOR_ENERGY:     m_Type = SENSOR;    break;
-        case ACTIVATOR_FORWARD: m_Type = ACTIVATOR; break;
-        case ACTIVATOR_LEFT:    m_Type = ACTIVATOR; break;
-        case ACTIVATOR_RIGHT:   m_Type = ACTIVATOR; break;
-    }
 }
 
 
@@ -40,63 +30,71 @@ Cell::~Cell()
 void
 Cell::Update()
 {
+    for( size_t i = 0; i < m_Synapses.size(); ++i )
+    {
+        float value = 0.0f;
+
+        switch( m_Synapses[ i ].type )
+        {
+            case SYN_FOOD:
+            {
+                value = m_Entity->GetSensorFood( m_X, m_Y );
+                m_Synapses[ i ].activated = true;
+            }
+            break;
+            case SYN_NEURON:
+            {
+                if( m_Synapses[ i ].cell->m_Fired == true )
+                {
+                    value = 1.0f;
+                    m_Synapses[ i ].activated = true;
+                }
+            }
+            break;
+        }
+
+        if( m_Synapses[ i ].inverted == false )
+        {
+            m_Value += value * m_Synapses[ i ].power;
+        }
+        else
+        {
+            m_Value += ( 1 - value ) * m_Synapses[ i ].power;
+        }
+    }
+}
+
+
+
+void
+Cell::UpdateFire()
+{
     if( m_Fired == true )
     {
         m_Fired = false;
     }
     else
     {
-        switch( m_Name )
-        {
-            case NEURON_COMMON:
-            {
-                for( size_t i = 0; i < m_Synapses.size(); ++i )
-                {
-                    if( m_Synapses[ i ].cell->m_Fired == true )
-                    {
-                        if( m_Synapses[ i ].inverted == false )
-                        {
-                            m_Value += m_Synapses[ i ].power;
-                        }
-                        else
-                        {
-                            m_Value -= m_Synapses[ i ].power;
-                            m_Value = ( m_Value < 0 ) ? 0 : m_Value;
-                        }
-                    }
-                }
-            }
-            break;
-
-            case SENSOR_ENERGY:
-            {
-                m_Value += m_Entity->GetSensorEnergy();
-            }
-            break;
-
-            case SENSOR_FOOD:
-            {
-                m_Value += m_Entity->GetSensorFood( m_X, m_Y );
-            }
-            break;
-        }
-
         if( m_Value >= m_Threshold )
         {
             m_Value = 0.0f;
             m_Fired = true;
 
-            if( m_Name == ACTIVATOR_FORWARD )
+            for( size_t i = 0; i < m_Activators.size(); ++i )
             {
-                m_Entity->SetForwardImpulse( 1.0f );
-            }
-            else if( m_Name == ACTIVATOR_LEFT )
-            {
-                 m_Entity->SetLeftImpulse( 1.0f );
-            }
-            else if( m_Name == ACTIVATOR_RIGHT )
-            {
-                 m_Entity->SetRightImpulse( 1.0f );
+                switch( m_Activators[ i ].type )
+                {
+                    case ACT_MOVE:
+                    {
+                        m_Entity->SetMove( m_Activators[ i ].move, 0.5f );
+                    }
+                    break;
+                    case ACT_ROTATE:
+                    {
+                        m_Entity->SetRotate( m_Activators[ i ].rotate, 0.5f );
+                    }
+                    break;
+                }
             }
         }
     }
@@ -105,48 +103,66 @@ Cell::Update()
 
 
 void
-Cell::Draw( const float x, const float y )
+Cell::Draw( const float ui_x, const float ui_y, const float x, const float y, const Ogre::Quaternion& rotation )
 {
     float scale = 8.0f;
 
+    // pos of cell related to entity pos
+    Ogre::Vector3 pos( m_X, m_Y, 0.0f );
+    pos = rotation * pos;
+
+    // draw neuron
     if( m_Fired == true )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
+    }
+    else if( m_Activators.size() > 0 )
+    {
+        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 1 ) );
     }
     else
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
     }
     float radius = 2.0f;
-    DEBUG_DRAW.Disc( x + m_X * scale, y + m_Y * scale, radius );
+    DEBUG_DRAW.Disc( ui_x + m_X * scale, ui_y + m_Y * scale, radius );
+    DEBUG_DRAW.Disc( x + pos.x, y + pos.y, radius );
 
-    if( m_Type == ACTIVATOR )
-    {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 0, 1 ) );
-    }
-    else if( m_Type == SENSOR )
-    {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
-    }
-    else
-    {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-    }
-    radius = 5.0f;
-    DEBUG_DRAW.Circle( x + m_X * scale, y + m_Y * scale, radius );
-
+    // draw all synapses
     for( size_t i = 0; i < m_Synapses.size(); ++i )
     {
         Cell* cell = m_Synapses[ i ].cell;
-        if( cell->m_Fired == true )
+        if( m_Synapses[ i ].type == SYN_NEURON )
         {
-            DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
+            if( m_Synapses[ i ].activated == true )
+            {
+                DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
+                m_Synapses[ i ].activated = false;
+            }
+            else
+            {
+                DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+            }
+            DEBUG_DRAW.Line( ui_x + m_X * scale, ui_y + m_Y * scale, ui_x + cell->m_X * scale, ui_y + cell->m_Y * scale );
+            Ogre::Vector3 pos2( cell->m_X, cell->m_Y, 0.0f );
+            pos2 = rotation * pos2;
+            DEBUG_DRAW.Line( x + pos.x, y + pos.y, x + pos2.x, y + pos2.y );
         }
-        else
+        else if( cell->type == SYN_FOOD )
         {
-            DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+            if( m_Synapses[ i ].activated == true )
+            {
+                DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
+                m_Synapses[ i ].activated = false;
+            }
+            else
+            {
+                DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
+            }
+            radius = 5.0f;
+            DEBUG_DRAW.Circle( ui_x + m_X * scale, ui_y + m_Y * scale, radius );
+            DEBUG_DRAW.Circle( x + pos.x, y + pos.y, radius );
         }
-        DEBUG_DRAW.Line( x + m_X * scale, y + m_Y * scale, x + cell->m_X * scale, y + cell->m_Y * scale );
     }
 }
 
@@ -204,43 +220,45 @@ void
 Cell::AddSynapse( const float power, const bool inverted, Cell* cell )
 {
     Synapse synapse;
-
-    bool found = false;
-    for( size_t i = 0; i < m_Synapses.size(); ++i )
-    {
-        if( ( m_Synapses[ i ].cell == cell ) && ( m_Synapses[ i ].inverted == inverted ) )
-        {
-            synapse = m_Synapses[ i ];
-            found = true;
-        }
-    }
-
-    if( found == true )
-    {
-        synapse.power += power;
-    }
-    else
-    {
-        synapse.power = power;
-        synapse.inverted = inverted;
-        synapse.cell = cell;
-        m_Synapses.push_back( synapse );
-    }
+    synapse.type = SYN_NEURON;
+    synapse.power = power;
+    synapse.inverted = inverted;
+    synapse.cell = cell;
+    synapse.activated = false;
+    m_Synapses.push_back( synapse );
 }
 
 
 
-Ogre::String
-Cell::CellTypeToString( const CellType type )
+void
+Cell::AddFoodSynapse( const float power, const bool inverted )
 {
-    switch( type )
-    {
-        case NEURON: return "NEURON";
-        case SENSOR_FOOD: return "SENSOR_FOOD";
-        case SENSOR_ENERGY: return "SENSOR_ENERGY";
-        case ACTIVATOR_FORWARD: return "ACTIVATOR_FORWARD";
-        case ACTIVATOR_LEFT: return "ACTIVATOR_LEFT";
-        case ACTIVATOR_RIGHT: return "ACTIVATOR_RIGHT";
-    }
-    return "UNKNOWN";
+    Synapse synapse;
+    synapse.type = SYN_FOOD;
+    synapse.power = power;
+    synapse.inverted = inverted;
+    synapse.activated = false;
+    m_Synapses.push_back( synapse );
+}
+
+
+
+void
+Cell::AddMoveActivator( const float move )
+{
+    Activator activator;
+    activator.type = ACT_MOVE;
+    activator.move = move;
+    m_Activators.push_back( activator );
+}
+
+
+
+void
+Cell::AddRotateActivator( const float rotate )
+{
+    Activator activator;
+    activator.type = ACT_MOVE;
+    activator.rotate = rotate;
+    m_Activators.push_back( activator );
 }

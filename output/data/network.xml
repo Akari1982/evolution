@@ -1,15 +1,21 @@
 <network>
-    <neuron type="sensor_food" x="5" y="-3" />
-    <neuron type="sensor_food" x="5" y="3" />
-    <neuron type="activator_forward" x="-2" y="0">
+    <neuron x="5" y="-3">
+        <synapse power="1" type="food" />
+    </neuron>
+    <neuron x="5" y="3">
+        <synapse power="1" type="food" />
+    </neuron>
+    <neuron x="-2" y="0">
         <synapse power="1" neuron_id="0" />
         <synapse power="1" neuron_id="1" />
+        <activator type="move" move="1" >
     </neuron>
-    <neuron type="activator_right" x="-2" y="-3">
+    <neuron x="-2" y="-3">
         <synapse power="1" neuron_id="0" />
+        <activator type="rotate" rotate="1" >
     </neuron>
-    <neuron type="activator_left" x="-2" y="3">
+    <neuron x="-2" y="3">
         <synapse power="1" neuron_id="1" />
+        <activator type="rotate" rotate="-1" >
     </neuron>
-
 </network>

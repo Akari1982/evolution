@@ -15,45 +15,34 @@ class Entity;
 class Cell
 {
 public:
-    enum CellName
+    enum SynapseType
     {
-        NEURON_COMMON = 0,
-        SENSOR_FOOD,
-        SENSOR_ENERGY,
-        ACTIVATOR_FORWARD,
-        ACTIVATOR_LEFT,
-        ACTIVATOR_RIGHT
+        SYN_NEURON,
+        SYN_FOOD,
     };
-    enum CellType
+    enum ActivatorType
     {
-        NEURON = 0,
-        SENSOR,
-        ACTIVATOR
+        ACT_MOVE,
+        ACT_ROTATE,
     };
 
-    Cell( Entity* entity, const CellName name, const float x, const float y );
+    Cell( Entity* entity, const float x, const float y );
     virtual ~Cell();
     void Update();
-    void Draw( const float x, const float y );
-
-    const CellName GetName() const;
-    const CellType GetType() const;
-    float GetX() const;
-    void SetX( const float x );
-    float GetY() const;
-    void SetY( const float y );
+    void UpdateFire();
+    void Draw( const float ui_x, const float ui_y, const float x, const float y, const Ogre::Quaternion& rotation );
 
     void AddSynapse( const float power, const bool inverted, Cell* cell );
+    void AddFoodSynapse( const float power, const bool inverted );
 
-    static Ogre::String CellTypeToString( const CellType type );
+    void AddMoveActivator( const float move );
+    void AddRotateActivator( const float rotate );
 
 private:
     Cell();
 
 protected:
     Entity* m_Entity;
-    CellName m_Name;
-    CellType m_Type;
 
     float m_X;
     float m_Y;
@@ -64,12 +53,21 @@ protected:
 
     struct Synapse
     {
+        SynapseType type;
         float power;
         bool inverted;
         Cell* cell;
+        bool activated;
     };
-
     std::vector< Synapse > m_Synapses;
+
+    struct Activator
+    {
+        ActivatorType type;
+        float move;
+        float rotate;
+    };
+    std::vector< Activator > m_Activators;
 };
 
 
