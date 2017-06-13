@@ -60,7 +60,7 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
                     }
                     else
                     {
-                        network[ self_id ]->AddSynapse( GetFloat( node2, "power" ), GetBool( node2, "inverted", false ), network[ GetInt( node2, "neuron_id" ) ] );
+                        network[ self_id ]->AddSynapse( GetFloat( node2, "power" ), GetBool( node2, "inverted", false ), GetInt( node2, "neuron_id" ) );
                     }
                 }
                 if( node2->Type() == TiXmlNode::TINYXML_ELEMENT && node2->ValueStr() == "activator" )
@@ -68,11 +68,11 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
                     Ogre::String type = GetString( node2, "type" );
                     if( type == "move" )
                     {
-                        network[ self_id ]->AddMoveActivator( GetFloat( node2, "move" ) );
+                        network[ self_id ]->AddMoveActivator( GetFloat( node2, "power" ) );
                     }
                     else if( type == "rotate" )
                     {
-                        network[ self_id ]->AddRotateActivator( GetFloat( node2, "rotate" ) );
+                        network[ self_id ]->AddRotateActivator( GetFloat( node2, "power" ) );
                     }
                 }
                 node2 = node2->NextSibling();
@@ -82,5 +82,94 @@ XmlNetworkFile::LoadNetwork( Entity* entity )
         node = node->NextSibling();
     }
 
-    entity->AddNetwork( network );
+    entity->SetNetwork( network );
+}
+
+
+
+void
+XmlNetworkFile::SaveNetwork( const Ogre::String& filename, Entity* entity )
+{
+    std::vector< int > parents = entity->GetParents();
+    std::vector< int > children = entity->GetChildren();
+    int name = entity->GetName();
+
+    Logger* dump = new Logger( filename );
+    dump->Log( "<network>\n" );
+    dump->Log( "    <entity name=\"" + IntToString( name ) + "\">\n" );
+    dump->Log( "        <parents>" );
+    for( size_t i = 0; i < parents.size(); ++i )
+    {
+        if( i > 0 )
+        {
+            dump->Log( " " );
+        }
+        dump->Log( IntToString( parents[ i ] ) );
+    }
+    dump->Log( "</parents>\n" );
+    dump->Log( "        <children>" );
+    for( size_t i = 0; i < children.size(); ++i )
+    {
+        if( i > 0 )
+        {
+            dump->Log( " " );
+        }
+        dump->Log( IntToString( children[ i ] ) );
+    }
+    dump->Log( "</children>\n" );
+    dump->Log( "    </entity>\n\n" );
+
+    std::vector< Cell* > net = entity->GetNetwork();
+    for( size_t i = 0; i < net.size(); ++i )
+    {
+        Cell* cell = net[ i ];
+        dump->Log( "    <neuron x=\"" + FloatToString( cell->m_X ) + "\" y=\"" + FloatToString( cell->m_Y ) + "\">\n" );
+
+        for( size_t i = 0; i < cell->m_Synapses.size(); ++i )
+        {
+            dump->Log( "        <synapse power=\"" + FloatToString( cell->m_Synapses[ i ].power ) + "\"" );
+            bool inverted = cell->m_Synapses[ i ].inverted;
+            if( inverted == true )
+            {
+                dump->Log( " inverted=\"true\"" );
+            }
+
+            switch( cell->m_Synapses[ i ].type )
+            {
+                case Cell::SYN_FOOD:
+                {
+                    dump->Log( " type=\"food\" />\n" );
+                }
+                break;
+                case Cell::SYN_NEURON:
+                {
+                    dump->Log( " neuron_id=\"" + IntToString( cell->m_Synapses[ i ].cell_id ) + "\" />\n" );
+                }
+                break;
+            }
+        }
+
+        for( size_t i = 0; i < cell->m_Activators.size(); ++i )
+        {
+            dump->Log( "        <activator power=\"" + FloatToString( cell->m_Activators[ i ].power ) + "\"" );
+            switch( cell->m_Activators[ i ].type )
+            {
+                case Cell::ACT_MOVE:
+                {
+                    dump->Log( " type=\"move\" />\n" );
+                }
+                break;
+                case Cell::ACT_ROTATE:
+                {
+                    dump->Log( " type=\"rotate\" />\n" );
+                }
+                break;
+            }
+        }
+
+        dump->Log( "    </neuron>\n" );
+    }
+
+    dump->Log( "</network>\n" );
+    delete dump;
 }

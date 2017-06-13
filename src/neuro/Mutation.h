@@ -6,7 +6,7 @@
 
 
 void
-NetworkMutation( Entity* parent, Entity* child );
+NetworkMutate( Entity* parent, Entity* child );
 
 
 

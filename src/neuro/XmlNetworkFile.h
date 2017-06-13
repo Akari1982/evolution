@@ -13,6 +13,7 @@ public:
     virtual ~XmlNetworkFile();
 
     void LoadNetwork( Entity* entity );
+    static void SaveNetwork( const Ogre::String& filename, Entity* entity );
 };
 
 

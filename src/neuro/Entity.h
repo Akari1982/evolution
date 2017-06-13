@@ -8,11 +8,17 @@
 class Entity
 {
 public:
-    Entity( const float x, const float y );
+    Entity( const int name, const float x, const float y );
     virtual ~Entity();
 
     void Update();
     void Draw( const float x, const float y );
+
+    int GetName() const;
+    void SetParents( std::vector< int >& parents );
+    std::vector< int >& GetParents();
+    void AddChild( const int child );
+    std::vector< int >& GetChildren();
 
     float GetRadius() const;
     float GetX() const;
@@ -33,8 +39,9 @@ public:
     float GetEnergy() const;
     void SetEnergy( const float energy );
 
-    void AddNetwork( std::vector< Cell* >& network );
+    void SetNetwork( std::vector< Cell* >& network );
     std::vector< Cell* >& GetNetwork();
+    Cell* GetCell( const int cell_id );
 
     float GetSensorFood( const float x, const float y ) const;
 
@@ -42,13 +49,17 @@ private:
     Entity();
 
 private:
+    int m_Name;
+    std::vector< int > m_Parents;
+    std::vector< int > m_Children;
+
     float m_Radius;
     float m_X;
     float m_Y;
     float m_Rotation;
 
     float m_MovePower;
-    float m_MoveTime
+    float m_MoveTime;
     float m_RotatePower;
     float m_RotateTime;
 

@@ -1,5 +1,6 @@
 #include "EntityManager.h"
 #include "EntityManagerCommands.h"
+#include "Mutation.h"
 #include "XmlNetworkFile.h"
 
 #include "../core/DebugDraw.h"
@@ -13,16 +14,21 @@ template<>EntityManager *Ogre::Singleton< EntityManager >::msSingleton = NULL;
 
 
 
-const size_t MAX_ENTITY = 20;
+const size_t MAX_ENTITY = 50;
 const size_t MAX_FOOD = 50;
+const float FOOD_TIME = 1;
 
 
 
 EntityManager::EntityManager():
+    m_EntityMaxName( 0 ),
+    m_NetworkFilename( "data/network.xml" ),
+    m_MaxParents( 0 ),
     m_X( 100.0f ),
     m_Y( 400.0f ),
     m_Width( 1080.0f ),
-    m_Height( 300.0f )
+    m_Height( 300.0f ),
+    m_NextFoodTime( FOOD_TIME )
 {
     InitCommands();
 }
@@ -50,6 +56,7 @@ void
 EntityManager::Update()
 {
     float delta = Timer::getSingleton().GetGameTimeDelta();
+    m_NextFoodTime -= delta;
 
     for( size_t i = 0; i < m_Entity.size(); ++i )
     {
@@ -107,7 +114,6 @@ EntityManager::Update()
             if( distance <= radius )
             {
                 float energy = entity->GetEnergy() + ( *it ).power;
-                energy = ( energy > 100.0f ) ? 100.0f : energy;
                 entity->SetEnergy( energy );
                 it = m_Food.erase( it );
             }
@@ -118,13 +124,19 @@ EntityManager::Update()
         }
     }
 
-
-
     // remove dead entity
     for( std::vector< Entity* >::iterator it = m_Entity.begin(); it != m_Entity.end(); )
     {
         if( ( ( *it )->GetEnergy() <= 0 ) || ( ( *it )->IsDead() == true ) )
         {
+            std::vector< int > parents = ( *it )->GetParents();
+            std::vector< int > children = ( *it )->GetChildren();
+            if( ( parents.size() > m_MaxParents ) && ( children.size() > 2 ) )
+            {
+                m_MaxParents = parents.size();
+                m_NetworkFilename = "data/network_" + IntToString( ( *it )->GetName() ) + "_" + IntToString( m_MaxParents ) + ".xml";
+                XmlNetworkFile::SaveNetwork( m_NetworkFilename, *it );
+            }
             delete ( *it );
             it = m_Entity.erase( it );
         }
@@ -134,52 +146,51 @@ EntityManager::Update()
         }
     }
 
-
-
     if( m_Entity.size() < MAX_ENTITY )
     {
-        bool born = false;
-
         for( size_t i = 0; i < m_Entity.size(); ++i )
         {
+
             Entity* entity = m_Entity[ i ];
             if( entity->GetEnergy() >= 80.0f )
             {
                 entity->SetEnergy( 20.0f );
 
                 Entity* child;
-                child = new Entity( entity->GetX(), entity->GetY() );
-                XmlNetworkFile* network = new XmlNetworkFile( "data/network.xml" );
-                network->LoadNetwork( child );
-                delete network;
+                child = new Entity( m_EntityMaxName, entity->GetX(), entity->GetY() );
+                entity->AddChild( m_EntityMaxName );
+                ++m_EntityMaxName;
+                NetworkMutate( entity, child );
                 m_Entity.push_back( child );
-                born = true;
+                break;
             }
         }
 
-        if( born == false )
+        if( ( m_Entity.size() == 0 ) && ( m_MaxParents == 0 ) )
         {
-            Entity* entity;
-            entity = new Entity( m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
-            XmlNetworkFile* network = new XmlNetworkFile( "data/network.xml" );
-            network->LoadNetwork( entity );
-            delete network;
-            m_Entity.push_back( entity );
+            m_MaxParents = 0;
+            for( size_t i = 0; i < 5; ++i )
+            {
+                Entity* entity;
+                entity = new Entity( m_EntityMaxName, m_X + rand() % ( int )m_Width, m_Y + rand() % ( int )m_Height );
+                ++m_EntityMaxName;
+                XmlNetworkFile* network = new XmlNetworkFile( m_NetworkFilename );
+                network->LoadNetwork( entity );
+                delete network;
+                m_Entity.push_back( entity );
+            }
         }
     }
 
-
-
-    if( m_Food.size() < MAX_FOOD )
+    if( m_NextFoodTime <= 0 && m_Food.size() < MAX_FOOD )
     {
         Food food;
-        food.power = 10 + rand() % 20;
+        food.power = 40 + rand() % 20;
         food.x = m_X + rand() % ( int )m_Width;
         food.y = m_Y + rand() % ( int )m_Height;
         m_Food.push_back( food );
+        m_NextFoodTime = FOOD_TIME;
     }
-
-
 
     Draw();
 }
@@ -195,9 +206,9 @@ EntityManager::Draw()
     DEBUG_DRAW.Line( m_X, m_Y, m_X + m_Width, m_Y );
     DEBUG_DRAW.Line( m_X, m_Y + m_Height, m_X + m_Width, m_Y + m_Height );
 
-    for( size_t i = 0; i < m_Entity.size(); ++i )
+    for( size_t i = 0; ( i < m_Entity.size() ) && ( i < 30 ); ++i )
     {
-        m_Entity[ i ]->Draw( 50 + i * 120, 120 );
+        m_Entity[ i ]->Draw( 50 + ( i % 10 ) * 120, 20 + ( i / 10 ) * 120 );
     }
 
     for( size_t i = 0; i < m_Food.size(); ++i )

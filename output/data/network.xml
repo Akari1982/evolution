@@ -1,21 +1,133 @@
 <network>
-    <neuron x="5" y="-3">
-        <synapse power="1" type="food" />
+    <entity name="4309">
+        <parents>2 11 26 42 55 68 76 93 104 128 155 164 169 174 189 198 207 214 237 240 282 302 338 356 367 374 381 418 441 446 464 498 504 512 514 520 562 563 591 595 598 602 628 666 691 705 720 733 736 738 779 797 803 812 840 855 859 863 894 905 932 962 991 1005 1014 1024 1030 1050 1061 1070 1087 1102 1109 1110 1124 1130 1152 1157 1159 1161 1189 1193 1202 1214 1217 1252 1278 1308 1335 1353 1356 1364 1387 1399 1404 1426 1445 1449 1461 1495 1498 1500 1505 1514 1520 1536 1548 1578 1589 1602 1605 1616 1631 1640 1646 1671 1690 1718 1730 1757 1766 1779 1784 1803 1827 1849 1861 1887 1897 1907 1933 1969 1988 2014 2026 2042 2049 2053 2059 2090 2091 2096 2109 2124 2135 2141 2146 2164 2191 2218 2227 2262 2277 2296 2308 2325 2351 2357 2373 2391 2408 2414 2419 2459 2472 2474 2479 2482 2500 2521 2536 2554 2568 2585 2596 2612 2652 2661 2680 2689 2704 2710 2727 2749 2767 2774 2780 2796 2800 2811 2822 2840 2865 2897 2933 2934 2946 2956 2981 2990 3015 3031 3053 3082 3104 3117 3131 3159 3182 3201 3219 3232 3239 3242 3247 3267 3277 3296 3312 3338 3347 3358 3362 3393 3403 3408 3426 3433 3446 3449 3467 3492 3494 3499 3505 3521 3542 3571 3592 3599 3604 3636 3648 3679 3693 3703 3708 3713 3725 3736 3746 3777 3778 3789 3794 3800 3807 3836 3838 3843 3864 3890 3900 3920 3944 3954 3970 3979 4012 4027 4039 4055 4072 4077 4092 4110 4126 4139 4146 4150 4171 4194 4199 4210 4227 4240 4247 4253 4269 4272 4277 4278 4285 4287 4300 4304</parents>
+        <children>4316 4324 4333</children>
+    </entity>
+
+    <neuron x="-5" y="0">
+        <synapse power="1.084" neuron_id="0" />
+        <synapse power="0.191" type="food" />
+        <synapse power="0.314" type="food" />
+        <synapse power="0.319" inverted="true" type="food" />
+        <synapse power="0.998" type="food" />
+        <synapse power="0.516" type="food" />
+        <synapse power="0.503" inverted="true" type="food" />
+        <synapse power="0.42" inverted="true" type="food" />
+        <synapse power="0.669" inverted="true" type="food" />
+        <synapse power="-0.000999991" type="food" />
+        <synapse power="0.949" inverted="true" type="food" />
+        <synapse power="0.61" inverted="true" type="food" />
+        <synapse power="-0.047" type="food" />
+        <synapse power="-0.072" type="food" />
+        <synapse power="0.629" inverted="true" neuron_id="2" />
+        <synapse power="0.508" type="food" />
+        <synapse power="0.333" type="food" />
+        <synapse power="0.892" type="food" />
+        <synapse power="1.136" type="food" />
+        <synapse power="-0.1" type="food" />
+        <synapse power="0.303" inverted="true" type="food" />
+        <synapse power="0.436" inverted="true" type="food" />
+        <synapse power="0.142" inverted="true" neuron_id="12" />
+        <activator power="2.025" type="move" />
     </neuron>
-    <neuron x="5" y="3">
-        <synapse power="1" type="food" />
+    <neuron x="7.5" y="18.6">
+        <synapse power="0.858" inverted="true" type="food" />
+        <synapse power="0.824" inverted="true" type="food" />
+        <synapse power="0.658" inverted="true" type="food" />
+        <synapse power="0.677" type="food" />
+        <synapse power="0.476" neuron_id="0" />
+        <synapse power="0.588" type="food" />
+        <synapse power="0.334" inverted="true" type="food" />
+        <synapse power="0.926" neuron_id="0" />
+        <synapse power="0.527" type="food" />
+        <synapse power="0.507" type="food" />
+        <synapse power="0.214" type="food" />
+        <synapse power="0.215" type="food" />
+        <synapse power="0.665" inverted="true" type="food" />
+        <synapse power="0.569" inverted="true" type="food" />
+        <synapse power="0.38" inverted="true" type="food" />
+        <synapse power="1.097" type="food" />
+        <synapse power="-0.019" inverted="true" type="food" />
+        <synapse power="0.608" type="food" />
+        <synapse power="0.981" inverted="true" type="food" />
+        <synapse power="1.15" type="food" />
+        <synapse power="0.32" type="food" />
+        <synapse power="0.846" inverted="true" type="food" />
+        <synapse power="0.59" inverted="true" type="food" />
+        <synapse power="0.717" inverted="true" neuron_id="3" />
+        <synapse power="0.178" type="food" />
+        <synapse power="0.02" inverted="true" type="food" />
+        <synapse power="-0.075" inverted="true" neuron_id="5" />
+        <synapse power="0.71" inverted="true" type="food" />
+        <synapse power="1.024" type="food" />
+        <synapse power="0.671" inverted="true" type="food" />
+        <synapse power="0.13" type="food" />
+        <synapse power="0.139" neuron_id="8" />
+        <synapse power="0.519" type="food" />
+        <synapse power="0.526" neuron_id="4" />
     </neuron>
-    <neuron x="-2" y="0">
-        <synapse power="1" neuron_id="0" />
-        <synapse power="1" neuron_id="1" />
-        <activator type="move" move="1" >
+    <neuron x="-16.7" y="5.7">
+        <synapse power="0.485" type="food" />
+        <synapse power="1.141" inverted="true" neuron_id="0" />
+        <synapse power="0.573" neuron_id="3" />
+        <synapse power="0.743" inverted="true" neuron_id="0" />
+        <synapse power="0.844" type="food" />
+        <synapse power="0.677" type="food" />
+        <synapse power="0.954" inverted="true" neuron_id="1" />
+        <synapse power="0.174" inverted="true" neuron_id="9" />
+        <synapse power="0.89" inverted="true" neuron_id="3" />
     </neuron>
-    <neuron x="-2" y="-3">
-        <synapse power="1" neuron_id="0" />
-        <activator type="rotate" rotate="1" >
+    <neuron x="-9.7" y="-3.6">
+        <synapse power="-0.014" type="food" />
+        <synapse power="0.911" inverted="true" type="food" />
+        <synapse power="0.485" inverted="true" neuron_id="1" />
+        <synapse power="1.225" neuron_id="0" />
     </neuron>
-    <neuron x="-2" y="3">
-        <synapse power="1" neuron_id="1" />
-        <activator type="rotate" rotate="-1" >
+    <neuron x="23.1" y="0.6">
+        <synapse power="-0.053" type="food" />
+        <synapse power="0.467" type="food" />
+        <synapse power="0.288" neuron_id="2" />
+        <synapse power="0.897" inverted="true" neuron_id="1" />
+        <synapse power="0.173" inverted="true" type="food" />
+        <synapse power="0.333" inverted="true" neuron_id="2" />
+        <synapse power="0.119" neuron_id="5" />
+    </neuron>
+    <neuron x="15.5" y="-3.5">
+        <synapse power="0.824" type="food" />
+        <synapse power="0.387" inverted="true" neuron_id="1" />
+        <synapse power="0.879" neuron_id="1" />
+        <synapse power="0.27" inverted="true" type="food" />
+    </neuron>
+    <neuron x="-2.9" y="-12.8">
+        <synapse power="0.881" inverted="true" type="food" />
+        <synapse power="0.165" type="food" />
+        <synapse power="0.344" neuron_id="2" />
+        <synapse power="0.473" type="food" />
+        <synapse power="0.37" type="food" />
+        <synapse power="0.305" inverted="true" neuron_id="4" />
+    </neuron>
+    <neuron x="-15.8" y="11.3">
+        <synapse power="-0.325" inverted="true" neuron_id="0" />
+        <synapse power="0.154" neuron_id="4" />
+    </neuron>
+    <neuron x="2.7" y="-3.4">
+        <synapse power="0.381" type="food" />
+        <synapse power="0.072" neuron_id="5" />
+        <activator power="0.766" type="rotate" />
+    </neuron>
+    <neuron x="-6.2" y="2.9">
+        <synapse power="0.242" type="food" />
+        <synapse power="0.791" neuron_id="0" />
+    </neuron>
+    <neuron x="-19.1" y="-29.6">
+        <synapse power="0.573" type="food" />
+        <synapse power="0.851" inverted="true" type="food" />
+    </neuron>
+    <neuron x="-6.4" y="24.6">
+        <synapse power="-0.036" inverted="true" type="food" />
+        <synapse power="0.511" inverted="true" neuron_id="9" />
+    </neuron>
+    <neuron x="-0.4" y="-14">
+        <synapse power="0.666" neuron_id="5" />
     </neuron>
 </network>

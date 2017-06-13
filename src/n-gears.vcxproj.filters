@@ -241,6 +241,9 @@
     <ClCompile Include="Main.cpp">
       <Filter>N-Gears files</Filter>
     </ClCompile>
+    <ClCompile Include="neuro\Mutation.cpp">
+      <Filter>N-Gears files\neuro</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="core\library\luabind\adopt_policy.hpp">
@@ -644,6 +647,9 @@
     </ClInclude>
     <ClInclude Include="Main.h">
       <Filter>N-Gears files</Filter>
+    </ClInclude>
+    <ClInclude Include="neuro\Mutation.h">
+      <Filter>N-Gears files\neuro</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

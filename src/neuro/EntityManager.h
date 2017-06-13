@@ -25,6 +25,9 @@ public:
 
 private:
     std::vector< Entity* > m_Entity;
+    int m_EntityMaxName;
+    Ogre::String m_NetworkFilename;
+    int m_MaxParents;
 
     struct Food
     {
@@ -35,7 +38,6 @@ private:
     std::vector< Food > m_Food;
 
     float m_NextFoodTime;
-    float m_SpawnTime;
 
     float m_X;
     float m_Y;

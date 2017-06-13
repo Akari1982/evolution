@@ -28,27 +28,6 @@ Cell::~Cell()
 
 
 void
-Cell::Copy( Cell* cell )
-{
-    m_X = cell->m_X;
-    m_Y = cell->m_Y;
-
-    for( size_t i = 0; i < cell->m_Synapses.size(); ++i )
-    {
-        //AddSynapse( const float power, const bool inverted, Cell* cell )
-        //AddFoodSynapse( const float power, const bool inverted )
-    }
-
-    for( size_t i = 0; i < cell->m_Activators.size(); ++i )
-    {
-        //AddMoveActivator( const float move )
-        //AddRotateActivator( const float rotate )
-    }
-}
-
-
-
-void
 Cell::Update()
 {
     for( size_t i = 0; i < m_Synapses.size(); ++i )
@@ -60,12 +39,21 @@ Cell::Update()
             case SYN_FOOD:
             {
                 value = m_Entity->GetSensorFood( m_X, m_Y );
-                m_Synapses[ i ].activated = true;
+                if( value > 0 )
+                {
+                    m_Synapses[ i ].activated = true;
+                }
             }
             break;
             case SYN_NEURON:
             {
-                if( m_Synapses[ i ].cell->m_Fired == true )
+                Cell* cell = m_Entity->GetCell( m_Synapses[ i ].cell_id );
+if( cell == NULL )
+{
+    LOG_ERROR( "[ERROR] Cell::Update" );
+    return;
+}
+                if( cell->m_Fired == true )
                 {
                     value = 1.0f;
                     m_Synapses[ i ].activated = true;
@@ -107,12 +95,12 @@ Cell::UpdateFire()
                 {
                     case ACT_MOVE:
                     {
-                        m_Entity->SetMove( m_Activators[ i ].move, 0.5f );
+                        m_Entity->SetMove( m_Activators[ i ].power, 0.5f );
                     }
                     break;
                     case ACT_ROTATE:
                     {
-                        m_Entity->SetRotate( m_Activators[ i ].rotate, 0.5f );
+                        m_Entity->SetRotate( m_Activators[ i ].power, 0.5f );
                     }
                     break;
                 }
@@ -126,7 +114,7 @@ Cell::UpdateFire()
 void
 Cell::Draw( const float ui_x, const float ui_y, const float x, const float y, const Ogre::Quaternion& rotation )
 {
-    float scale = 8.0f;
+    float scale = 1.0f;
 
     // pos of cell related to entity pos
     Ogre::Vector3 pos( m_X, m_Y, 0.0f );
@@ -147,14 +135,14 @@ Cell::Draw( const float ui_x, const float ui_y, const float x, const float y, co
     }
     float radius = 2.0f;
     DEBUG_DRAW.Disc( ui_x + m_X * scale, ui_y + m_Y * scale, radius );
-    DEBUG_DRAW.Disc( x + pos.x, y + pos.y, radius );
+    //DEBUG_DRAW.Disc( x + pos.x, y + pos.y, radius );
 
     // draw all synapses
     for( size_t i = 0; i < m_Synapses.size(); ++i )
     {
-        Cell* cell = m_Synapses[ i ].cell;
         if( m_Synapses[ i ].type == SYN_NEURON )
         {
+            Cell* cell = m_Entity->GetCell( m_Synapses[ i ].cell_id );
             if( m_Synapses[ i ].activated == true )
             {
                 DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
@@ -165,11 +153,11 @@ Cell::Draw( const float ui_x, const float ui_y, const float x, const float y, co
                 DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
             }
             DEBUG_DRAW.Line( ui_x + m_X * scale, ui_y + m_Y * scale, ui_x + cell->m_X * scale, ui_y + cell->m_Y * scale );
-            Ogre::Vector3 pos2( cell->m_X, cell->m_Y, 0.0f );
-            pos2 = rotation * pos2;
-            DEBUG_DRAW.Line( x + pos.x, y + pos.y, x + pos2.x, y + pos2.y );
+            //Ogre::Vector3 pos2( cell->m_X, cell->m_Y, 0.0f );
+            //pos2 = rotation * pos2;
+            //DEBUG_DRAW.Line( x + pos.x, y + pos.y, x + pos2.x, y + pos2.y );
         }
-        else if( cell->type == SYN_FOOD )
+        else if( m_Synapses[ i ].type == SYN_FOOD )
         {
             if( m_Synapses[ i ].activated == true )
             {
@@ -190,13 +178,13 @@ Cell::Draw( const float ui_x, const float ui_y, const float x, const float y, co
 
 
 void
-Cell::AddSynapse( const float power, const bool inverted, Cell* cell )
+Cell::AddSynapse( const float power, const bool inverted, const int cell_id )
 {
     Synapse synapse;
     synapse.type = SYN_NEURON;
     synapse.power = power;
     synapse.inverted = inverted;
-    synapse.cell = cell;
+    synapse.cell_id = cell_id;
     synapse.activated = false;
     m_Synapses.push_back( synapse );
 }
@@ -217,21 +205,21 @@ Cell::AddFoodSynapse( const float power, const bool inverted )
 
 
 void
-Cell::AddMoveActivator( const float move )
+Cell::AddMoveActivator( const float power )
 {
     Activator activator;
     activator.type = ACT_MOVE;
-    activator.move = move;
+    activator.power = power;
     m_Activators.push_back( activator );
 }
 
 
 
 void
-Cell::AddRotateActivator( const float rotate )
+Cell::AddRotateActivator( const float power )
 {
     Activator activator;
-    activator.type = ACT_MOVE;
-    activator.rotate = rotate;
+    activator.type = ACT_ROTATE;
+    activator.power = power;
     m_Activators.push_back( activator );
 }

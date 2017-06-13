@@ -1,0 +1,20 @@
+<network>
+    <neuron x="30" y="-10">
+        <synapse power="1" type="food" />
+    </neuron>
+    <neuron x="30" y="10">
+        <synapse power="1" type="food" />
+    </neuron>
+    <neuron x="-5" y="0">
+        <synapse power="1" inverted="true" neuron_id="2" />
+        <activator power="1" type="move" />
+    </neuron>
+    <neuron x="-5" y="-10">
+        <synapse power="1" neuron_id="0" />
+        <activator power="-1" type="rotate" />
+    </neuron>
+    <neuron x="-5" y="10">
+        <synapse power="1" neuron_id="1" />
+        <activator power="1" type="rotate" />
+    </neuron>
+</network>

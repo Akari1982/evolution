@@ -790,7 +790,7 @@ DebugDraw::DestroyQuadVertexBuffer()
 void
 DebugDraw::CreateCircleVertexBuffer()
 {
-    m_CircleMaxVertexCount = 1024 * 16;
+    m_CircleMaxVertexCount = 4096 * 16;
     m_CircleRenderOp.vertexData = new Ogre::VertexData;
     m_CircleRenderOp.vertexData->vertexStart = 0;
 
@@ -824,7 +824,7 @@ DebugDraw::DestroyCircleVertexBuffer()
 void
 DebugDraw::CreateDiscVertexBuffer()
 {
-    m_DiscMaxVertexCount = 1024 * 24;
+    m_DiscMaxVertexCount = 4096 * 24;
     m_DiscRenderOp.vertexData = new Ogre::VertexData;
     m_DiscRenderOp.vertexData->vertexStart = 0;
 

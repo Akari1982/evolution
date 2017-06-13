@@ -791,7 +791,7 @@ Console::messageLogged( const Ogre::String& message, Ogre::LogMessageLevel lml, 
 void
 Console::LoadHistory()
 {
-    std::ifstream file( "q-gears_ch.txt" );
+    std::ifstream file( "n-gears_ch.txt" );
     std::string historyLine;
     while( std::getline( file, historyLine ) )
     {
@@ -814,7 +814,7 @@ Console::SaveHistory()
     std::list< Ogre::String >::iterator i = m_History.begin();
     for( ; i != m_History.end(); ++i )
     {
-        file << *i << "\r\n";
+        file << *i << "\n";
     }
 }
 
@@ -823,7 +823,7 @@ Console::SaveHistory()
 void
 Console::AddToHistory( const Ogre::String& history )
 {
-    if(m_History.size() >= m_HistoryMaxSize )
+    if( m_History.size() >= m_HistoryMaxSize )
     {
         m_History.pop_back();
     }
