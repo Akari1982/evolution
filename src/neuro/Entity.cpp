@@ -240,7 +240,7 @@ Entity::SetRotate( const float power, const float time )
 bool
 Entity::IsDead() const
 {
-    return ( m_Life <= 0 );
+    return ( m_Life <= 0 ) || ( m_Energy <= 0 );
 }
 
 
