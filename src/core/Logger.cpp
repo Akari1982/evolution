@@ -31,9 +31,14 @@ BoolToString( bool value )
 
 
 Ogre::String
-IntToString( int value )
+IntToString( int value, unsigned short width, char fill )
 {
-    return Ogre::StringConverter::toString( value );
+    std::stringstream stream;
+    stream.width( width );
+    stream.fill( fill );
+    stream.setf( std::ios::dec, std::ios::basefield );
+    stream << value;
+    return stream.str();
 }
 
 

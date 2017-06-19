@@ -16,7 +16,7 @@
 
 Ogre::String HexToString( int value, unsigned short width, char fill );
 Ogre::String BoolToString( bool value );
-Ogre::String IntToString( int value );
+Ogre::String IntToString( int value, unsigned short width = 0, char fill = '0' );
 Ogre::String FloatToString( float value );
 
 
