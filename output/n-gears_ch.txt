@@ -1,3 +1,5 @@
+/timer_scale_game 10
+/timer_scale_game 5
 /timer_scale_game 20
 /timer_scale_game 5
 /timer_scale_game 50
@@ -28,5 +30,3 @@
 /timer_scale_game 5
 /timer_scale_game 2
 /timer_scale_game 5
-/timer_scale_game 5
-/timer_scale_game 2
