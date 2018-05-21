@@ -21,7 +21,6 @@ Entity::Entity( const int name, const float x, const float y ):
     m_Energy( 20.0f ),
     m_Think( 0.1f )
 {
-    m_Rotation = ( float )( rand() % 360 );
 }
 
 
@@ -56,7 +55,7 @@ Entity::Update()
         m_Think = 0.1f;
     }
 
-    m_Life -= delta;
+    //m_Life -= delta;
 
     SetEnergy( m_Energy - ( delta * ( 1 + ( ( float )( m_Network.size() ) / 20.0f ) ) ) );
 }
