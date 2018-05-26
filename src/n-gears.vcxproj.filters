@@ -5,12 +5,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd;cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="N-Gears files\social">
-      <UniqueIdentifier>{890c8622-49ce-4500-8ee6-e20ac5360769}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="N-Gears files\neuro">
-      <UniqueIdentifier>{d3ea1573-de2a-4682-857b-50de1fd47f4e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="N-Gears files\core">
       <UniqueIdentifier>{cdfbe643-549f-4f48-bf98-489b8a6f3edb}</UniqueIdentifier>
     </Filter>
@@ -22,6 +16,9 @@
     </Filter>
     <Filter Include="N-Gears files\core\TinyXml">
       <UniqueIdentifier>{2a8a35a0-cb85-40af-ad81-45906b03e636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="N-Gears files\cell2">
+      <UniqueIdentifier>{67177d57-14b3-4b77-a242-e7ea01a98091}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -220,29 +217,17 @@
     <ClCompile Include="core\XmlFile.cpp">
       <Filter>N-Gears files\core</Filter>
     </ClCompile>
-    <ClCompile Include="neuro\Cell.cpp">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClCompile>
-    <ClCompile Include="neuro\Entity.cpp">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClCompile>
-    <ClCompile Include="neuro\EntityManager.cpp">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClCompile>
-    <ClCompile Include="neuro\XmlNetworkFile.cpp">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClCompile>
-    <ClCompile Include="social\Person.cpp">
-      <Filter>N-Gears files\social</Filter>
-    </ClCompile>
-    <ClCompile Include="social\SocialManager.cpp">
-      <Filter>N-Gears files\social</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>N-Gears files</Filter>
     </ClCompile>
-    <ClCompile Include="neuro\Mutation.cpp">
-      <Filter>N-Gears files\neuro</Filter>
+    <ClCompile Include="cell2\Cell.cpp">
+      <Filter>N-Gears files\cell2</Filter>
+    </ClCompile>
+    <ClCompile Include="cell2\EntityManager.cpp">
+      <Filter>N-Gears files\cell2</Filter>
+    </ClCompile>
+    <ClCompile Include="cell2\Ontogenesis.cpp">
+      <Filter>N-Gears files\cell2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -621,35 +606,20 @@
     <ClInclude Include="core\XmlFile.h">
       <Filter>N-Gears files\core</Filter>
     </ClInclude>
-    <ClInclude Include="neuro\Cell.h">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClInclude>
-    <ClInclude Include="neuro\Entity.h">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClInclude>
-    <ClInclude Include="neuro\EntityManager.h">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClInclude>
-    <ClInclude Include="neuro\EntityManagerCommands.h">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClInclude>
-    <ClInclude Include="neuro\XmlNetworkFile.h">
-      <Filter>N-Gears files\neuro</Filter>
-    </ClInclude>
-    <ClInclude Include="social\Person.h">
-      <Filter>N-Gears files\social</Filter>
-    </ClInclude>
-    <ClInclude Include="social\SocialManager.h">
-      <Filter>N-Gears files\social</Filter>
-    </ClInclude>
-    <ClInclude Include="social\SocialManagerCommands.h">
-      <Filter>N-Gears files\social</Filter>
-    </ClInclude>
     <ClInclude Include="Main.h">
       <Filter>N-Gears files</Filter>
     </ClInclude>
-    <ClInclude Include="neuro\Mutation.h">
-      <Filter>N-Gears files\neuro</Filter>
+    <ClInclude Include="cell2\Cell.h">
+      <Filter>N-Gears files\cell2</Filter>
+    </ClInclude>
+    <ClInclude Include="cell2\EntityManager.h">
+      <Filter>N-Gears files\cell2</Filter>
+    </ClInclude>
+    <ClInclude Include="cell2\Ontogenesis.h">
+      <Filter>N-Gears files\cell2</Filter>
+    </ClInclude>
+    <ClInclude Include="cell2\EntityManagerCommands.h">
+      <Filter>N-Gears files\cell2</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

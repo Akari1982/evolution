@@ -11,6 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="cell2\Cell.cpp" />
+    <ClCompile Include="cell2\EntityManager.cpp" />
+    <ClCompile Include="cell2\Ontogenesis.cpp" />
     <ClCompile Include="core\CameraManager.cpp" />
     <ClCompile Include="core\ConfigCmd.cpp" />
     <ClCompile Include="core\ConfigCmdManager.cpp" />
@@ -77,15 +80,12 @@
     <ClCompile Include="core\Utilites.cpp" />
     <ClCompile Include="core\XmlFile.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="neuro\Cell.cpp" />
-    <ClCompile Include="neuro\Entity.cpp" />
-    <ClCompile Include="neuro\EntityManager.cpp" />
-    <ClCompile Include="neuro\Mutation.cpp" />
-    <ClCompile Include="neuro\XmlNetworkFile.cpp" />
-    <ClCompile Include="social\Person.cpp" />
-    <ClCompile Include="social\SocialManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cell2\Cell.h" />
+    <ClInclude Include="cell2\EntityManager.h" />
+    <ClInclude Include="cell2\EntityManagerCommands.h" />
+    <ClInclude Include="cell2\Ontogenesis.h" />
     <ClInclude Include="core\Assert.h" />
     <ClInclude Include="core\CameraManager.h" />
     <ClInclude Include="core\CameraManagerCommands.h" />
@@ -212,15 +212,6 @@
     <ClInclude Include="core\Utilites.h" />
     <ClInclude Include="core\XmlFile.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="neuro\Cell.h" />
-    <ClInclude Include="neuro\Entity.h" />
-    <ClInclude Include="neuro\EntityManager.h" />
-    <ClInclude Include="neuro\EntityManagerCommands.h" />
-    <ClInclude Include="neuro\Mutation.h" />
-    <ClInclude Include="neuro\XmlNetworkFile.h" />
-    <ClInclude Include="social\Person.h" />
-    <ClInclude Include="social\SocialManager.h" />
-    <ClInclude Include="social\SocialManagerCommands.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E51D599E-B1F2-45CA-A98A-1A12140EDC45}</ProjectGuid>

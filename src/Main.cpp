@@ -13,8 +13,7 @@
 #include "core/InputManager.h"
 #include "core/Logger.h"
 #include "core/Timer.h"
-#include "neuro/EntityManager.h"
-#include "social/SocialManager.h"
+#include "cell/EntityManager.h"
 
 
 
@@ -84,7 +83,6 @@ main( int argc, char *argv[] )
     // create This earlier than DisplayFrameListener cause it can fire event there
     CameraManager* camera_manager = new CameraManager();
     EntityManager* entity_manager = new EntityManager();
-    SocialManager* social_manager = new SocialManager();
     Console* console = new Console();
 
 
@@ -114,7 +112,6 @@ main( int argc, char *argv[] )
     root->removeFrameListener( frame_listener );
     delete frame_listener;
     delete entity_manager;
-    delete social_manager;
     delete console;
     delete camera_manager;
     delete input_manager;
