@@ -456,7 +456,7 @@ Ontogenesis::AddProtein( std::vector< Protein >& proteins, const int id, const f
 
 
 
-float
+const float
 Ontogenesis::GetProteinPower( std::vector< Protein >& proteins, const int protein, const int x, const int y )
 {
     float power = 0.0f;
@@ -479,7 +479,86 @@ Ontogenesis::GetProteinPower( std::vector< Protein >& proteins, const int protei
 
 
 
-bool
+const size_t
+Ontogenesis::FindCellByProteinGradient( std::vector< Cell* >& network, std::vector< Protein >& proteins, const int protein, const int x, const int y )
+{
+    float power = GetProteinPower( proteins, protein, x, y );
+
+    if( IsCell( network, x, y ) == true )
+    {
+        
+    }
+
+
+}
+
+
+
+const float
+Ontogenesis::FindProteinGradient( std::vector< ProteinData >& data, const int x, const int y, const float power, int& ret_x, int& ret_y )
+{
+    float power_new = 0.0f;
+    for( size_t i = 0; i < data.size(); ++i )
+    {
+        if( data[ i ].x == x && data[ i ].y == y )
+        {
+            power_new = data[ i ].power;
+        }
+    }
+
+    if( power_new > power )
+    {
+        int new_ret_x;
+        int new_ret_y;
+        float power1;
+        float power_greatest = power_new;
+
+        power1 = FindProteinGradient( data, x + 1, y, power_new, new_ret_x, new_ret_x );
+        if( power1 > power_greatest )
+        {
+            ret_x = new_ret_x;
+            ret_y = new_ret_y;
+            power_greatest = power1;
+        }
+        power1 = FindProteinGradient( data, x - 1, y, power_new, new_ret_x, new_ret_x );
+        if( power1 > power_greatest )
+        {
+            ret_x = new_ret_x;
+            ret_y = new_ret_y;
+            power_greatest = power1;
+        }
+        power1 = FindProteinGradient( data, x, y + 1, power_new, new_ret_x, new_ret_x );
+        if( power1 > power_greatest )
+        {
+            ret_x = new_ret_x;
+            ret_y = new_ret_y;
+            power_greatest = power1;
+        }
+        power1 = FindProteinGradient( data, x, y - 1, power_new, new_ret_x, new_ret_x );
+        if( power1 > power_greatest )
+        {
+            ret_x = new_ret_x;
+            ret_y = new_ret_y;
+            power_greatest = power1;
+        }
+
+        if( power_greatest == power_new )
+        {
+            ret_x = x;
+            ret_y = y;
+        }
+
+        return power_greatest;
+    }
+    else
+    {
+        return -1;
+    }
+}
+
+
+
+const bool
 Ontogenesis::FindPlaceForCell( std::vector< Cell* >& network, const int x, const int y, const int radius, int &new_x, int &new_y )
 {
     for( int r = 1; r <= radius; ++r )
