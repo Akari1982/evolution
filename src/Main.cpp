@@ -13,7 +13,7 @@
 #include "core/InputManager.h"
 #include "core/Logger.h"
 #include "core/Timer.h"
-#include "cell/EntityManager.h"
+#include "cell2/EntityManager.h"
 
 
 

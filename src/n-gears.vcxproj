@@ -11,9 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cell2\Cell.cpp" />
-    <ClCompile Include="cell2\EntityManager.cpp" />
-    <ClCompile Include="cell2\Ontogenesis.cpp" />
+    <ClCompile Include="cell\Cell.cpp" />
+    <ClCompile Include="cell\Entity.cpp" />
+    <ClCompile Include="cell\EntityManager.cpp" />
+    <ClCompile Include="cell\Ontogenesis.cpp" />
+    <ClCompile Include="cell\XmlGenerationFile.cpp" />
     <ClCompile Include="core\CameraManager.cpp" />
     <ClCompile Include="core\ConfigCmd.cpp" />
     <ClCompile Include="core\ConfigCmdManager.cpp" />
@@ -82,10 +84,12 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cell2\Cell.h" />
-    <ClInclude Include="cell2\EntityManager.h" />
-    <ClInclude Include="cell2\EntityManagerCommands.h" />
-    <ClInclude Include="cell2\Ontogenesis.h" />
+    <ClInclude Include="cell\Cell.h" />
+    <ClInclude Include="cell\Entity.h" />
+    <ClInclude Include="cell\EntityManager.h" />
+    <ClInclude Include="cell\EntityManagerCommands.h" />
+    <ClInclude Include="cell\Ontogenesis.h" />
+    <ClInclude Include="cell\XmlGenerationFile.h" />
     <ClInclude Include="core\Assert.h" />
     <ClInclude Include="core\CameraManager.h" />
     <ClInclude Include="core\CameraManagerCommands.h" />

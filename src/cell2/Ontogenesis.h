@@ -24,16 +24,10 @@ public:
     // что экспрессирует ген
     enum ExpressionType
     {
-        // реальные клетки могут делится на 2 одинаковые и на 2 неодинаковые части.
-        // протеины заключенные в клетке могут поделится полностью или
-        // каждый отдельный протеин может сконцентрироватся только в одной дочерней клетке
-        // клетка делится только на 2 части
-        // [bool = 1] - внутренний протеин наследуется
-        E_SPLIT = 0,    // клетка делится
+        E_SPLIT = 0,        // клетка делится случайно
+        E_SPLIT_GRADIENT,   // клетка делится по градиенту протеина
         E_PROTEIN,      // создать белок
 
-        E_SPAWN,        // клетка порождает другую клетку не меняя себя
-        E_MIGRATE,      // клетка ползет
         E_DENDRITE,     // породить дендрит
         E_DENDRITE_I,   // породить инвертированный дендрит
         E_AXON,         // породить аксон
@@ -72,15 +66,22 @@ public:
 
     void Step();
 
+    void AddCell( const int x, const int y );
+    void AddProtein( const int id, const float power, const int x, const int y );
+
 private:
-    struct Protein
+    struct ProteinData
     {
-        int id;
         float power;
         int x;
         int y;
     };
-    float SearchProtein( const int protein, const int x, const int y );
+    struct Protein
+    {
+        int id;
+        std::vector< ProteinData > data;
+    };
+    float GetProteinPower( const int protein, const int x, const int y );
     void MoveCell( Cell* cell, const int dir_x, const int dir_y );
     void DirToMove( const int dir, int& x, int& y );
     Cell* GetCell( const int x, const int y );
@@ -88,9 +89,11 @@ private:
     Ogre::String ConditionTypeToString( const ConditionType type );
     Ogre::String ExpressionTypeToString( const ExpressionType type );
 
+public:
+    std::vector< Cell* > m_Cells;
+
 private:
     std::vector< Gene > m_Genome;
-    std::vector< Cell* > m_Cells;
     std::vector< Protein > m_Proteins;
 };
 

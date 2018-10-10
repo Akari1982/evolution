@@ -12,6 +12,8 @@ class Cell
 public:
     Cell();
     virtual ~Cell();
+
+    void Update();
     void Draw();
 
     int GetX() const;

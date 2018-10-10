@@ -756,7 +756,7 @@ DebugDraw::DestroyTriangle3dVertexBuffer()
 void
 DebugDraw::CreateQuadVertexBuffer()
 {
-    m_QuadMaxVertexCount = 1024 * 6;
+    m_QuadMaxVertexCount = 16384 * 6;
     m_QuadRenderOp.vertexData = new Ogre::VertexData;
     m_QuadRenderOp.vertexData->vertexStart = 0;
 

@@ -59,6 +59,11 @@ protected:
     float m_X;
     float m_Y;
 
+    int m_InnerProtein;
+    int m_InnerProteinPower;
+    int m_OuterProtein;
+    int m_OuterProteinRadius;
+
     float m_Threshold;
     float m_Value;
     bool m_Fired;

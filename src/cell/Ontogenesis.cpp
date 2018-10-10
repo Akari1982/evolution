@@ -34,6 +34,8 @@ Ontogenesis::~Ontogenesis()
 void
 Ontogenesis::Draw( const unsigned int x, const unsigned int y )
 {
+    float scale = 8.0f;
+
     int cur_gen = m_Generations.size() - 1;
     if( cur_gen >= 0 )
     {
@@ -41,6 +43,22 @@ Ontogenesis::Draw( const unsigned int x, const unsigned int y )
         DEBUG_DRAW.Text( x, y, "Generation " + IntToString( m_Generations[ cur_gen ].id ) );
         DEBUG_DRAW.Text( x + 200, y, "Top fitness: " + IntToString( ( int )m_Generations[ cur_gen ].top_fitness ) + " (" + IntToString( m_Generations[ cur_gen ].top_id ) + ")" );
         DEBUG_DRAW.Text( x + 400, y, "Number of species: " + IntToString( m_Generations[ cur_gen ].species.size() ) );
+
+        for( size_t s = 0; s < m_Generations[ cur_gen ].species.size(); ++s )
+        {
+            std::vector< Protein > proteins = m_Generations[ cur_gen ].species[ s ].proteins;
+            for( size_t i = 0; i < proteins.size(); ++i )
+            {
+                for( size_t j = 0; j < proteins[ i ].data.size(); ++j )
+                {
+                    float x1 = 50 + s * 120 + x + proteins[ i ].data[ j ].x * scale;
+                    float y1 = 120 + y + proteins[ i ].data[ j ].y * scale;
+
+                    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 2 * proteins[ i ].data[ j ].power ) );
+                    DEBUG_DRAW.Quad( x1 - scale / 2.0f, y1 - scale / 2.0f, x1 + scale / 2.0f, y1 - scale / 2.0f, x1 + scale / 2.0f, y1 + scale / 2.0f, x1 - scale / 2.0f, y1 + scale / 2.0f );
+                }
+            }
+        }
     }
 }
 
@@ -92,43 +110,88 @@ Ontogenesis::LoadNetwork( Entity* entity )
     int protein_activator_right = 5;
 
     Cell* cell = new Cell( entity, Cell::NEURON_COMMON, 0, 0 );
-    cell->SetInnerProtein( protein_stem, 1.0f );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::SENSOR_ENERGY, 0, 3 );
-    cell->SetOuterProtein( protein_sensor_energy );
-    cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::SENSOR_FOOD, 5, -5 );
-    cell->SetOuterProtein( protein_sensor_food );
-    cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::SENSOR_FOOD, 5, 5 );
-    cell->SetOuterProtein( protein_sensor_food );
-    cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::SENSOR_ENEMY, 8, 0 );
-    cell->SetOuterProtein( protein_sensor_enemy );
-    cell->SetOuterProteinRadius( 8 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::ACTIVATOR_FORWARD, -5, 0 );
-    cell->SetOuterProtein( protein_activator_forward );
-    cell->SetOuterProteinRadius( 6 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::ACTIVATOR_LEFT, -3, -3 );
-    cell->SetOuterProtein( protein_activator_left );
-    cell->SetOuterProteinRadius( 5 );
     species.network.push_back( cell );
 
     cell = new Cell( entity, Cell::ACTIVATOR_RIGHT, -3, 3 );
-    cell->SetOuterProtein( protein_activator_right );
-    cell->SetOuterProteinRadius( 5 );
     species.network.push_back( cell );
+
+    // default protein
+    ProteinData data;
+    Protein protein;
+
+    protein.id = protein_sensor_energy;
+    data.power = 8.0f;
+    data.x = 0;
+    data.y = 3;
+    protein.data.push_back( data );
+    species.proteins.push_back( protein );
+    protein.data.clear();
+
+    protein.id = protein_sensor_food;
+    data.power = 8.0f;
+    data.x = 5;
+    data.y = -5;
+    protein.data.push_back( data );
+    species.proteins.push_back( protein );
+    protein.data.clear();
+
+    protein.id = protein_sensor_food;
+    data.power = 8.0f;
+    data.x = 5;
+    data.y = 5;
+    protein.data.push_back( data );
+    species.proteins.push_back( protein );
+    protein.data.clear();
+
+    protein.id = protein_sensor_enemy;
+    data.power = 8.0f;
+    data.x = 8;
+    data.y = 0;
+    protein.data.push_back( data );
+    species.proteins.push_back( protein );
+    protein.data.clear();
+
+    protein.id = protein_activator_forward;
+    data.power = 6.0f;
+    data.x = -5;
+    data.y = 0;
+    protein.data.push_back( data );
+    species.proteins.push_back( protein );
+    protein.data.clear();
+
+    protein.id = protein_activator_left;
+    data.power = 5.0f;
+    data.x = -3;
+    data.y = -3;
+    protein.data.push_back( data );
+    species.proteins.push_back( protein );
+    protein.data.clear();
+
+    protein.id = protein_activator_right;
+    data.power = 5.0f;
+    data.x = -3;
+    data.y = 3;
+    protein.data.push_back( data );
+    species.proteins.push_back( protein );
+    protein.data.clear();
 
 
 
@@ -136,6 +199,67 @@ Ontogenesis::LoadNetwork( Entity* entity )
     while( cycles < 5 )
     {
         ++cycles;
+
+        for( size_t i = 0; i < species.proteins.size(); ++i )
+        {
+            for( size_t j = 0; j < species.proteins[ i ].data.size(); ++j )
+            {
+                float power = species.proteins[ i ].data[ j ].power;
+                power /= 1.2f;
+                if( power < 0.05f )
+                {
+                    power = 0.0f;
+                }
+                species.proteins[ i ].data[ j ].power = power;
+            }
+        }
+        for( size_t i = 0; i < species.proteins.size(); ++i )
+        {
+            size_t size = species.proteins[ i ].data.size();
+            for( size_t j = 0; j < size; ++j )
+            {
+                float power = species.proteins[ i ].data[ j ].power;
+
+                if( power > 0.2f )
+                {
+                    int x = species.proteins[ i ].data[ j ].x;
+                    int y = species.proteins[ i ].data[ j ].y;
+                    float add_power = power / 8.0f;
+
+                    AddProtein( species.proteins, species.proteins[ i ].id, add_power, x, y - 1 );
+                    AddProtein( species.proteins, species.proteins[ i ].id, add_power, x, y + 1 );
+                    AddProtein( species.proteins, species.proteins[ i ].id, add_power, x - 1, y );
+                    AddProtein( species.proteins, species.proteins[ i ].id, add_power, x + 1, y );
+
+                    species.proteins[ i ].data[ j ].power -= add_power * 4.0f;
+                }
+            }
+        }
+        for( size_t i = 0; i < species.proteins.size(); ++i )
+        {
+            for( std::vector< ProteinData >::iterator it = species.proteins[ i ].data.begin(); it != species.proteins[ i ].data.end(); )
+            {
+                if( ( *it ).power < 0.05f )
+                {
+                    it = species.proteins[ i ].data.erase( it );
+                }
+                else
+                {
+                    ++it;
+                }
+            }
+        }
+        for( std::vector< Protein >::iterator it = species.proteins.begin(); it != species.proteins.end(); )
+        {
+            if( ( *it ).data.size() == 0 )
+            {
+                it = species.proteins.erase( it );
+            }
+            else
+            {
+                ++it;
+            }
+        }
 
         for( size_t i = 0; i < species.network.size() && i < MAX_CELL; ++i )
         {
@@ -156,22 +280,14 @@ Ontogenesis::LoadNetwork( Entity* entity )
  
                     switch( cond.type )
                     {
-                        case C_O_PROTEIN:
-                        case C_NO_PROTEIN:
+                        case C_PROTEIN:
                         {
-                            std::vector< PowerProtein > powers;
-                            float power = SearchOuterProtein( species.network, ( int )cond.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
-                            if( ( ( cond.type == C_O_PROTEIN ) && ( power < cond.value2 ) ) || ( ( cond.type == C_NO_PROTEIN ) && ( power > cond.value2 ) ) )
+                            float power = GetProteinPower( species.proteins, ( int )cond.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY() );
+                            if( ( cond.value2 != -1 ) && ( power < cond.value2 ) )
                             {
                                 exec = false;
                             }
-                        }
-                        break;
-                        case C_I_PROTEIN:
-                        case C_NI_PROTEIN:
-                        {
-                            float power = ( species.network[ i ]->GetInnerProtein() == cond.value1 ) ? species.network[ i ]->GetInnerProteinPower() : 0.0f;
-                            if( ( ( cond.type == C_I_PROTEIN ) && ( power < cond.value2 ) ) || ( ( cond.type == C_NI_PROTEIN ) && ( power > cond.value2 ) ) )
+                            else if( ( cond.value3 != -1 ) && ( power > cond.value3 ) )
                             {
                                 exec = false;
                             }
@@ -195,12 +311,6 @@ Ontogenesis::LoadNetwork( Entity* entity )
                                 if( place == true )
                                 {
                                     Cell* cell = new Cell( entity, species.network[ i ]->GetName(), x, y );
-                                    if( expr.value1 == 1 )
-                                    {
-                                        float new_power = species.network[ i ]->GetInnerProteinPower() / 2.0f;
-                                        cell->SetInnerProtein( species.network[ i ]->GetInnerProtein(), new_power );
-                                        species.network[ i ]->SetInnerProteinPower( new_power );
-                                    }
                                     species.network.push_back( cell );
                                 }
                             }
@@ -217,39 +327,9 @@ Ontogenesis::LoadNetwork( Entity* entity )
                                 }
                             }
                             break;
-                            case E_MIGRATE:
+                            case E_PROTEIN:
                             {
-                                std::vector< PowerProtein > powers;
-                                SearchOuterProtein( species.network, ( int )expr.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
-                                for( size_t c = 0; c < powers.size(); ++c )
-                                {
-                                    Cell* cell = species.network[ powers[ c ].cell_id ];
-                                    int x = 0;
-                                    int y = 0;
-                                    bool place = FindPlaceForCell( species.network, cell->GetX(), cell->GetY(), cell->GetOuterProteinRadius(), x, y );
-                                    if( place == true )
-                                    {
-                                        species.network[ i ]->SetX( x );
-                                        species.network[ i ]->SetY( y );
-                                    }
-                                }
-                                powers.clear();
-                            }
-                            break;
-                            case E_O_PROTEIN:
-                            {
-                                if( species.network[ i ]->GetOuterProtein() != expr.value1 )
-                                {
-                                    species.network[ i ]->SetOuterProtein( ( int )expr.value1 );
-                                }
-                            }
-                            break;
-                            case E_I_PROTEIN:
-                            {
-                                if( species.network[ i ]->GetInnerProtein() != expr.value1 )
-                                {
-                                    species.network[ i ]->SetInnerProtein( ( int )expr.value1, 1.0f );
-                                }
+                                AddProtein( species.proteins, ( int )expr.value1, expr.value2, species.network[ i ]->GetX(), species.network[ i ]->GetY() );
                             }
                             break;
                             case E_DENDRITE:
@@ -257,8 +337,9 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             case E_AXON:
                             case E_AXON_I:
                             {
+/*
                                 std::vector< PowerProtein > powers;
-                                SearchOuterProtein( species.network, ( int )expr.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
+                                GetProteinPower( species.proteins, ( int )expr.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
                                 for( size_t c = 0; c < powers.size(); ++c )
                                 {
                                     bool inverted = ( expr.type == E_DENDRITE_I ) || ( expr.type == E_AXON_I );
@@ -279,6 +360,7 @@ Ontogenesis::LoadNetwork( Entity* entity )
                                     }
                                 }
                                 powers.clear();
+*/
                             }
                             break;
                         }
@@ -337,30 +419,61 @@ Ontogenesis::LoadGeneration( const Generation& generation )
 
 
 
-float
-Ontogenesis::SearchOuterProtein( std::vector< Cell* >& network, const int protein, const int x, const int y, std::vector< PowerProtein >& powers )
+void
+Ontogenesis::AddProtein( std::vector< Protein >& proteins, const int id, const float power, const int x, const int y )
 {
-    float power = 0.0f;
-
-    for( size_t i = 0; i < network.size(); ++i )
+    for( size_t i = 0; i < proteins.size(); ++i )
     {
-        if( network[ i ]->GetOuterProtein() == protein )
+        if( proteins[ i ].id == id )
         {
-            int x2 = network[ i ]->GetX();
-            int y2 = network[ i ]->GetY();
-            float distance = sqrt( ( x2 - x ) * ( x2 - x ) + ( y2 - y ) * ( y2 - y ) );
-            if( distance < network[ i ]->GetOuterProteinRadius() )
+            for( size_t j = 0; j < proteins[ i ].data.size(); ++j )
             {
-                PowerProtein pp;
-                pp.power = network[ i ]->GetOuterProteinRadius() / distance;
-                pp.cell_id = i;
-                powers.push_back( pp );
-
-                power += pp.power;
+                if( proteins[ i ].data[ j ].x == x && proteins[ i ].data[ j ].y == y )
+                {
+                    proteins[ i ].data[ j ].power += power;
+                    return;
+                }
             }
+
+            ProteinData data;
+            data.power = power;
+            data.x = x;
+            data.y = y;
+            proteins[ i ].data.push_back( data );
+            return;
         }
     }
 
+    ProteinData data;
+    Protein protein;
+    protein.id = id;
+    data.power = power;
+    data.x = x;
+    data.y = y;
+    protein.data.push_back( data );
+    proteins.push_back( protein );
+}
+
+
+
+float
+Ontogenesis::GetProteinPower( std::vector< Protein >& proteins, const int protein, const int x, const int y )
+{
+    float power = 0.0f;
+
+    for( size_t i = 0; i < proteins.size(); ++i )
+    {
+        if( proteins[ i ].id == protein )
+        {
+            for( size_t j = 0; j < proteins[ i ].data.size(); ++j )
+            {
+                if( proteins[ i ].data[ j ].x == x && proteins[ i ].data[ j ].y == y )
+                {
+                    power = proteins[ i ].data[ j ].power;
+                }
+            }
+        }
+    }
     return power;
 }
 
@@ -543,18 +656,16 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
                 ExpressionType type = mutated[ i ].expr[ expr_id ].type;
                 if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
                 {
-                    if( type == E_MIGRATE || type == E_O_PROTEIN || type == E_I_PROTEIN || type == E_DENDRITE || type == E_DENDRITE_I || type == E_AXON || type == E_AXON_I )
+                    if( type == E_PROTEIN || type == E_DENDRITE || type == E_DENDRITE_I || type == E_AXON || type == E_AXON_I )
                     {
                         ExpressionType new_type;
                         switch( rand() % 7 )
                         {
-                            case 0: new_type = E_MIGRATE; break;
-                            case 1: new_type = E_O_PROTEIN; break;
-                            case 2: new_type = E_I_PROTEIN; break;
-                            case 3: new_type = E_DENDRITE; break;
-                            case 4: new_type = E_DENDRITE_I; break;
-                            case 5: new_type = E_AXON; break;
-                            case 6: new_type = E_AXON_I; break;
+                            case 0: new_type = E_PROTEIN; break;
+                            case 1: new_type = E_DENDRITE; break;
+                            case 2: new_type = E_DENDRITE_I; break;
+                            case 3: new_type = E_AXON; break;
+                            case 4: new_type = E_AXON_I; break;
                         }
 
                         if( type != new_type )
@@ -605,10 +716,7 @@ Ontogenesis::GenerateRandomConditionValue( Condition& cond )
 {
     switch( cond.type )
     {
-        case C_O_PROTEIN:
-        case C_NO_PROTEIN:
-        case C_I_PROTEIN:
-        case C_NI_PROTEIN:
+        case C_PROTEIN:
         {
             cond.value1 = ( rand() % ( MAX_PROTEIN + 1 ) ) - 1;
             cond.value2 = ( rand() % 100 ) / 100.0f;
@@ -649,9 +757,7 @@ Ontogenesis::GenerateRandomExpressionValue( Expression& expr )
             expr.value3 = -5 + ( rand() % 10 );
         }
         break;
-        case E_MIGRATE:
-        case E_O_PROTEIN:
-        case E_I_PROTEIN:
+        case E_PROTEIN:
         case E_DENDRITE:
         case E_DENDRITE_I:
         case E_AXON:
@@ -670,10 +776,7 @@ Ontogenesis::ConditionTypeToString( const ConditionType type )
 {
     switch( type )
     {
-        case C_O_PROTEIN: return "O_PROTEIN";
-        case C_NO_PROTEIN: return "NO_PROTEIN";
-        case C_I_PROTEIN: return "I_PROTEIN";
-        case C_NI_PROTEIN: return "NI_PROTEIN";
+        case C_PROTEIN: return "PROTEIN";
     }
     return "UNKNOWN";
 }
@@ -683,21 +786,9 @@ Ontogenesis::ConditionTypeToString( const ConditionType type )
 Ontogenesis::ConditionType
 Ontogenesis::ConditionStringToType( const Ogre::String& type )
 {
-    if( type == "O_PROTEIN" )
+    if( type == "PROTEIN" )
     {
-        return C_O_PROTEIN;
-    }
-    else if( type == "NO_PROTEIN" )
-    {
-        return C_NO_PROTEIN;
-    }
-    else if( type == "I_PROTEIN" )
-    {
-        return C_I_PROTEIN;
-    }
-    else if( type == "NI_PROTEIN" )
-    {
-        return C_NI_PROTEIN;
+        return C_PROTEIN;
     }
     return C_TOTAL;
 }
@@ -711,9 +802,7 @@ Ontogenesis::ExpressionTypeToString( const ExpressionType type )
     {
         case E_SPLIT: return "SPLIT";
         case E_SPAWN: return "SPAWN";
-        case E_MIGRATE: return "MIGRATE";
-        case E_O_PROTEIN: return "O_PROTEIN";
-        case E_I_PROTEIN: return "I_PROTEIN";
+        case E_PROTEIN: return "PROTEIN";
         case E_DENDRITE: return "DENDRITE";
         case E_DENDRITE_I: return "DENDRITE_I";
         case E_AXON: return "AXON";
@@ -735,17 +824,9 @@ Ontogenesis::ExpressionStringToType( const Ogre::String& type )
     {
         return E_SPAWN;
     }
-    else if( type == "MIGRATE" )
+    else if( type == "PROTEIN" )
     {
-        return E_MIGRATE;
-    }
-    else if( type == "O_PROTEIN" )
-    {
-        return E_O_PROTEIN;
-    }
-    else if( type == "I_PROTEIN" )
-    {
-        return E_I_PROTEIN;
+        return E_PROTEIN;
     }
     else if( type == "DENDRITE" )
     {
@@ -781,10 +862,7 @@ Ontogenesis::DumpGenome( Logger* file, std::vector< Ontogenesis::Gene >& genome 
             file->Log( "            <condition type=\"" + ConditionTypeToString( cond.type ) + "\" " );
             switch( cond.type )
             {
-                case C_O_PROTEIN:
-                case C_NO_PROTEIN:
-                case C_I_PROTEIN:
-                case C_NI_PROTEIN:
+                case C_PROTEIN:
                 {
                     file->Log( "value1=\"" + FloatToString( cond.value1 ) + "\" value2=\"" + FloatToString( cond.value2 ) + "\" />\n" );
                 }
@@ -799,9 +877,7 @@ Ontogenesis::DumpGenome( Logger* file, std::vector< Ontogenesis::Gene >& genome 
             switch( expr.type )
             {
                 case E_SPLIT:
-                case E_MIGRATE:
-                case E_O_PROTEIN:
-                case E_I_PROTEIN:
+                case E_PROTEIN:
                 case E_DENDRITE:
                 case E_DENDRITE_I:
                 case E_AXON:

@@ -18,11 +18,7 @@ Ontogenesis::Ontogenesis()
     cond.type = ConditionType::C_PROTEIN;
     cond.value1 = 0;
     cond.value2 = 0.5f;
-    cond.value3 = 1.0f;
-    gene.cond.push_back( cond );
-    cond.type = ConditionType::C_DIVISION;
-    cond.value1 = 0;
-    cond.value2 = 2;
+    cond.value3 = -1;
     gene.cond.push_back( cond );
     Expression expr;
     expr.type = ExpressionType::E_SPLIT;
@@ -31,7 +27,33 @@ Ontogenesis::Ontogenesis()
     gene.cond.clear();
     gene.expr.clear();
 
+    gene.id = 1;
+    cond.type = ConditionType::C_PROTEIN;
+    cond.value1 = 0;
+    cond.value2 = -1;
+    cond.value3 = 1.0f;
+    gene.cond.push_back( cond );
+    expr.type = ExpressionType::E_PROTEIN;
+    expr.value1 = 1;
+    expr.value2 = 1.0f;
+    gene.expr.push_back( expr );
+    m_Genome.push_back( gene );
+    gene.cond.clear();
+    gene.expr.clear();
 
+    gene.id = 2;
+    cond.type = ConditionType::C_PROTEIN;
+    cond.value1 = 1;
+    cond.value2 = -1;
+    cond.value3 = 1.0f;
+    gene.cond.push_back( cond );
+    expr.type = ExpressionType::E_PROTEIN;
+    expr.value1 = 0;
+    expr.value2 = 1.0f;
+    gene.expr.push_back( expr );
+    m_Genome.push_back( gene );
+    gene.cond.clear();
+    gene.expr.clear();
 
     // default cell
     Cell* cell = new Cell();
@@ -40,30 +62,26 @@ Ontogenesis::Ontogenesis()
     m_Cells.push_back( cell );
 
     // default protein
+    ProteinData data;
     Protein protein;
+
     protein.id = 0;
-    protein.power = 10.0f;
-    protein.x = 20;
-    protein.y = 20;
+    data.power = 10.0f;
+    data.x = 20;
+    data.y = 20;
+    protein.data.push_back( data );
     m_Proteins.push_back( protein );
-
-    protein.id = 1;
-    protein.power = 5.0f;
-    protein.x = 10;
-    protein.y = 20;
-    m_Proteins.push_back( protein );
-
-    protein.id = 2;
-    protein.power = 5.0f;
-    protein.x = 30;
-    protein.y = 20;
-    m_Proteins.push_back( protein );
+    protein.data.clear();
 }
 
 
 
 Ontogenesis::~Ontogenesis()
 {
+    for( size_t i = 0; i < m_Cells.size(); ++i )
+    {
+        delete m_Cells[ i ];
+    }
 }
 
 
@@ -74,39 +92,38 @@ Ontogenesis::Draw()
 {
     float scale = 20.0f;
 
-    DEBUG_DRAW.SetTextAlignment( DebugDraw::CENTER );
+    DEBUG_DRAW.SetTextAlignment( DebugDraw::LEFT );
+    DEBUG_DRAW.Text( 0, 10, "Cells:" );
     for( size_t i = 0; i < m_Cells.size(); ++i )
     {
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 0.5 ) );
         DEBUG_DRAW.Disc( m_Cells[ i ]->GetX() * scale, m_Cells[ i ]->GetY() * scale, 10 );
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+        DEBUG_DRAW.SetTextAlignment( DebugDraw::CENTER );
         DEBUG_DRAW.Text( ( m_Cells[ i ]->GetX() ) * scale, ( m_Cells[ i ]->GetY() - 0.5f ) * scale, Ogre::StringConverter::toString( i ) );
+        DEBUG_DRAW.SetTextAlignment( DebugDraw::LEFT );
+        DEBUG_DRAW.Text( 10, 30 + i * 20, Ogre::StringConverter::toString( i ) + ":" + Ogre::StringConverter::toString( m_Cells[ i ]->GetDivision() ) );
     }
 
     for( size_t i = 0; i < m_Proteins.size(); ++i )
     {
-        if( m_Proteins[ i ].id == 1 )
+        for( size_t j = 0; j < m_Proteins[ i ].data.size(); ++j )
         {
-            DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 1, 1 ) );
+            float x = m_Proteins[ i ].data[ j ].x;
+            float y = m_Proteins[ i ].data[ j ].y;
+
+            DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 2 * m_Proteins[ i ].data[ j ].power ) );
+            DEBUG_DRAW.Quad( x * scale - scale / 2.0f, y * scale - scale / 2.0f, x * scale + scale / 2.0f, y * scale - scale / 2.0f, x * scale + scale / 2.0f, y * scale + scale / 2.0f, x * scale - scale / 2.0f, y * scale + scale / 2.0f );
+            DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+            DEBUG_DRAW.Text( ( x - 0.5f ) * scale, ( y - 0.5f ) * scale, Ogre::StringConverter::toString( ( int )m_Proteins[ i ].data[ j ].power ) );
         }
-        else if( m_Proteins[ i ].id == 2 )
-        {
-            DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
-        }
-        else
-        {
-            DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
-        }
-        //LOG_ERROR( "x=" + Ogre::StringConverter::toString( m_Proteins[ i ].x ) + " y=" + Ogre::StringConverter::toString( m_Proteins[ i ].y ) + " p:" + Ogre::StringConverter::toString( (float)m_Proteins[ i ].power ) );
-        DEBUG_DRAW.Circle( m_Proteins[ i ].x * scale, m_Proteins[ i ].y * scale, m_Proteins[ i ].power * scale );
-        //DEBUG_DRAW.Text( m_Cells[ i ]->GetX() * scale, m_Cells[ i ]->GetY() * scale, Ogre::StringConverter::toString( i ) );
     }
 
     DEBUG_DRAW.SetTextAlignment( DebugDraw::LEFT );
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
     for( size_t i = 0; i < m_Genome.size(); ++i )
     {
-        DEBUG_DRAW.Text( 10, 10 + i * 20.0f, "Gene" + Ogre::StringConverter::toString( m_Genome[ i ].id ) + ": " );
+        DEBUG_DRAW.Text( 810, 10 + i * 20.0f, "Gene" + Ogre::StringConverter::toString( m_Genome[ i ].id ) + ": " );
 /*
         for( size_t cond_id = 0; cond_id < m_Genome[ i ].cond.size(); ++cond_id )
         {
@@ -144,6 +161,68 @@ Ontogenesis::Draw()
 void
 Ontogenesis::Step()
 {
+    for( size_t i = 0; i < m_Proteins.size(); ++i )
+    {
+        for( size_t j = 0; j < m_Proteins[ i ].data.size(); ++j )
+        {
+            float power = m_Proteins[ i ].data[ j ].power;
+            power /= 1.2f;
+            if( power < 0.05f )
+            {
+                power = 0.0f;
+            }
+            m_Proteins[ i ].data[ j ].power = power;
+        }
+    }
+    for( size_t i = 0; i < m_Proteins.size(); ++i )
+    {
+        size_t size = m_Proteins[ i ].data.size();
+        for( size_t j = 0; j < size; ++j )
+        {
+            float power = m_Proteins[ i ].data[ j ].power;
+
+            if( power > 0.2f )
+            {
+                int x = m_Proteins[ i ].data[ j ].x;
+                int y = m_Proteins[ i ].data[ j ].y;
+                float add_power = power / 8.0f;
+
+                AddProtein( m_Proteins[ i ].id, add_power, x, y - 1 );
+                AddProtein( m_Proteins[ i ].id, add_power, x, y + 1 );
+                AddProtein( m_Proteins[ i ].id, add_power, x - 1, y );
+                AddProtein( m_Proteins[ i ].id, add_power, x + 1, y );
+
+                m_Proteins[ i ].data[ j ].power -= add_power * 4.0f;
+            }
+        }
+    }
+    for( size_t i = 0; i < m_Proteins.size(); ++i )
+    {
+        for( std::vector< ProteinData >::iterator it = m_Proteins[ i ].data.begin(); it != m_Proteins[ i ].data.end(); )
+        {
+            if( ( *it ).power < 0.05f )
+            {
+                it = m_Proteins[ i ].data.erase( it );
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+    for( std::vector< Protein >::iterator it = m_Proteins.begin(); it != m_Proteins.end(); )
+    {
+        if( ( *it ).data.size() == 0 )
+        {
+            it = m_Proteins.erase( it );
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+
     size_t size = m_Cells.size();
     for( size_t i = 0; i < size; ++i )
     {
@@ -160,8 +239,12 @@ Ontogenesis::Step()
                 {
                     case C_PROTEIN:
                     {
-                        float power = SearchProtein( ( int )cond.value1, m_Cells[ i ]->GetX(), m_Cells[ i ]->GetY() );
-                        if( ( power < cond.value2 ) || ( power > cond.value3 ) )
+                        float power = GetProteinPower( ( int )cond.value1, m_Cells[ i ]->GetX(), m_Cells[ i ]->GetY() );
+                        if( ( cond.value2 != -1 ) && ( power < cond.value2 ) )
+                        {
+                            exec = false;
+                        }
+                        else if( ( cond.value3 != -1 ) && ( power > cond.value3 ) )
                         {
                             exec = false;
                         }
@@ -189,30 +272,7 @@ Ontogenesis::Step()
                     {
                         case E_PROTEIN:
                         {
-                            int found = -1;
-                            for( size_t p_id = 0; p_id < m_Proteins.size(); ++p_id )
-                            {
-                                if( m_Proteins[ p_id ].id == ( int )expr.value1 )
-                                {
-                                    if( ( m_Proteins[ p_id ].x == m_Cells[ i ]->GetX() ) && ( m_Proteins[ p_id ].y == m_Cells[ i ]->GetY() ) )
-                                    {
-                                        found = p_id;
-                                    }
-                                }
-                            }
-                            if( found != -1 )
-                            {
-                                //m_Proteins[ found ].power += expr.value2;
-                            }
-                            else
-                            {
-                                Protein protein;
-                                protein.id = ( int )expr.value1;
-                                protein.power = expr.value2;
-                                protein.x =  m_Cells[ i ]->GetX();
-                                protein.y =  m_Cells[ i ]->GetY();
-                                m_Proteins.push_back( protein );
-                            }
+                            AddProtein( ( int )expr.value1, expr.value2, m_Cells[ i ]->GetX(), m_Cells[ i ]->GetY() );
                         }
                         break;
 
@@ -250,7 +310,7 @@ Ontogenesis::Step()
 
 
 float
-Ontogenesis::SearchProtein( const int protein, const int x, const int y )
+Ontogenesis::GetProteinPower( const int protein, const int x, const int y )
 {
     float power = 0.0f;
 
@@ -258,16 +318,15 @@ Ontogenesis::SearchProtein( const int protein, const int x, const int y )
     {
         if( m_Proteins[ i ].id == protein )
         {
-            int x2 = m_Proteins[ i ].x;
-            int y2 = m_Proteins[ i ].y;
-            float distance = (float)sqrt( ( x2 - x ) * ( x2 - x ) + ( y2 - y ) * ( y2 - y ) );
-            if( distance < m_Proteins[ i ].power )
+            for( size_t j = 0; j < m_Proteins[ i ].data.size(); ++j )
             {
-                power += ( m_Proteins[ i ].power - distance ) / m_Proteins[ i ].power;
+                if( m_Proteins[ i ].data[ j ].x == x && m_Proteins[ i ].data[ j ].y == y )
+                {
+                    power = m_Proteins[ i ].data[ j ].power;
+                }
             }
         }
     }
-    //LOG_ERROR( "x=" + Ogre::StringConverter::toString( x ) + " y=" + Ogre::StringConverter::toString( y ) + " p:" + Ogre::StringConverter::toString( power ) );
     return power;
 }
 
@@ -287,6 +346,54 @@ Ontogenesis::MoveCell( Cell* cell, const int dir_x, const int dir_y )
 
     cell->SetX( x );
     cell->SetY( y );
+}
+
+
+
+void
+Ontogenesis::AddCell( const int x, const int y )
+{
+    Cell* cell = new Cell();
+    cell->SetX( x );
+    cell->SetY( y );
+    m_Cells.push_back( cell );
+}
+
+
+
+void
+Ontogenesis::AddProtein( const int id, const float power, const int x, const int y )
+{
+    for( size_t i = 0; i < m_Proteins.size(); ++i )
+    {
+        if( m_Proteins[ i ].id == id )
+        {
+            for( size_t j = 0; j < m_Proteins[ i ].data.size(); ++j )
+            {
+                if( m_Proteins[ i ].data[ j ].x == x && m_Proteins[ i ].data[ j ].y == y )
+                {
+                    m_Proteins[ i ].data[ j ].power += power;
+                    return;
+                }
+            }
+
+            ProteinData data;
+            data.power = power;
+            data.x = x;
+            data.y = y;
+            m_Proteins[ i ].data.push_back( data );
+            return;
+        }
+    }
+
+    ProteinData data;
+    Protein protein;
+    protein.id = id;
+    data.power = power;
+    data.x = x;
+    data.y = y;
+    protein.data.push_back( data );
+    m_Proteins.push_back( protein );
 }
 
 
@@ -343,7 +450,7 @@ Ontogenesis::ExpressionTypeToString( const ExpressionType type )
     switch( type )
     {
         case E_SPLIT: return "SPLIT";
-        case E_SPAWN: return "SPAWN";
+        case E_SPLIT_GRADIENT: return "SPLIT_GRADIENT";
         case E_MIGRATE: return "MIGRATE";
         case E_PROTEIN: return "PROTEIN";
         case E_DENDRITE: return "DENDRITE";

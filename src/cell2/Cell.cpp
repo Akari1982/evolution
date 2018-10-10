@@ -22,6 +22,13 @@ Cell::~Cell()
 
 
 void
+Cell::Update()
+{
+}
+
+
+
+void
 Cell::Draw()
 {
 }

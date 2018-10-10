@@ -15,12 +15,7 @@ class Ontogenesis
 public:
     enum ConditionType
     {
-        // сигналом для дальнейшей экспрессии в клетках может быть
-        C_O_PROTEIN = 0,
-        C_NO_PROTEIN,
-        C_I_PROTEIN,
-        C_NI_PROTEIN,
-
+        C_PROTEIN = 0,
         C_TOTAL
     };
 
@@ -33,9 +28,7 @@ public:
         // [bool = 1] - внутренний протеин наследуется
         E_SPLIT = 0,
         E_SPAWN,
-        E_MIGRATE,
-        E_O_PROTEIN,
-        E_I_PROTEIN,
+        E_PROTEIN,
         E_DENDRITE,
         E_DENDRITE_I,
         E_AXON,
@@ -49,6 +42,7 @@ public:
         ConditionType type;
         float value1;
         float value2;
+        float value3;
     };
 
     struct Expression
@@ -67,10 +61,24 @@ public:
         std::vector< Expression > expr;
     };
 
+    struct ProteinData
+    {
+        float power;
+        int x;
+        int y;
+    };
+
+    struct Protein
+    {
+        int id;
+        std::vector< ProteinData > data;
+    };
+
     struct Species
     {
         float fitness;
         std::vector< Gene > genome;
+        std::vector< Protein > proteins;
         std::vector< Cell* > network;
     };
 
@@ -107,7 +115,8 @@ private:
         float power;
         size_t cell_id;
     };
-    float SearchOuterProtein( std::vector< Cell* >& network, const int protein, const int x, const int y, std::vector< PowerProtein >& powers );
+    void AddProtein( std::vector< Protein >& proteins, const int id, const float power, const int x, const int y );
+    float GetProteinPower( std::vector< Protein >& proteins, const int protein, const int x, const int y );
     bool FindPlaceForCell( std::vector< Cell* >& network, const int x, const int y, const int radius, int &new_x, int &new_y );
     bool IsCell( std::vector< Cell* >& network, const int x, const int y );
     std::vector< Gene > Mutate( std::vector< Gene >& genome );

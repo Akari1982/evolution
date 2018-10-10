@@ -240,6 +240,9 @@ EntityManager::Update()
 void
 EntityManager::Draw()
 {
+    m_Ontogenesis0->Draw( 10, 10 );
+    m_Ontogenesis1->Draw( 10, 190 );
+
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
     DEBUG_DRAW.Line( m_X, m_Y, m_X, m_Y + m_Height );
     DEBUG_DRAW.Line( m_X + m_Width, m_Y, m_X + m_Width, m_Y + m_Height );
@@ -272,9 +275,6 @@ EntityManager::Draw()
         DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 1, 0, 1 ) );
         DEBUG_DRAW.Quad( x - radius, y - radius, x + radius, y - radius, x + radius, y + radius, x - radius, y + radius );
     }
-
-    m_Ontogenesis0->Draw( 10, 10 );
-    m_Ontogenesis1->Draw( 10, 190 );
 }
 
 

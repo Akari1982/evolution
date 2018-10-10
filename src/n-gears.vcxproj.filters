@@ -17,8 +17,8 @@
     <Filter Include="N-Gears files\core\TinyXml">
       <UniqueIdentifier>{2a8a35a0-cb85-40af-ad81-45906b03e636}</UniqueIdentifier>
     </Filter>
-    <Filter Include="N-Gears files\cell2">
-      <UniqueIdentifier>{67177d57-14b3-4b77-a242-e7ea01a98091}</UniqueIdentifier>
+    <Filter Include="N-Gears files\cell">
+      <UniqueIdentifier>{1bbad3e5-6895-4d9b-886d-ae9b21400e17}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -220,14 +220,20 @@
     <ClCompile Include="Main.cpp">
       <Filter>N-Gears files</Filter>
     </ClCompile>
-    <ClCompile Include="cell2\Cell.cpp">
-      <Filter>N-Gears files\cell2</Filter>
+    <ClCompile Include="cell\Cell.cpp">
+      <Filter>N-Gears files\cell</Filter>
     </ClCompile>
-    <ClCompile Include="cell2\EntityManager.cpp">
-      <Filter>N-Gears files\cell2</Filter>
+    <ClCompile Include="cell\Entity.cpp">
+      <Filter>N-Gears files\cell</Filter>
     </ClCompile>
-    <ClCompile Include="cell2\Ontogenesis.cpp">
-      <Filter>N-Gears files\cell2</Filter>
+    <ClCompile Include="cell\EntityManager.cpp">
+      <Filter>N-Gears files\cell</Filter>
+    </ClCompile>
+    <ClCompile Include="cell\Ontogenesis.cpp">
+      <Filter>N-Gears files\cell</Filter>
+    </ClCompile>
+    <ClCompile Include="cell\XmlGenerationFile.cpp">
+      <Filter>N-Gears files\cell</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -609,17 +615,23 @@
     <ClInclude Include="Main.h">
       <Filter>N-Gears files</Filter>
     </ClInclude>
-    <ClInclude Include="cell2\Cell.h">
-      <Filter>N-Gears files\cell2</Filter>
+    <ClInclude Include="cell\Cell.h">
+      <Filter>N-Gears files\cell</Filter>
     </ClInclude>
-    <ClInclude Include="cell2\EntityManager.h">
-      <Filter>N-Gears files\cell2</Filter>
+    <ClInclude Include="cell\Entity.h">
+      <Filter>N-Gears files\cell</Filter>
     </ClInclude>
-    <ClInclude Include="cell2\Ontogenesis.h">
-      <Filter>N-Gears files\cell2</Filter>
+    <ClInclude Include="cell\EntityManager.h">
+      <Filter>N-Gears files\cell</Filter>
     </ClInclude>
-    <ClInclude Include="cell2\EntityManagerCommands.h">
-      <Filter>N-Gears files\cell2</Filter>
+    <ClInclude Include="cell\EntityManagerCommands.h">
+      <Filter>N-Gears files\cell</Filter>
+    </ClInclude>
+    <ClInclude Include="cell\Ontogenesis.h">
+      <Filter>N-Gears files\cell</Filter>
+    </ClInclude>
+    <ClInclude Include="cell\XmlGenerationFile.h">
+      <Filter>N-Gears files\cell</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
