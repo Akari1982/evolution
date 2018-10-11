@@ -337,30 +337,26 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             case E_AXON:
                             case E_AXON_I:
                             {
-/*
-                                std::vector< PowerProtein > powers;
-                                GetProteinPower( species.proteins, ( int )expr.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY(), powers );
-                                for( size_t c = 0; c < powers.size(); ++c )
+                                int cell_id = FindCellByProteinGradient( species.network, species.proteins, ( int )expr.value1, species.network[ i ]->GetX(), species.network[ i ]->GetY() );
+                                if( cell_id != -1 )
                                 {
                                     bool inverted = ( expr.type == E_DENDRITE_I ) || ( expr.type == E_AXON_I );
-                                    int type = species.network[ powers[ c ].cell_id ]->GetType();
+                                    int type = species.network[ cell_id ]->GetType();
                                     if( ( expr.type == E_DENDRITE ) || ( expr.type == E_DENDRITE_I ) )
                                     {
                                         if( type == Cell::NEURON || type == Cell::SENSOR )
                                         {
-                                            species.network[ i ]->AddSynapse( powers[ c ].power, inverted, species.network[ powers[ c ].cell_id ] );
+                                            species.network[ i ]->AddSynapse( 1, inverted, species.network[ cell_id ] );
                                         }
                                     }
                                     else
                                     {
                                         if( type == Cell::ACTIVATOR )
                                         {
-                                            species.network[ powers[ c ].cell_id ]->AddSynapse( powers[ c ].power, inverted, species.network[ i ] );
+                                            species.network[ cell_id ]->AddSynapse( 1, inverted, species.network[ i ] );
                                         }
                                     }
                                 }
-                                powers.clear();
-*/
                             }
                             break;
                         }
@@ -479,17 +475,28 @@ Ontogenesis::GetProteinPower( std::vector< Protein >& proteins, const int protei
 
 
 
-const size_t
+const int
 Ontogenesis::FindCellByProteinGradient( std::vector< Cell* >& network, std::vector< Protein >& proteins, const int protein, const int x, const int y )
 {
-    float power = GetProteinPower( proteins, protein, x, y );
+    float power = -1;
+    int ret_x;
+    int ret_y
 
-    if( IsCell( network, x, y ) == true )
+    for( size_t i = 0; i < proteins.size(); ++i )
     {
-        
+        if( proteins[ i ].id == protein )
+        {
+            power = FindProteinGradient( proteins[ i ].data, x, y, 0, ret_x, ret_y );
+            break;
+        }
     }
 
+    if( power > -1 )
+    {
+        return GetCell( network, ret_x, ret_y );
+    }
 
+    return -1;
 }
 
 
@@ -567,7 +574,7 @@ Ontogenesis::FindPlaceForCell( std::vector< Cell* >& network, const int x, const
         for( int i = -r + 1; i <= r; ++i )
         {
             new_x = x + i;
-            if( IsCell( network, new_x, new_y ) == false )
+            if( GetCell( network, new_x, new_y ) == -1 )
             {
                 return true;
             }
@@ -575,7 +582,7 @@ Ontogenesis::FindPlaceForCell( std::vector< Cell* >& network, const int x, const
         for( int i = -r + 1; i <= r; ++i )
         {
             new_y = y + i;
-            if( IsCell( network, new_x, new_y ) == false )
+            if( GetCell( network, new_x, new_y ) == -1 )
             {
                 return true;
             }
@@ -583,7 +590,7 @@ Ontogenesis::FindPlaceForCell( std::vector< Cell* >& network, const int x, const
         for( int i = r - 1; i <= -r; --i )
         {
             new_x = x + i;
-            if( IsCell( network, new_x, new_y ) == false )
+            if( GetCell( network, new_x, new_y ) == -1 )
             {
                 return true;
             }
@@ -591,7 +598,7 @@ Ontogenesis::FindPlaceForCell( std::vector< Cell* >& network, const int x, const
         for( int i = r - 1; i <= -r; --i )
         {
             new_y = y + i;
-            if( IsCell( network, new_x, new_y ) == false )
+            if( GetCell( network, new_x, new_y ) == -1 )
             {
                 return true;
             }
@@ -603,18 +610,18 @@ Ontogenesis::FindPlaceForCell( std::vector< Cell* >& network, const int x, const
 
 
 
-bool
-Ontogenesis::IsCell( std::vector< Cell* >& network, const int x, const int y )
+const int
+Ontogenesis::GetCell( std::vector< Cell* >& network, const int x, const int y )
 {
     for( size_t i = 0; i < network.size(); ++i )
     {
         if( network[ i ]->GetX() == x && network[ i ]->GetY() == y )
         {
-            return true;
+            return i;
         }
     }
 
-    return false;
+    return -1;
 }
 
 

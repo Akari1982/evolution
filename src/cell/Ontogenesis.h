@@ -116,9 +116,11 @@ private:
         size_t cell_id;
     };
     void AddProtein( std::vector< Protein >& proteins, const int id, const float power, const int x, const int y );
-    float GetProteinPower( std::vector< Protein >& proteins, const int protein, const int x, const int y );
-    bool FindPlaceForCell( std::vector< Cell* >& network, const int x, const int y, const int radius, int &new_x, int &new_y );
-    bool IsCell( std::vector< Cell* >& network, const int x, const int y );
+    const float GetProteinPower( std::vector< Protein >& proteins, const int protein, const int x, const int y );
+    const int FindCellByProteinGradient( std::vector< Cell* >& network, std::vector< Protein >& proteins, const int protein, const int x, const int y );
+    const float FindProteinGradient( std::vector< ProteinData >& data, const int x, const int y, const float power, int& ret_x, int& ret_y );
+    const bool FindPlaceForCell( std::vector< Cell* >& network, const int x, const int y, const int radius, int &new_x, int &new_y );
+    const int GetCell( std::vector< Cell* >& network, const int x, const int y );
     std::vector< Gene > Mutate( std::vector< Gene >& genome );
     Condition GenerateRandomCondition();
     void GenerateRandomConditionValue( Condition& cond );
