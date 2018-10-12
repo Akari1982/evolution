@@ -1,14 +1,14 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "Cell.h"
+#include "Onthogenesis.h"
 
 
 
-class Entity
+class Entity : public Onthogenesis
 {
 public:
-    Entity( const int type, const float x, const float y );
+    Entity( const float x, const float y );
     virtual ~Entity();
 
     void Update();
@@ -35,12 +35,6 @@ public:
     float GetFitness() const;
     void SetFitness( const float fitness );
 
-    size_t GetGenerationId() const;
-    size_t GetSpeciesId() const;
-    int GetType() const;
-
-    void AddNetwork( std::vector< Cell* >& network, const size_t generation_id, const size_t species_id );
-
     float GetSensorEnergy() const;
     float GetSensorFood( const float x, const float y ) const;
     float GetSensorEnemy( const float x, const float y ) const;
@@ -62,12 +56,7 @@ private:
     float m_Energy;
     float m_Fitness;
 
-    size_t m_GenerationId;
-    size_t m_SpeciesId;
-    int m_Type;
-
     float m_Think;
-    std::vector< Cell* > m_Network;
 };
 
 

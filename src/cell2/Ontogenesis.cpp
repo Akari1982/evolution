@@ -222,7 +222,6 @@ Ontogenesis::Step()
         }
     }
 
-
     size_t size = m_Cells.size();
     for( size_t i = 0; i < size; ++i )
     {

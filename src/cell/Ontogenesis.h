@@ -5,7 +5,6 @@
 #include <OgreString.h>
 
 #include "Cell.h"
-#include "Entity.h"
 #include "../core/Logger.h"
 
 
@@ -74,37 +73,17 @@ public:
         std::vector< ProteinData > data;
     };
 
-    struct Species
-    {
-        float fitness;
-        std::vector< Gene > genome;
-        std::vector< Protein > proteins;
-        std::vector< Cell* > network;
-    };
-
-    struct Generation
-    {
-        int id;
-        float top_fitness;
-        size_t top_id;
-        std::vector< Gene > base_genome;
-        std::vector< Species > species;
-
-        Ogre::String file_name;
-    };
-
 public:
-    Ontogenesis( const Ogre::String& file_prefix );
+    Ontogenesis();
     virtual ~Ontogenesis();
 
     void Draw( const unsigned int x, const unsigned int y );
 
-    void LoadNetwork( Entity* entity );
-    void EntityDeath( Entity* entity );
+    void DevelopmentStep();
 
-    ConditionType ConditionStringToType( const Ogre::String& type );
-    ExpressionType ExpressionStringToType( const Ogre::String& type );
-    void LoadGeneration( const Generation& generation );
+    void SetGenome( std::vector< Gene >& genome );
+    std::vector< Gene > GetGenome() const;
+    void DumpGenome( Logger* file, std::vector< Gene >& genome ) const;
 
 private:
     Ontogenesis();
@@ -115,12 +94,12 @@ private:
         float power;
         size_t cell_id;
     };
-    void AddProtein( std::vector< Protein >& proteins, const int id, const float power, const int x, const int y );
-    const float GetProteinPower( std::vector< Protein >& proteins, const int protein, const int x, const int y );
-    const int FindCellByProteinGradient( std::vector< Cell* >& network, std::vector< Protein >& proteins, const int protein, const int x, const int y );
+    void AddProtein( const int id, const float power, const int x, const int y );
+    const float GetProteinPower( const int protein, const int x, const int y );
+    const int FindCellByProteinGradient( const int protein, const int x, const int y );
     const float FindProteinGradient( std::vector< ProteinData >& data, const int x, const int y, const float power, int& ret_x, int& ret_y );
-    const bool FindPlaceForCell( std::vector< Cell* >& network, const int x, const int y, const int radius, int &new_x, int &new_y );
-    const int GetCell( std::vector< Cell* >& network, const int x, const int y );
+    const bool FindPlaceForCell( const int x, const int y, const int radius, int &new_x, int &new_y );
+    const int GetCell( const int x, const int y );
     std::vector< Gene > Mutate( std::vector< Gene >& genome );
     Condition GenerateRandomCondition();
     void GenerateRandomConditionValue( Condition& cond );
@@ -129,14 +108,15 @@ private:
 
     Ogre::String ConditionTypeToString( const ConditionType type );
     Ogre::String ExpressionTypeToString( const ExpressionType type );
-    void DumpGenome( Logger* file, std::vector< Gene >& genome );
-    void DumpGeneration( Generation& generation );
+    ConditionType ConditionStringToType( const Ogre::String& type );
+    ExpressionType ExpressionStringToType( const Ogre::String& type );
 
 private:
-    Ogre::String m_FilePrefix;
+    std::vector< Gene > m_Genome;
+    std::vector< Protein > m_Proteins;
 
-    unsigned int m_GeneUniqueId;
-    std::vector< Generation > m_Generations;
+protected:
+    std::vector< Cell* > m_Cells;
 };
 
 

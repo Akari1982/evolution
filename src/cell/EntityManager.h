@@ -5,7 +5,6 @@
 
 #include "../core/Event.h"
 #include "Entity.h"
-#include "Ontogenesis.h"
 
 
 
@@ -20,18 +19,27 @@ public:
     void Draw();
 
     void InitCommands();
-    void RunGeneration( const int type, Ogre::String& file_name );
+    void RunGeneration( Ogre::String& file_name );
+    struct Generation
+    {
+        int id;
+        float top_fitness;
+        size_t top_id;
+        std::vector< Gene > base_genome;
+        std::vector< Entity* > species;
 
-    float FeelFood( const float x, const float y );
-    float FeelEnemy( const int type, const float x, const float y );
-    bool CheckMove( Entity* entity, const float move_x, const float move_y );
+        Ogre::String file_name;
+    };
+    void DumpGeneration( Generation& generation );
+
+    const int GetGenerationByEntity( Entity* entity ) const;
+
+    float FeelFood( const float x, const float y ) const;
+    float FeelEnemy( const float x, const float y ) const;
+    bool CheckMove( Entity* entity, const float move_x, const float move_y ) const;
 
 private:
-    Ontogenesis* m_Ontogenesis0;
-    Ontogenesis* m_Ontogenesis1;
     std::vector< Entity* > m_Entity;
-    int m_TypeNum0;
-    int m_TypeNum1;
 
     struct Food
     {
@@ -48,6 +56,9 @@ private:
     float m_Y;
     float m_Width;
     float m_Height;
+
+    std::vector< Generation > m_Generations;
+    std::vector< Generation > m_GenerationsPrev;
 };
 
 
