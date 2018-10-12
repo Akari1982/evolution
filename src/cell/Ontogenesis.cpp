@@ -319,8 +319,8 @@ Ontogenesis::LoadNetwork( Entity* entity )
                             {
                                 int x = ( int )expr.value2;
                                 int y = ( int )expr.value3;
-                                bool occupied = IsCell( species.network, x, y );
-                                if( occupied == false )
+                                int occupied = GetCell( species.network, x, y );
+                                if( occupied == -1 )
                                 {
                                     Cell* cell = new Cell( entity, ( Cell::CellName )( int )expr.value1, x, y );
                                     species.network.push_back( cell );
@@ -480,7 +480,7 @@ Ontogenesis::FindCellByProteinGradient( std::vector< Cell* >& network, std::vect
 {
     float power = -1;
     int ret_x;
-    int ret_y
+    int ret_y;
 
     for( size_t i = 0; i < proteins.size(); ++i )
     {
