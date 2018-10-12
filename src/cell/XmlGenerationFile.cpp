@@ -1,5 +1,6 @@
 #include "XmlGenerationFile.h"
 
+#include "cell/EntityManager.h"
 #include "../core/Logger.h"
 #include "../core/Utilites.h"
 
@@ -19,7 +20,7 @@ XmlGenerationFile::~XmlGenerationFile()
 
 
 void
-XmlGenerationFile::LoadGeneration( Ontogenesis* ontogenesis )
+XmlGenerationFile::LoadGeneration()
 {
     TiXmlNode* node = m_File.RootElement();
 
@@ -29,7 +30,7 @@ XmlGenerationFile::LoadGeneration( Ontogenesis* ontogenesis )
         return;
     }
 
-    Ontogenesis::Generation generation;
+    EntityManager::Generation generation;
     generation.id = GetInt( node, "id" );
     generation.top_fitness = 0.0f;
     generation.top_id = 0;
@@ -79,5 +80,5 @@ XmlGenerationFile::LoadGeneration( Ontogenesis* ontogenesis )
         node = node->NextSibling();
     }
 
-    ontogenesis->LoadGeneration( generation );
+    EntityManager::getSingleton().LoadGeneration( generation );
 }

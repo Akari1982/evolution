@@ -120,40 +120,6 @@ Ontogenesis::~Ontogenesis()
 
 
 
-
-void
-Ontogenesis::Draw( const unsigned int x, const unsigned int y )
-{
-    float scale = 8.0f;
-
-    int cur_gen = m_Generations.size() - 1;
-    if( cur_gen >= 0 )
-    {
-        DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-        DEBUG_DRAW.Text( x, y, "Generation " + IntToString( m_Generations[ cur_gen ].id ) );
-        DEBUG_DRAW.Text( x + 200, y, "Top fitness: " + IntToString( ( int )m_Generations[ cur_gen ].top_fitness ) + " (" + IntToString( m_Generations[ cur_gen ].top_id ) + ")" );
-        DEBUG_DRAW.Text( x + 400, y, "Number of species: " + IntToString( m_Generations[ cur_gen ].species.size() ) );
-
-        for( size_t s = 0; s < m_Generations[ cur_gen ].species.size(); ++s )
-        {
-            std::vector< Protein > proteins = m_Generations[ cur_gen ].species[ s ].proteins;
-            for( size_t i = 0; i < proteins.size(); ++i )
-            {
-                for( size_t j = 0; j < proteins[ i ].data.size(); ++j )
-                {
-                    float x1 = 50 + s * 120 + x + proteins[ i ].data[ j ].x * scale;
-                    float y1 = 120 + y + proteins[ i ].data[ j ].y * scale;
-
-                    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 2 * proteins[ i ].data[ j ].power ) );
-                    DEBUG_DRAW.Quad( x1 - scale / 2.0f, y1 - scale / 2.0f, x1 + scale / 2.0f, y1 - scale / 2.0f, x1 + scale / 2.0f, y1 + scale / 2.0f, x1 - scale / 2.0f, y1 + scale / 2.0f );
-                }
-            }
-        }
-    }
-}
-
-
-
 void
 Ontogenesis::DevelopmentStep()
 {

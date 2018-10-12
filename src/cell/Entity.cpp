@@ -67,6 +67,19 @@ Entity::Draw( const float x, const float y )
     // DEBUG_DRAW.Text( m_X, m_Y - 8, IntToString( ( int )m_Energy ) );
     // DEBUG_DRAW.SetTextAlignment( DebugDraw::LEFT );
 
+    float scale = 8.0f;
+    for( size_t i = 0; i < m_Proteins.size(); ++i )
+    {
+        for( size_t j = 0; j < m_Proteins[ i ].data.size(); ++j )
+        {
+            float x1 = x + m_Proteins[ i ].data[ j ].x * scale;
+            float y1 = y + m_Proteins[ i ].data[ j ].y * scale;
+
+            DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 2 * m_Proteins[ i ].data[ j ].power ) );
+            DEBUG_DRAW.Quad( x1 - scale / 2.0f, y1 - scale / 2.0f, x1 + scale / 2.0f, y1 - scale / 2.0f, x1 + scale / 2.0f, y1 + scale / 2.0f, x1 - scale / 2.0f, y1 + scale / 2.0f );
+        }
+    }
+
     // draw network
     for( size_t i = 0; i < m_Cells.size(); ++i )
     {

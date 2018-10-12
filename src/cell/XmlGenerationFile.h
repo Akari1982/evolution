@@ -2,8 +2,7 @@
 #define XML_GENERATION_FILE_H
 
 #include "../core/XmlFile.h"
-#include "Entity.h"
-#include "Ontogenesis.h"
+
 
 
 class XmlGenerationFile : public XmlFile
@@ -12,7 +11,7 @@ public:
     explicit XmlGenerationFile( const Ogre::String& file );
     virtual ~XmlGenerationFile();
 
-    void LoadGeneration( Ontogenesis* ontogenesis );
+    void LoadGeneration();
 
 private:
     Ogre::String m_FileName;

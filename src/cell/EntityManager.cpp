@@ -290,6 +290,11 @@ void
 EntityManager::Draw()
 {
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
+    DEBUG_DRAW.Text( 10, 10, "Generation " + IntToString( m_Generations.id ) );
+    DEBUG_DRAW.Text( 210, 10, "Top fitness: " + IntToString( ( int )m_Generations.top_fitness ) + " (" + IntToString( m_Generations.top_id ) + ")" );
+    DEBUG_DRAW.Text( 410, 10, "Number of species: " + IntToString( m_Generations.species.size() ) );
+
+    DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
     DEBUG_DRAW.Line( m_X, m_Y, m_X, m_Y + m_Height );
     DEBUG_DRAW.Line( m_X + m_Width, m_Y, m_X + m_Width, m_Y + m_Height );
     DEBUG_DRAW.Line( m_X, m_Y, m_X + m_Width, m_Y );
@@ -297,7 +302,7 @@ EntityManager::Draw()
 
     for( size_t i = 0; i < m_Entity.size(); ++i )
     {
-        m_Entity[ i ]->Draw( 50 + ( i % 10 ) * 120, 120 );
+        m_Entity[ i ]->Draw( 50 + ( i % 10 ) * 120, 120 + ( i / 10 ) * 240 );
     }
 
     for( size_t i = 0; i < m_Food.size(); ++i )
@@ -317,10 +322,18 @@ EntityManager::Draw()
 void
 EntityManager::RunGeneration( const int type, Ogre::String& file_name )
 {
-    for( unsigned int i = 0; i < m_Entity.size(); ++i )
+    for( size_t i = 0; i < m_GenerationPrev.size(); ++i )
     {
-        delete m_Entity[ i ];
+        delete m_GenerationPrev.species[ i ];
     }
+    m_GenerationPrev.clear();
+
+    for( size_t i = 0; i < m_Generation.size(); ++i )
+    {
+        delete m_Generation.species[ i ];
+    }
+    m_Generation.clear();
+
     m_Entity.clear();
 
     XmlGenerationFile file( file_name );
@@ -329,9 +342,16 @@ EntityManager::RunGeneration( const int type, Ogre::String& file_name )
 
 
 
+void
+EntityManager::LoadGeneration( const Generation& generation )
+{
+    m_Generation = generation;
+}
+
+
 
 void
-Ontogenesis::DumpGeneration( Generation& generation ) const
+EntityManager::DumpGeneration( Generation& generation ) const
 {
     Logger* dump = new Logger( generation.file_name );
     dump->Log( "<generation id=\"" + IntToString( generation.id ) + "\">\n" );

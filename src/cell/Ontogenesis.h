@@ -77,8 +77,6 @@ public:
     Ontogenesis();
     virtual ~Ontogenesis();
 
-    void Draw( const unsigned int x, const unsigned int y );
-
     void DevelopmentStep();
 
     void SetGenome( std::vector< Gene >& genome );
@@ -111,12 +109,10 @@ private:
     ConditionType ConditionStringToType( const Ogre::String& type );
     ExpressionType ExpressionStringToType( const Ogre::String& type );
 
-private:
-    std::vector< Gene > m_Genome;
-    std::vector< Protein > m_Proteins;
-
 protected:
     std::vector< Cell* > m_Cells;
+    std::vector< Gene > m_Genome;
+    std::vector< Protein > m_Proteins;
 };
 
 
