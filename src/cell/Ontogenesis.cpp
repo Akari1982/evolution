@@ -6,17 +6,18 @@
 
 
 const int MAX_PROTEIN = 7;
-const int MAX_CELL_PER_SPLIT = 4;
-const int MAX_CELL = 10;
 const int SPECIES_PER_GENERATION = 50;
 const int GENES_PER_GENOME = 7;
 const int COND_PER_GENE = 3;
 const int EXPR_PER_GENE = 5;
 const int CHANGES_PER_MUTATION = 3;
 
+int Ontogenesis::m_GeneUniqueId = 0;
 
 
-Ontogenesis::Ontogenesis()
+
+Ontogenesis::Ontogenesis():
+    m_Energy( 100.0f )
 {
     // Default cells
     int protein_stem = 0;
@@ -27,69 +28,77 @@ Ontogenesis::Ontogenesis()
     int protein_activator_left = 4;
     int protein_activator_right = 5;
 
-    Cell* cell = new Cell( entity, Cell::NEURON_COMMON, 0, 0 );
+    Cell* cell = new Cell( Cell::NEURON_COMMON, 0, 0 );
     m_Cells.push_back( cell );
 
-    cell = new Cell( entity, Cell::SENSOR_ENERGY, 0, 3 );
+    cell = new Cell( Cell::SENSOR_ENERGY, 0, 2 );
     m_Cells.push_back( cell );
 
-    cell = new Cell( entity, Cell::SENSOR_FOOD, 5, -5 );
+    cell = new Cell( Cell::SENSOR_FOOD, 3, -3 );
     m_Cells.push_back( cell );
 
-    cell = new Cell( entity, Cell::SENSOR_FOOD, 5, 5 );
+    cell = new Cell( Cell::SENSOR_FOOD, 3, 3 );
     m_Cells.push_back( cell );
 
-    cell = new Cell( entity, Cell::SENSOR_ENEMY, 8, 0 );
+    cell = new Cell( Cell::SENSOR_ENEMY, 5, 0 );
     m_Cells.push_back( cell );
 
-    cell = new Cell( entity, Cell::ACTIVATOR_FORWARD, -5, 0 );
+    cell = new Cell( Cell::ACTIVATOR_FORWARD, -3, 0 );
     m_Cells.push_back( cell );
 
-    cell = new Cell( entity, Cell::ACTIVATOR_LEFT, -3, -3 );
+    cell = new Cell( Cell::ACTIVATOR_LEFT, -2, -2 );
     m_Cells.push_back( cell );
 
-    cell = new Cell( entity, Cell::ACTIVATOR_RIGHT, -3, 3 );
+    cell = new Cell( Cell::ACTIVATOR_RIGHT, -2, 2 );
     m_Cells.push_back( cell );
 
     // default protein
     ProteinData data;
     Protein protein;
 
+    protein.id = protein_stem;
+    data.power = 5.0f;
+    data.x = 0;
+    data.y = 0;
+    protein.data.push_back( data );
+    m_Proteins.push_back( protein );
+    protein.data.clear();
+
     protein.id = protein_sensor_energy;
     data.power = 8.0f;
     data.x = 0;
+    data.y = 2;
+    protein.data.push_back( data );
+    m_Proteins.push_back( protein );
+    protein.data.clear();
+
+    protein.id = protein_sensor_food;
+    data.power = 8.0f;
+    data.x = 3;
+    data.y = -3;
+    protein.data.push_back( data );
+    m_Proteins.push_back( protein );
+    protein.data.clear();
+
+    protein.id = protein_sensor_food;
+    data.power = 8.0f;
+    data.x = 3;
     data.y = 3;
-    protein.data.push_back( data );
-    m_Proteins.push_back( protein );
-    protein.data.clear();
-
-    protein.id = protein_sensor_food;
-    data.power = 8.0f;
-    data.x = 5;
-    data.y = -5;
-    protein.data.push_back( data );
-    m_Proteins.push_back( protein );
-    protein.data.clear();
-
-    protein.id = protein_sensor_food;
-    data.power = 8.0f;
-    data.x = 5;
-    data.y = 5;
     protein.data.push_back( data );
     m_Proteins.push_back( protein );
     protein.data.clear();
 
     protein.id = protein_sensor_enemy;
     data.power = 8.0f;
-    data.x = 8;
+    data.x = 5;
     data.y = 0;
     protein.data.push_back( data );
     m_Proteins.push_back( protein );
     protein.data.clear();
 
     protein.id = protein_activator_forward;
-    data.power = 6.0f;
-    data.x = -5;
+    data.power = 25.0f;
+    data.x = -3;
     data.y = 0;
     protein.data.push_back( data );
     m_Proteins.push_back( protein );
@@ -97,16 +106,16 @@ Ontogenesis::Ontogenesis()
 
     protein.id = protein_activator_left;
     data.power = 5.0f;
-    data.x = -3;
-    data.y = -3;
+    data.x = -2;
+    data.y = -2;
     protein.data.push_back( data );
     m_Proteins.push_back( protein );
     protein.data.clear();
 
     protein.id = protein_activator_right;
     data.power = 5.0f;
-    data.x = -3;
-    data.y = 3;
+    data.x = -2;
+    data.y = 2;
     protein.data.push_back( data );
     m_Proteins.push_back( protein );
     protein.data.clear();
@@ -222,6 +231,8 @@ Ontogenesis::DevelopmentStep()
 
             if( exec == true )
             {
+                --m_Energy;
+
                 for( size_t expr_id = 0; expr_id < gene.expr.size(); ++expr_id )
                 {
                     Expression expr = gene.expr[ expr_id ];
@@ -234,7 +245,7 @@ Ontogenesis::DevelopmentStep()
                             bool place = FindPlaceForCell( m_Cells[ i ]->GetX(), m_Cells[ i ]->GetY(), 1, x, y );
                             if( place == true )
                             {
-                                Cell* cell = new Cell( entity, m_Cells[ i ]->GetName(), x, y );
+                                Cell* cell = new Cell( m_Cells[ i ]->GetName(), x, y );
                                 m_Cells.push_back( cell );
                             }
                         }
@@ -246,7 +257,7 @@ Ontogenesis::DevelopmentStep()
                             int occupied = GetCell( x, y );
                             if( occupied == -1 )
                             {
-                                Cell* cell = new Cell( entity, ( Cell::CellName )( int )expr.value1, x, y );
+                                Cell* cell = new Cell( ( Cell::CellName )( int )expr.value1, x, y );
                                 m_Cells.push_back( cell );
                             }
                         }
@@ -270,14 +281,14 @@ Ontogenesis::DevelopmentStep()
                                 {
                                     if( type == Cell::NEURON || type == Cell::SENSOR )
                                     {
-                                        m_Cells[ i ]->AddSynapse( 1, inverted, m_Cells[ cell_id ] );
+                                        m_Cells[ i ]->AddSynapse( expr.value2, inverted, m_Cells[ cell_id ] );
                                     }
                                 }
                                 else
                                 {
                                     if( type == Cell::ACTIVATOR )
                                     {
-                                        m_Cells[ cell_id ]->AddSynapse( 1, inverted, m_Cells[ i ] );
+                                        m_Cells[ cell_id ]->AddSynapse( expr.value2, inverted, m_Cells[ i ] );
                                     }
                                 }
                             }
@@ -370,7 +381,7 @@ Ontogenesis::FindCellByProteinGradient( const int protein, const int x, const in
 
     if( power > -1 )
     {
-        return GetCell( m_Cells, ret_x, ret_y );
+        return GetCell( ret_x, ret_y );
     }
 
     return -1;
@@ -397,28 +408,28 @@ Ontogenesis::FindProteinGradient( std::vector< ProteinData >& data, const int x,
         float power1;
         float power_greatest = power_new;
 
-        power1 = FindProteinGradient( data, x + 1, y, power_new, new_ret_x, new_ret_x );
+        power1 = FindProteinGradient( data, x + 1, y, power_new, new_ret_x, new_ret_y );
         if( power1 > power_greatest )
         {
             ret_x = new_ret_x;
             ret_y = new_ret_y;
             power_greatest = power1;
         }
-        power1 = FindProteinGradient( data, x - 1, y, power_new, new_ret_x, new_ret_x );
+        power1 = FindProteinGradient( data, x - 1, y, power_new, new_ret_x, new_ret_y );
         if( power1 > power_greatest )
         {
             ret_x = new_ret_x;
             ret_y = new_ret_y;
             power_greatest = power1;
         }
-        power1 = FindProteinGradient( data, x, y + 1, power_new, new_ret_x, new_ret_x );
+        power1 = FindProteinGradient( data, x, y + 1, power_new, new_ret_x, new_ret_y );
         if( power1 > power_greatest )
         {
             ret_x = new_ret_x;
             ret_y = new_ret_y;
             power_greatest = power1;
         }
-        power1 = FindProteinGradient( data, x, y - 1, power_new, new_ret_x, new_ret_x );
+        power1 = FindProteinGradient( data, x, y - 1, power_new, new_ret_x, new_ret_y );
         if( power1 > power_greatest )
         {
             ret_x = new_ret_x;
@@ -509,15 +520,12 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
     std::vector< Gene > mutated;
     int changes = 0;
 
-
-
     // insert new genes if genome is empty or if 20% chance
     // add one random condition and one random expression
     if( ( genome.size() == 0 ) || ( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) ) )
     {
         Gene gene;
         gene.id = m_GeneUniqueId;
-        gene.conserv = 0.0f;
         Condition cond = GenerateRandomCondition();
         gene.cond.push_back( cond );
         Expression expr = GenerateRandomExpression();
@@ -527,28 +535,23 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
         ++changes;
     }
 
-
-
     // copy existed genome to mutated and do some mutation
     for( size_t i = 0; i < genome.size(); ++i )
     {
         Gene gene = genome[ i ];
 
-        // chance to be deleted 0-5% (reduced if this is conservative gene)
+        // chance to be deleted 0-5%
         // don't delete if this is only gene in genome
         // just don't copy it to new genome
-        if( ( changes >= CHANGES_PER_MUTATION ) || ( genome.size() == 1 ) || ( ( rand() % ( int )( 20.0f * ( gene.conserv + 1.0f ) ) ) != 1 ) )
+        if( ( changes >= CHANGES_PER_MUTATION ) || ( genome.size() == 1 ) || ( ( rand() % 20 ) != 1 ) )
         {
-            //gene.conserv += ( 100.0f - gene.conserv ) / 4.0f;
-            //gene.conserv = ( gene.conserv > 99.0f ) ? 99.0f : gene.conserv;
             mutated.push_back( gene );
 
-            // chance to be duplicated 20% (not affected by conservativeness not count as chagnes)
+            // chance to be duplicated 20%
             if( ( genome.size() < GENES_PER_GENOME ) && ( ( rand() % 5 ) == 1 ) )
             {
                 Gene dup_gene = gene;
                 dup_gene.id = m_GeneUniqueId;
-                dup_gene.conserv = 0.0f;
                 mutated.push_back( dup_gene );
                 ++m_GeneUniqueId;
             }
@@ -559,104 +562,87 @@ Ontogenesis::Mutate( std::vector< Ontogenesis::Gene >& genome )
         }
     }
 
-
-
-
     for( size_t i = 0; i < mutated.size(); ++i )
     {
-        // mutate only if conserv roll pass
-        if( ( rand() % 100 ) < 100.0f - mutated[ i ].conserv )
+        // remove random condition if there are more than one condition
+        // chance 10%
+        if( ( changes < CHANGES_PER_MUTATION ) && ( mutated[ i ].cond.size() > 1 ) && ( ( rand() % 100 ) < 10 ) )
         {
-            // remove random condition if there are more than one condition
-            // chance 10%
-            if( ( changes < CHANGES_PER_MUTATION ) && ( mutated[ i ].cond.size() > 1 ) && ( ( rand() % 100 ) < 10 ) )
+            mutated[ i ].cond.erase( mutated[ i ].cond.begin() + ( rand() % mutated[ i ].cond.size() ) );
+            ++changes;
+        }
+        for( size_t cond_id = 0; cond_id < mutated[ i ].cond.size(); ++cond_id )
+        {
+            // conditions can interchangebly mutate as they want
+            // chance of mutation 0-30%
+            if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
             {
-                mutated[ i ].cond.erase( mutated[ i ].cond.begin() + ( rand() % mutated[ i ].cond.size() ) );
+                mutated[ i ].cond[ cond_id ].type = ( ConditionType )( rand() % C_TOTAL );
                 ++changes;
-                //mutated[ i ].conserv /= 2.0f;
             }
-            for( size_t cond_id = 0; cond_id < mutated[ i ].cond.size(); ++cond_id )
+            if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
             {
-                // conditions can interchangebly mutate as they want
-                // chance of mutation 0-30%
-                if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
-                {
-                    mutated[ i ].cond[ cond_id ].type = ( ConditionType )( rand() % C_TOTAL );
-                    ++changes;
-                    //mutated[ i ].conserv /= 2.0f;
-                }
-                if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
-                {
-                    GenerateRandomConditionValue( mutated[ i ].cond[ cond_id ] );
-                    ++changes;
-                    //mutated[ i ].conserv /= 2.0f;
-                }
-            }
-            // add random condition with chance 10%
-            if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 10 ) )
-            {
-                mutated[ i ].cond.push_back( GenerateRandomCondition() );
+                GenerateRandomConditionValue( mutated[ i ].cond[ cond_id ] );
                 ++changes;
-                //mutated[ i ].conserv /= 2.0f;
-            }
-
-
-
-            // remove random expression if there are more than one expression
-            // chance 10%
-            if( ( changes < CHANGES_PER_MUTATION ) && ( mutated[ i ].expr.size() > 1 ) && ( ( rand() % 100 ) < 5 ) )
-            {
-                mutated[ i ].expr.erase( mutated[ i ].expr.begin() + ( rand() % mutated[ i ].expr.size() ) );
-                ++changes;
-                //mutated[ i ].conserv /= 2.0f;
-            }
-            for( size_t expr_id = 0; expr_id < mutated[ i ].expr.size(); ++expr_id )
-            {
-                // only protein expression can mutate
-                // don't mutate SPLIT because this is the only expression
-                // uses cell types instead of protein
-                // chance of mutation 0-30%
-                ExpressionType type = mutated[ i ].expr[ expr_id ].type;
-                if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
-                {
-                    if( type == E_PROTEIN || type == E_DENDRITE || type == E_DENDRITE_I || type == E_AXON || type == E_AXON_I )
-                    {
-                        ExpressionType new_type;
-                        switch( rand() % 7 )
-                        {
-                            case 0: new_type = E_PROTEIN; break;
-                            case 1: new_type = E_DENDRITE; break;
-                            case 2: new_type = E_DENDRITE_I; break;
-                            case 3: new_type = E_AXON; break;
-                            case 4: new_type = E_AXON_I; break;
-                        }
-
-                        if( type != new_type )
-                        {
-                            mutated[ i ].expr[ expr_id ].type = new_type;
-                            ++changes;
-                            //mutated[ i ].conserv /= 2.0f;
-                        }
-                    }
-                }
-                if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
-                {
-                    GenerateRandomExpressionValue( mutated[ i ].expr[ expr_id ] );
-                    ++changes;
-                    //mutated[ i ].conserv /= 2.0f;
-                }
-            }
-            // add random expression with chance 10%
-            if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 10 ) )
-            {
-                mutated[ i ].expr.push_back( GenerateRandomExpression() );
-                ++changes;
-                //mutated[ i ].conserv /= 2.0f;
             }
         }
+        // add random condition with chance 10%
+        if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 10 ) )
+        {
+            mutated[ i ].cond.push_back( GenerateRandomCondition() );
+            ++changes;
+        }
+
+
+
+        // remove random expression if there are more than one expression
+        // chance 10%
+        if( ( changes < CHANGES_PER_MUTATION ) && ( mutated[ i ].expr.size() > 1 ) && ( ( rand() % 100 ) < 5 ) )
+        {
+            mutated[ i ].expr.erase( mutated[ i ].expr.begin() + ( rand() % mutated[ i ].expr.size() ) );
+            ++changes;
+        }
+        for( size_t expr_id = 0; expr_id < mutated[ i ].expr.size(); ++expr_id )
+        {
+            // only protein expression can mutate
+            // don't mutate SPLIT because this is the only expression
+            // uses cell types instead of protein
+            // chance of mutation 0-30%
+            ExpressionType type = mutated[ i ].expr[ expr_id ].type;
+            if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
+            {
+                if( type == E_PROTEIN || type == E_DENDRITE || type == E_DENDRITE_I || type == E_AXON || type == E_AXON_I )
+                {
+                    ExpressionType new_type;
+                    switch( rand() % 5 )
+                    {
+                        case 0: new_type = E_PROTEIN; break;
+                        case 1: new_type = E_DENDRITE; break;
+                        case 2: new_type = E_DENDRITE_I; break;
+                        case 3: new_type = E_AXON; break;
+                        case 4: new_type = E_AXON_I; break;
+                    }
+
+                    if( type != new_type )
+                    {
+                        mutated[ i ].expr[ expr_id ].type = new_type;
+                        ++changes;
+                    }
+                }
+            }
+            if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 30 ) )
+            {
+                GenerateRandomExpressionValue( mutated[ i ].expr[ expr_id ] );
+                ++changes;
+            }
+        }
+        // add random expression with chance 10%
+        if( ( changes < CHANGES_PER_MUTATION ) && ( ( rand() % 100 ) < 10 ) )
+        {
+            mutated[ i ].expr.push_back( GenerateRandomExpression() );
+            ++changes;
+        }
     }
-
-
 
     return mutated;
 }
@@ -683,6 +669,7 @@ Ontogenesis::GenerateRandomConditionValue( Condition& cond )
         {
             cond.value1 = ( rand() % ( MAX_PROTEIN + 1 ) ) - 1;
             cond.value2 = ( rand() % 100 ) / 100.0f;
+            cond.value3 = ( rand() % 100 ) / 100.0f;
         }
         break;
     }
@@ -727,6 +714,7 @@ Ontogenesis::GenerateRandomExpressionValue( Expression& expr )
         case E_AXON_I:
         {
             expr.value1 = ( float )( ( rand() % ( MAX_PROTEIN + 1 ) ) - 1 );
+            expr.value2 = ( ( float ) ( rand() % 100 ) ) / 100.0f;
         }
         break;
     }
@@ -820,7 +808,7 @@ Ontogenesis::SetGenome( std::vector< Gene >& genome )
 
 
 
-std::vector< Gene >
+std::vector< Ontogenesis::Gene >
 Ontogenesis::GetGenome() const
 {
     return m_Genome;
@@ -829,11 +817,11 @@ Ontogenesis::GetGenome() const
 
 
 void
-Ontogenesis::DumpGenome( Logger* file, std::vector< Ontogenesis::Gene >& genome ) const
+Ontogenesis::DumpGenome( Logger* file, std::vector< Ontogenesis::Gene >& genome )
 {
     for( size_t i = 0; i < genome.size(); ++i )
     {
-        file->Log( "        <gene id=\"" + IntToString( genome[ i ].id ) + "\" conserv=\"" + FloatToString( genome[ i ].conserv ) + "\">\n" );
+        file->Log( "        <gene id=\"" + IntToString( genome[ i ].id ) + "\">\n" );
 
         for( size_t cond_id = 0; cond_id < genome[ i ].cond.size(); ++cond_id )
         {

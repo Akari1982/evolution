@@ -8,7 +8,6 @@
 
 
 Entity::Entity( const float x, const float y ):
-    m_Radius( 2.0f + 3.0f ),
     m_X( x ),
     m_Y( y ),
     m_Rotation( 0.0f ),
@@ -16,7 +15,6 @@ Entity::Entity( const float x, const float y ):
     m_LeftImpulse( 0.0f ),
     m_RightImpulse( 0.0f ),
     m_Life( 100.0f ),
-    m_Energy( 20.0f ),
     m_Fitness( 0.0f ),
     m_Think( 0.1f )
 {
@@ -41,7 +39,7 @@ Entity::Update()
     {
         for( size_t i = 0; i < m_Cells.size(); ++i )
         {
-            m_Cells[ i ]->Update();
+            m_Cells[ i ]->Update( this );
         }
 
         DevelopmentStep();
@@ -59,7 +57,7 @@ Entity::Draw( const float x, const float y )
 {
     // draw entity itself
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 0, 0, 1 ) );
-    DEBUG_DRAW.Disc( m_X, m_Y, m_Radius );
+    DEBUG_DRAW.Disc( m_X, m_Y, GetRadius() );
 
     // draw energy
     // DEBUG_DRAW.SetColour( Ogre::ColourValue( 0, 0, 0, 1 ) );
@@ -83,7 +81,7 @@ Entity::Draw( const float x, const float y )
     // draw network
     for( size_t i = 0; i < m_Cells.size(); ++i )
     {
-        m_Cells[ i ]->Draw( x, y );
+        m_Cells[ i ]->Draw( this, x, y );
 
         Cell::CellName name = m_Cells[ i ]->GetName();
         if( name == Cell::SENSOR_FOOD || name == Cell::SENSOR_ENEMY )
@@ -107,21 +105,20 @@ Entity::Draw( const float x, const float y )
 
     // draw info about entity
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-    DEBUG_DRAW.Text( x - 40, y - 90, "id:" + IntToString( m_SpeciesId ) );
-    DEBUG_DRAW.Text( x - 40, y - 70, "fit:" + IntToString( ( int )m_Fitness ) + " (" + IntToString( ( int )m_Life ) + ")" );
+    DEBUG_DRAW.Text( x - 40, y - 70, "fit:" + IntToString( ( int )m_Fitness ) + " (" + IntToString( ( int )m_Life ) + "/" + IntToString( ( int )m_Energy ) + ")" );
 }
 
 
 
-float
+const unsigned int
 Entity::GetRadius() const
 {
-    return m_Radius;
+    return m_Cells.size();
 }
 
 
 
-float
+const float
 Entity::GetX() const
 {
     return m_X;
@@ -137,7 +134,7 @@ Entity::SetX( const float x )
 
 
 
-float
+const float
 Entity::GetY() const
 {
     return m_Y;
@@ -153,7 +150,7 @@ Entity::SetY( const float y )
 
 
 
-float
+const float
 Entity::GetRotation() const
 {
     return m_Rotation;
@@ -169,7 +166,7 @@ Entity::SetRotation( const float rotation )
 
 
 
-float
+const float
 Entity::GetForwardImpulse() const
 {
     return m_ForwardImpulse;
@@ -185,7 +182,7 @@ Entity::SetForwardImpulse( const float forward_impulse )
 
 
 
-float
+const float
 Entity::GetLeftImpulse() const
 {
     return m_LeftImpulse;
@@ -201,7 +198,7 @@ Entity::SetLeftImpulse( const float left_impulse )
 
 
 
-float
+const float
 Entity::GetRightImpulse() const
 {
     return m_RightImpulse;
@@ -217,7 +214,7 @@ Entity::SetRightImpulse( const float right_impulse )
 
 
 
-bool
+const bool
 Entity::IsDead() const
 {
     return ( m_Life <= 0 );
@@ -225,7 +222,7 @@ Entity::IsDead() const
 
 
 
-float
+const float
 Entity::GetEnergy() const
 {
     return m_Energy;
@@ -238,12 +235,11 @@ void
 Entity::SetEnergy( const float energy )
 {
     m_Energy = energy;
-    m_Radius = 2.0f + ( energy / 20.0f ) * 3.0f;
 }
 
 
 
-float
+const float
 Entity::GetFitness() const
 {
     return m_Fitness;
@@ -260,7 +256,7 @@ Entity::SetFitness( const float fitness )
 
 
 
-float
+const float
 Entity::GetSensorEnergy() const
 {
     return m_Energy / 100.0f;
@@ -268,7 +264,7 @@ Entity::GetSensorEnergy() const
 
 
 
-float
+const float
 Entity::GetSensorFood( const float x, const float y ) const
 {
     Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );
@@ -284,7 +280,7 @@ Entity::GetSensorFood( const float x, const float y ) const
 
 
 
-float
+const float
 Entity::GetSensorEnemy( const float x, const float y ) const
 {
     Ogre::Vector3 rotation( 0.0f, 0.0f, 0.0f );

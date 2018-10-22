@@ -32,16 +32,16 @@ public:
         ACTIVATOR
     };
 
-    Cell( Entity* entity, const CellName name, const float x, const float y );
+    Cell( const CellName name, const float x, const float y );
     virtual ~Cell();
-    void Update();
-    void Draw( const float x, const float y );
+    void Update( Entity* entity );
+    void Draw( Entity* entity, const float x, const float y );
 
     const CellName GetName() const;
     const CellType GetType() const;
-    float GetX() const;
+    const float GetX() const;
     void SetX( const float x );
-    float GetY() const;
+    const float GetY() const;
     void SetY( const float y );
 
     void AddSynapse( const float power, const bool inverted, Cell* cell );
@@ -52,17 +52,11 @@ private:
     Cell();
 
 protected:
-    Entity* m_Entity;
     CellName m_Name;
     CellType m_Type;
 
     float m_X;
     float m_Y;
-
-    int m_InnerProtein;
-    int m_InnerProteinPower;
-    int m_OuterProtein;
-    int m_OuterProteinRadius;
 
     float m_Threshold;
     float m_Value;

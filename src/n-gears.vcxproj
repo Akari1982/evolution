@@ -247,8 +247,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>.\output</OutDir>
-    <TargetName>x-gears_d</TargetName>
+    <OutDir>.\..\output\</OutDir>
+    <TargetName>n-gears_d</TargetName>
     <IntDir>.\compile_d</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -260,7 +260,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\library;C:\zlib128-dll\include;C:\OgreSDK_vc11_v1-9-0\boost;C:\OgreSDK_vc11_v1-9-0\include\OIS;C:\OgreSDK_vc11_v1-9-0\include\OGRE;$(IncludePath)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\boost_1_55_0;D:\reverse\svn\x-gears\src\core\library;C:\zlib128-dll\include;C:\OgreSDK_vc11_v1-9-0\boost;C:\OgreSDK_vc11_v1-9-0\include\OIS;C:\OgreSDK_vc11_v1-9-0\include\OGRE;$(IncludePath)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>TIXML_USE_STL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>

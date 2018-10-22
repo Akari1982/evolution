@@ -55,20 +55,23 @@ DebugDraw::DebugDraw():
     {
         LOG_ERROR( "Could not find font \"CourierNew\" for debug draw." );
     }
-    m_Font->load();
-    pass = m_Font->getMaterial()->getTechnique( 0 )->getPass( 0 );
-    pass->setVertexColourTracking( Ogre::TVC_AMBIENT );
-    pass->setCullingMode( Ogre::CULL_NONE );
-    pass->setDepthCheckEnabled( true );
-    pass->setDepthWriteEnabled( true );
-    pass->setLightingEnabled( false );
-    pass->setSceneBlending( Ogre::SBT_TRANSPARENT_ALPHA );
+    else
+    {
+        m_Font->load();
+        pass = m_Font->getMaterial()->getTechnique( 0 )->getPass( 0 );
+        pass->setVertexColourTracking( Ogre::TVC_AMBIENT );
+        pass->setCullingMode( Ogre::CULL_NONE );
+        pass->setDepthCheckEnabled( true );
+        pass->setDepthWriteEnabled( true );
+        pass->setLightingEnabled( false );
+        pass->setSceneBlending( Ogre::SBT_TRANSPARENT_ALPHA );
 
-    pass->setAlphaRejectFunction( Ogre::CMPF_GREATER );
-    pass->setAlphaRejectValue( 0 );
-    Ogre::TextureUnitState* tex = pass->getTextureUnitState( 0 );
-    tex->setNumMipmaps( -1 );
-    tex->setTextureFiltering( Ogre::TFO_NONE );
+        pass->setAlphaRejectFunction( Ogre::CMPF_GREATER );
+        pass->setAlphaRejectValue( 0 );
+        Ogre::TextureUnitState* tex = pass->getTextureUnitState( 0 );
+        tex->setNumMipmaps( -1 );
+        tex->setTextureFiltering( Ogre::TFO_NONE );
+    }
 
     m_SceneManager->addRenderQueueListener( this );
 }

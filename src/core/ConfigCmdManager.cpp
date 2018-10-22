@@ -11,6 +11,7 @@ template<>ConfigCmdManager *Ogre::Singleton< ConfigCmdManager >::msSingleton = N
 
 ConfigCmdManager::ConfigCmdManager()
 {
+    m_Commands.reserve( 50 );
     InitCmd();
 }
 

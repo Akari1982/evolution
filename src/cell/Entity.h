@@ -1,49 +1,49 @@
 #ifndef ENTITY_H
 #define ENTITY_H
 
-#include "Onthogenesis.h"
+#include "Ontogenesis.h"
 
 
 
-class Entity : public Onthogenesis
+class Entity : public Ontogenesis
 {
 public:
     Entity( const float x, const float y );
     virtual ~Entity();
 
     void Update();
+    void UpdateCells();
     void Draw( const float x, const float y );
 
-    float GetRadius() const;
-    float GetX() const;
+    const unsigned int GetRadius() const;
+    const float GetX() const;
     void SetX( const float x );
-    float GetY() const;
+    const float GetY() const;
     void SetY( const float y );
-    float GetRotation() const;
+    const float GetRotation() const;
     void SetRotation( const float rotation );
 
-    float GetForwardImpulse() const;
+    const float GetForwardImpulse() const;
     void SetForwardImpulse( const float forward_impulse );
-    float GetLeftImpulse() const;
+    const float GetLeftImpulse() const;
     void SetLeftImpulse( const float left_impulse );
-    float GetRightImpulse() const;
+    const float GetRightImpulse() const;
     void SetRightImpulse( const float right_impulse );
 
-    bool IsDead() const;
-    float GetEnergy() const;
+    const bool IsDead() const;
+    const float GetEnergy() const;
     void SetEnergy( const float energy );
-    float GetFitness() const;
+    const float GetFitness() const;
     void SetFitness( const float fitness );
 
-    float GetSensorEnergy() const;
-    float GetSensorFood( const float x, const float y ) const;
-    float GetSensorEnemy( const float x, const float y ) const;
+    const float GetSensorEnergy() const;
+    const float GetSensorFood( const float x, const float y ) const;
+    const float GetSensorEnemy( const float x, const float y ) const;
 
 private:
     Entity();
 
 private:
-    float m_Radius;
     float m_X;
     float m_Y;
     float m_Rotation;
@@ -53,7 +53,6 @@ private:
     float m_RightImpulse;
 
     float m_Life;
-    float m_Energy;
     float m_Fitness;
 
     float m_Think;

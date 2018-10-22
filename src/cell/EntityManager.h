@@ -25,18 +25,19 @@ public:
         int id;
         float top_fitness;
         size_t top_id;
-        std::vector< Gene > base_genome;
+        std::vector< Ontogenesis::Gene > base_genome;
         std::vector< Entity* > species;
 
         Ogre::String file_name;
     };
-    void DumpGeneration( Generation& generation );
+    void LoadGeneration( const Generation& generation );
+    void DumpGeneration( Generation& generation ) const;
 
-    const int GetGenerationByEntity( Entity* entity ) const;
+    const int GetGenerationByEntity( Entity* entity, size_t& species_id ) const;
 
-    float FeelFood( const float x, const float y ) const;
-    float FeelEnemy( const float x, const float y ) const;
-    bool CheckMove( Entity* entity, const float move_x, const float move_y ) const;
+    const float FeelFood( const float x, const float y ) const;
+    const float FeelEnemy( const float x, const float y ) const;
+    const bool CheckMove( Entity* entity, const float move_x, const float move_y ) const;
 
 private:
     std::vector< Entity* > m_Entity;
@@ -57,8 +58,8 @@ private:
     float m_Width;
     float m_Height;
 
-    std::vector< Generation > m_Generations;
-    std::vector< Generation > m_GenerationsPrev;
+    Generation m_Generation;
+    Generation m_GenerationPrev;
 };
 
 

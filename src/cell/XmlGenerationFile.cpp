@@ -1,6 +1,6 @@
 #include "XmlGenerationFile.h"
 
-#include "cell/EntityManager.h"
+#include "EntityManager.h"
 #include "../core/Logger.h"
 #include "../core/Utilites.h"
 
@@ -48,7 +48,6 @@ XmlGenerationFile::LoadGeneration()
                 {
                     Ontogenesis::Gene gene;
                     gene.id = GetInt( node2, "id" );
-                    gene.conserv = GetFloat( node2, "conserv" );
 
                     TiXmlNode* node3 = node2->FirstChild();
                     while( node3 != NULL )
@@ -56,7 +55,7 @@ XmlGenerationFile::LoadGeneration()
                         if( node3->Type() == TiXmlNode::TINYXML_ELEMENT && node3->ValueStr() == "condition" )
                         {
                             Ontogenesis::Condition cond;
-                            cond.type = ontogenesis->ConditionStringToType( GetString( node3, "type" ) );
+                            cond.type = Ontogenesis::ConditionStringToType( GetString( node3, "type" ) );
                             cond.value1 = GetFloat( node3, "value1", 0.0f );
                             cond.value2 = GetFloat( node3, "value2", 0.0f );
                             gene.cond.push_back( cond );
@@ -64,7 +63,7 @@ XmlGenerationFile::LoadGeneration()
                         else if( node3->Type() == TiXmlNode::TINYXML_ELEMENT && node3->ValueStr() == "expression" )
                         {
                             Ontogenesis::Expression expr;
-                            expr.type = ontogenesis->ExpressionStringToType( GetString( node3, "type" ) );
+                            expr.type = Ontogenesis::ExpressionStringToType( GetString( node3, "type" ) );
                             expr.value1 = GetFloat( node3, "value1", 0.0f );
                             expr.value2 = GetFloat( node3, "value2", 0.0f );
                             expr.value3 = GetFloat( node3, "value3", 0.0f );

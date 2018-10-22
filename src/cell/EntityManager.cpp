@@ -14,7 +14,8 @@ template<>EntityManager *Ogre::Singleton< EntityManager >::msSingleton = NULL;
 
 
 const float SPAWN_TIME = 0;
-const size_t MAX_ENTITY = 20;
+const size_t MAX_ENTITY = 10;
+const size_t SPECIES_PER_GENERATION = 50;
 const size_t MAX_FOOD = 50;
 const float FOOD_TIME = 0;
 
@@ -36,44 +37,18 @@ EntityManager::EntityManager():
     m_Generation.file_name = "gen_" + IntToString( m_Generation.id ) + ".xml";
 
     // test genome
-    Gene gene;
+    Ontogenesis::Gene gene;
     gene.id = 0;
-    Condition cond;
-    cond.type = ConditionType::C_PROTEIN;
+    Ontogenesis::Condition cond;
+    cond.type = Ontogenesis::ConditionType::C_PROTEIN;
     cond.value1 = 0;
     cond.value2 = 0.5f;
     cond.value3 = -1;
     gene.cond.push_back( cond );
-    Expression expr;
-    expr.type = ExpressionType::E_SPLIT;
-    gene.expr.push_back( expr );
-    m_Generation.base_genome.push_back( gene );
-    gene.cond.clear();
-    gene.expr.clear();
-
-    gene.id = 1;
-    cond.type = ConditionType::C_PROTEIN;
-    cond.value1 = 0;
-    cond.value2 = -1;
-    cond.value3 = 1.0f;
-    gene.cond.push_back( cond );
-    expr.type = ExpressionType::E_PROTEIN;
-    expr.value1 = 1;
-    expr.value2 = 1.0f;
-    gene.expr.push_back( expr );
-    m_Generation.base_genome.push_back( gene );
-    gene.cond.clear();
-    gene.expr.clear();
-
-    gene.id = 2;
-    cond.type = ConditionType::C_PROTEIN;
-    cond.value1 = 1;
-    cond.value2 = -1;
-    cond.value3 = 1.0f;
-    gene.cond.push_back( cond );
-    expr.type = ExpressionType::E_PROTEIN;
-    expr.value1 = 0;
-    expr.value2 = 1.0f;
+    Ontogenesis::Expression expr;
+    expr.type = Ontogenesis::ExpressionType::E_AXON_I;
+    expr.value1 = 3;
+    expr.value2 = 1;
     gene.expr.push_back( expr );
     m_Generation.base_genome.push_back( gene );
     gene.cond.clear();
@@ -84,12 +59,12 @@ EntityManager::EntityManager():
 
 EntityManager::~EntityManager()
 {
-    for( size_t i = 0; i < m_GenerationPrev.size(); ++i )
+    for( size_t i = 0; i < m_GenerationPrev.species.size(); ++i )
     {
         delete m_GenerationPrev.species[ i ];
     }
 
-    for( size_t i = 0; i < m_Generation.size(); ++i )
+    for( size_t i = 0; i < m_Generation.species.size(); ++i )
     {
         delete m_Generation.species[ i ];
     }
@@ -149,8 +124,9 @@ EntityManager::Update()
         }
         if( forward_impulse > 0.0f )
         {
-            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
-            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * 20.0f;
+            float radius = entity->GetRadius();
+            float pos_x = start_x + Ogre::Math::Cos( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * ( 100.0f / radius );
+            float pos_y = start_y + Ogre::Math::Sin( Ogre::Radian( Ogre::Degree( rotation ) ) ) * delta * ( 100.0f / radius );
             pos_x = ( pos_x < m_X ) ? m_Width + pos_x : pos_x;
             pos_x = ( pos_x > m_X + m_Width ) ? 2 * m_X + m_Width - pos_x : pos_x;
             pos_y = ( pos_y < m_Y ) ? m_Height + pos_y : pos_y;
@@ -161,8 +137,9 @@ EntityManager::Update()
             forward_impulse = ( forward_impulse < 0.0f ) ? 0.0f : forward_impulse;
             entity->SetForwardImpulse( forward_impulse );
 
+            entity->SetEnergy( entity->GetEnergy() - delta );
+
             // check entity / food collision
-            float radius = entity->GetRadius();
             float x = entity->GetX();
             float y = entity->GetY();
             for( std::vector< Food >::iterator it = m_Food.begin(); it != m_Food.end(); )
@@ -187,19 +164,23 @@ EntityManager::Update()
             // check entity / entity collision
             for( size_t j = 0; j < m_Entity.size(); ++j )
             {
-                float x1 = m_Entity[ j ]->GetX();
-                float y1 = m_Entity[ j ]->GetY();
-                float radius1 = m_Entity[ j ]->GetRadius();
-                float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
-                if( distance <= radius + radius1 )
+                if( m_Entity[ j ] != entity )
                 {
-                    if( radius >= radius1 )
+                    float x1 = m_Entity[ j ]->GetX();
+                    float y1 = m_Entity[ j ]->GetY();
+                    float radius1 = m_Entity[ j ]->GetRadius();
+                    float distance = sqrt( ( x - x1 ) * ( x - x1 ) + ( y - y1 ) * ( y - y1 ) );
+
+                    if( distance <= radius + radius1 )
                     {
-                        float energy = entity->GetEnergy() + m_Entity[ j ]->GetEnergy();
-                        energy = ( energy > 100.0f) ? 100.0f : energy;
-                        entity->SetEnergy( energy );
-                        entity->SetFitness( entity->GetFitness() + m_Entity[ j ]->GetEnergy() );
-                        m_Entity[ j ]->SetEnergy( 0 );
+                        if( radius >= radius1 )
+                        {
+                            float energy = entity->GetEnergy() + m_Entity[ j ]->GetEnergy();
+                            energy = ( energy > 100.0f) ? 100.0f : energy;
+                            entity->SetEnergy( energy );
+                            entity->SetFitness( entity->GetFitness() + m_Entity[ j ]->GetEnergy() );
+                            m_Entity[ j ]->SetEnergy( 0 );
+                        }
                     }
                 }
             }
@@ -226,10 +207,10 @@ EntityManager::Update()
             {
                 m_GenerationPrev.top_fitness = fitness;
                 m_GenerationPrev.top_id = species_id;
-                m_Generation.base_genome = entity->GetGenome();
+                m_Generation.base_genome = ( *it )->GetGenome();
 
-                DumpGeneration( m_Generation );
-                DumpGeneration( m_GenerationPrev );
+                //DumpGeneration( m_Generation );
+                //DumpGeneration( m_GenerationPrev );
             }
 
             it = m_Entity.erase( it );
@@ -246,7 +227,7 @@ EntityManager::Update()
 
         if( m_Generation.species.size() >= SPECIES_PER_GENERATION )
         {
-            for( size_t i = 0; i < m_GenerationPrev.size(); ++i )
+            for( size_t i = 0; i < m_GenerationPrev.species.size(); ++i )
             {
                 delete m_GenerationPrev.species[ i ];
             }
@@ -256,13 +237,11 @@ EntityManager::Update()
             m_Generation.top_id = 0;
             m_Generation.id = m_GenerationPrev.id + 1;
             m_Generation.species.clear();
-            m_Generation.base_genome = m_GenerationPrev.species[ m_GenerationPrev.top_id ].GetGenome();
+            m_Generation.base_genome = m_GenerationPrev.species[ m_GenerationPrev.top_id ]->GetGenome();
+            m_Generation.file_name = "gen_" + IntToString( m_Generation.id ) + ".xml";
 
-            generation.file_name = "gen_" + IntToString( generation.id ) + ".xml";
-            m_Generation.push_back( generation );
-
-            DumpGeneration( m_Generation );
-            DumpGeneration( m_GenerationPrev );
+            //DumpGeneration( m_Generation );
+            //DumpGeneration( m_GenerationPrev );
         }
 
         entity->SetGenome( m_Generation.base_genome );
@@ -290,9 +269,9 @@ void
 EntityManager::Draw()
 {
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
-    DEBUG_DRAW.Text( 10, 10, "Generation " + IntToString( m_Generations.id ) );
-    DEBUG_DRAW.Text( 210, 10, "Top fitness: " + IntToString( ( int )m_Generations.top_fitness ) + " (" + IntToString( m_Generations.top_id ) + ")" );
-    DEBUG_DRAW.Text( 410, 10, "Number of species: " + IntToString( m_Generations.species.size() ) );
+    DEBUG_DRAW.Text( 10, 10, "Generation " + IntToString( m_Generation.id ) );
+    DEBUG_DRAW.Text( 210, 10, "Top fitness: " + IntToString( ( int )m_Generation.top_fitness ) + " (" + IntToString( m_Generation.top_id ) + ")" );
+    DEBUG_DRAW.Text( 410, 10, "Number of species: " + IntToString( m_Generation.species.size() ) );
 
     DEBUG_DRAW.SetColour( Ogre::ColourValue( 1, 1, 1, 1 ) );
     DEBUG_DRAW.Line( m_X, m_Y, m_X, m_Y + m_Height );
@@ -320,19 +299,19 @@ EntityManager::Draw()
 
 
 void
-EntityManager::RunGeneration( const int type, Ogre::String& file_name )
+EntityManager::RunGeneration( Ogre::String& file_name )
 {
-    for( size_t i = 0; i < m_GenerationPrev.size(); ++i )
+    for( size_t i = 0; i < m_GenerationPrev.species.size(); ++i )
     {
         delete m_GenerationPrev.species[ i ];
     }
-    m_GenerationPrev.clear();
+    m_GenerationPrev.species.clear();
 
-    for( size_t i = 0; i < m_Generation.size(); ++i )
+    for( size_t i = 0; i < m_Generation.species.size(); ++i )
     {
         delete m_Generation.species[ i ];
     }
-    m_Generation.clear();
+    m_Generation.species.clear();
 
     m_Entity.clear();
 
@@ -356,13 +335,13 @@ EntityManager::DumpGeneration( Generation& generation ) const
     Logger* dump = new Logger( generation.file_name );
     dump->Log( "<generation id=\"" + IntToString( generation.id ) + "\">\n" );
     dump->Log( "    <base_genome>\n" );
-    DumpGenome( dump, generation.base_genome );
+    Ontogenesis::DumpGenome( dump, generation.base_genome );
     dump->Log( "    </base_genome>\n\n" );
 
     for( size_t i = 0; i < generation.species.size(); ++i )
     {
-        dump->Log( "    <specie id=\"" + IntToString( i ) + "\" fitness=\"" + FloatToString( generation.species[ i ].fitness ) + "\">\n" );
-        DumpGenome( dump, generation.species[ i ].genome );
+        dump->Log( "    <specie id=\"" + IntToString( i ) + "\" fitness=\"" + FloatToString( generation.species[ i ]->GetFitness() ) + "\">\n" );
+        Ontogenesis::DumpGenome( dump, generation.species[ i ]->GetGenome() );
         dump->Log( "    </specie>\n" );
     }
     dump->Log( "</generation>\n" );
@@ -373,23 +352,23 @@ EntityManager::DumpGeneration( Generation& generation ) const
 const int
 EntityManager::GetGenerationByEntity( Entity* entity, size_t& species_id ) const
 {
-    for( size_t i = 0; i < m_Generations.species.size(); ++i )
+    for( size_t i = 0; i < m_Generation.species.size(); ++i )
     {
-        if( m_Generations.species[ i ] == entity )
+        if( m_Generation.species[ i ] == entity )
         {
             species_id = i;
             return 1;
         }
     }
-    for( size_t i = 0; i < m_GenerationsPrev.species.size(); ++i )
+    for( size_t i = 0; i < m_GenerationPrev.species.size(); ++i )
     {
-        if( m_GenerationsPrev.species[ i ] == entity )
+        if( m_GenerationPrev.species[ i ] == entity )
         {
             species_id = i;
             return 0;
         }
     }
-    return -1
+    return -1;
 }
 
 

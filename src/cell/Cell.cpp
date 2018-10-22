@@ -9,8 +9,7 @@
 
 
 
-Cell::Cell( Entity* entity, const CellName name, const float x, const float y ):
-    m_Entity( entity ),
+Cell::Cell( const CellName name, const float x, const float y ):
     m_Name( name ),
     m_X( x ),
     m_Y( y ),
@@ -39,7 +38,7 @@ Cell::~Cell()
 
 
 void
-Cell::Update()
+Cell::Update( Entity* entity )
 {
     if( m_Fired == true )
     {
@@ -64,19 +63,19 @@ Cell::Update()
 
                 case SENSOR_ENERGY:
                 {
-                    value = m_Entity->GetSensorEnergy();
+                    value = entity->GetSensorEnergy();
                 }
                 break;
 
                 case SENSOR_FOOD:
                 {
-                    value = m_Entity->GetSensorFood( m_X, m_Y );
+                    value = entity->GetSensorFood( m_X, m_Y );
                 }
                 break;
 
                 case SENSOR_ENEMY:
                 {
-                    value = m_Entity->GetSensorEnemy( m_X, m_Y );
+                    value = entity->GetSensorEnemy( m_X, m_Y );
                 }
                 break;
             }
@@ -98,15 +97,15 @@ Cell::Update()
 
             if( m_Name == ACTIVATOR_FORWARD )
             {
-                m_Entity->SetForwardImpulse( 1.0f );
+                entity->SetForwardImpulse( 1.0f );
             }
             else if( m_Name == ACTIVATOR_LEFT )
             {
-                 m_Entity->SetLeftImpulse( 1.0f );
+                 entity->SetLeftImpulse( 1.0f );
             }
             else if( m_Name == ACTIVATOR_RIGHT )
             {
-                 m_Entity->SetRightImpulse( 1.0f );
+                 entity->SetRightImpulse( 1.0f );
             }
         }
     }
@@ -115,7 +114,7 @@ Cell::Update()
 
 
 void
-Cell::Draw( const float x, const float y )
+Cell::Draw( Entity* entity, const float x, const float y )
 {
     if( m_Fired == true )
     {
@@ -132,19 +131,19 @@ Cell::Draw( const float x, const float y )
         {
             case SENSOR_ENERGY:
             {
-                value = m_Entity->GetSensorEnergy();
+                value = entity->GetSensorEnergy();
             }
             break;
 
             case SENSOR_FOOD:
             {
-                value = m_Entity->GetSensorFood( m_X, m_Y );
+                value = entity->GetSensorFood( m_X, m_Y );
             }
             break;
 
             case SENSOR_ENEMY:
             {
-                value = m_Entity->GetSensorEnemy( m_X, m_Y );
+                value = entity->GetSensorEnemy( m_X, m_Y );
             }
             break;
         }
@@ -199,7 +198,7 @@ Cell::GetType() const
 
 
 
-float
+const float
 Cell::GetX() const
 {
     return m_X;
@@ -215,7 +214,7 @@ Cell::SetX( const float x )
 
 
 
-float
+const float
 Cell::GetY() const
 {
     return m_Y;

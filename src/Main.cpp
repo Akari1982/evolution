@@ -13,7 +13,7 @@
 #include "core/InputManager.h"
 #include "core/Logger.h"
 #include "core/Timer.h"
-#include "cell2/EntityManager.h"
+#include "cell/EntityManager.h"
 
 
 
@@ -85,13 +85,9 @@ main( int argc, char *argv[] )
     EntityManager* entity_manager = new EntityManager();
     Console* console = new Console();
 
-
-
     // set base listner for usual game moduls
     GameFrameListener* frame_listener = new GameFrameListener( window );
     root->addFrameListener( frame_listener );
-
-
 
     // execute config
     {
@@ -99,13 +95,9 @@ main( int argc, char *argv[] )
         config.Execute( "./data/config.cfg" );
     }
 
-
-
     // run application cycle
     g_ApplicationState = QG_GAME;
     root->startRendering();
-
-
 
     // system modules
     // we must remove this first cause this can fire event to console

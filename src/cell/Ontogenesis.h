@@ -55,7 +55,6 @@ public:
     struct Gene
     {
         int id;
-        float conserv;
         std::vector< Condition > cond;
         std::vector< Expression > expr;
     };
@@ -81,11 +80,13 @@ public:
 
     void SetGenome( std::vector< Gene >& genome );
     std::vector< Gene > GetGenome() const;
-    void DumpGenome( Logger* file, std::vector< Gene >& genome ) const;
 
-private:
-    Ontogenesis();
+    static Ogre::String ConditionTypeToString( const ConditionType type );
+    static Ogre::String ExpressionTypeToString( const ExpressionType type );
+    static ConditionType ConditionStringToType( const Ogre::String& type );
+    static ExpressionType ExpressionStringToType( const Ogre::String& type );
 
+    static void DumpGenome( Logger* file, std::vector< Gene >& genome );
 private:
     struct PowerProtein
     {
@@ -104,15 +105,14 @@ private:
     Expression GenerateRandomExpression();
     void GenerateRandomExpressionValue( Expression& expr );
 
-    Ogre::String ConditionTypeToString( const ConditionType type );
-    Ogre::String ExpressionTypeToString( const ExpressionType type );
-    ConditionType ConditionStringToType( const Ogre::String& type );
-    ExpressionType ExpressionStringToType( const Ogre::String& type );
-
 protected:
     std::vector< Cell* > m_Cells;
     std::vector< Gene > m_Genome;
     std::vector< Protein > m_Proteins;
+
+    static int m_GeneUniqueId;
+
+    float m_Energy;
 };
 
 
